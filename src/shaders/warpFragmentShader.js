@@ -55,7 +55,7 @@ const warpFragmentShader =
         //gl_FragColor = texture1 * blendTextures;
         //gl_FragColor = vec4(blendTextures * uv.x, blendTextures * uv.y, 0.0, 1.0);
         //gl_FragColor = texture1;
-        gl_FragColor = finalTexture;
+        //gl_FragColor = finalTexture;
     }
 `;
 

@@ -38,8 +38,8 @@ const fragmentShader =
 
         //gl_FragColor = vec4(1.0 - disc, 0.0, 0.0, 1.0) * vOpacity;
         //gl_FragColor = vec4(color.rgb, color.a) * vOpacity;
-        gl_FragColor = color * vOpacity;
-        //gl_FragColor = vec4(1.0);
+        //gl_FragColor = color * vOpacity;
+        gl_FragColor = vec4(1.0);
     }
 `;
 

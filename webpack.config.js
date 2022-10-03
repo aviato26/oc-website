@@ -26,7 +26,7 @@ module.exports =
       },
 
       {
-        test: /\.(jpg|fbx|svg|png|pdf|glb|gltf|wasm|jpeg)$/,
+        test: /\.(jpg|fbx|svg|png|pdf|glb|gltf|wasm|jpeg|ttf)$/,
         loader: "file-loader"
       },
 /*
