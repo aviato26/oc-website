@@ -10,7 +10,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import laptop from './laptop2.glb';
 
-import PageDesciption from './components/services.js';
+import PageDesciption from '../components/services.js';
 
 import postFragmentShader from './shaders/postFragment.js';
 import postVertexShader from './shaders/postVertex.js';
