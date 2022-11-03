@@ -2,7 +2,7 @@
 
 
 import * as THREE from 'three';
-import './css/style.css';
+import '../css/style.css';
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
@@ -23,9 +23,11 @@ import floorTexture from './textures/floorTex.jpg';
 
 import spaceImg from './textures/neonLights.jpeg';
 
+//import cpu from './cpu-design3c22.glb';
+//import cpu from './updated-cpu-final.glb';
+import cpu from './cpu2.glb';
 
-import cpu from './cpu-design3c22.glb';
-
+import AnimationController from '../../UIEvents/AnimationController';
 
 import vertexShader from './shaders/vertex.js';
 import fragmentShader from './shaders/fragment.js';
@@ -45,8 +47,6 @@ export default class HomeScene
   {
 
     this.scene = new THREE.Scene();
-    this.scene2 = new THREE.Scene();
-
 
     this.width = window.innerWidth;
     this.height = window.innerHeight;
@@ -54,31 +54,22 @@ export default class HomeScene
 
     this.camera = new THREE.PerspectiveCamera( 45, this.width / this.height, 1, 1000 );
 
-    this.camera2 = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-
     this.mouse = new THREE.Vector2(0, 0);
 
+    // class to control the triggers for animations
+    //this.animationController = new AnimationController();
 
-
+    //console.log(this.animationController.currentAnimation)
 
 this.environmentMap = new THREE.TextureLoader().load(spaceImg, (img) => {
-
     img.mapping = THREE.EquirectangularReflectionMapping;
-    //img.encoding = THREE.sRGBEncoding;
-    //img.encoding = THREE.BasicDepthPacking
-    //img.encoding = THREE.RGBADepthPacking
-
-    //img.toneMapping = false;
-    this.scene2.environment = img;
-    //this.scene2.emissiveIntensity = 10.5;
-    //this.scene2.background = img;
-
+    this.scene.environment = img;
   });
 
 
 
 
-    this.clock = new THREE.Clock();
+    //this.clock = new THREE.Clock();
 
     this.renderer = parentRenderer;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -93,7 +84,7 @@ this.environmentMap = new THREE.TextureLoader().load(spaceImg, (img) => {
 
 
 
-const sceneLoader = new GLTFLoader();
+this.model = new GLTFLoader();
 const cpuTex = new THREE.TextureLoader().load(cpuTexture);
 const cpuNorm = new THREE.TextureLoader().load(cpuNormal);
 const cpuRough = new THREE.TextureLoader().load(cpuRoughness);
@@ -147,8 +138,14 @@ logoTex.flipY = false;
 //logoTex.encoding = THREE.sRGBEncoding;
 //console.log(cpuTex)
 
- sceneLoader.load(cpu, (obj) => {
-  //console.log(obj.scene.children)
+ this.model.load(cpu, (obj) => {
+  //console.log(obj)
+
+  this.loaded = true;
+  this.cameraScene = obj;
+  this.cameraAnimation = obj.animations;
+
+  this.playAnimation();
 
   let cam = obj.scene.getObjectByName('Camera');
   this.c2 = cam.children[0];
@@ -195,11 +192,11 @@ logoTex.flipY = false;
 
   // composer must not render to screen in order to save all the passes to pass through to store as a texture
   this.composer.renderToScreen = false;
-  this.composer.addPass(new RenderPass(this.scene2, this.camera));
+  this.composer.addPass(new RenderPass(this.scene, this.camera));
 
   let bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
 
-  let bokehPass = new BokehPass(this.scene2, this.camera, {
+  let bokehPass = new BokehPass(this.scene, this.camera, {
     //focus: 3.5,
     focus: 4.0,    
     //aperture: .01,
@@ -222,28 +219,73 @@ logoTex.flipY = false;
   floor.material.emissiveIntensity = 2;
 
 
-  this.scene2.add(obj.scene)
+  this.scene.add(obj.scene)
 });
 
+this.playAction = false;
 
+this.t = 0;
 
+/*
+document.addEventListener('mousedown', () => {
+  this.playAction = true;
+})
+*/
 
     this.camera.position.z = 10;
 
   }
 
+  playAnimation(){
+   this.mixer = new THREE.AnimationMixer(this.cameraScene.scene);
+   //this.mixer = new THREE.AnimationMixer(this.camera);
+   let clips = this.cameraAnimation;
+   this.action = this.mixer.clipAction(clips[0]);
+   this.action.setLoop(THREE.LoopOnce);
+   this.action.clampWhenFinished = true;
+   //this.action.play();
+   //this.action.reset();
+   //this.mixer.play();
+   //console.log(clips)
+    //let clip = new THREE.AnimationClip(clips);
+   //let action = this.mixer.clipAction(clips[0]);
+   //action.play();
+  }
 
-  getRenderedSceneTexture(){
 
+  easeOutElastic(x){
+    const c4 = (2 * Math.PI) / 3;
+    
+    return x === 0
+      ? 0
+      : x === 1
+      ? 1
+      : Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * c4) + 1;
+    }
+
+
+
+  getRenderedSceneTexture(time){
 
     this.cpuWireShader.uniforms.time.value += 0.1;
+    //this.t = performance.now();
 
       if(this.composer){
-        //this.renderer.setRenderTarget(this.bufferRenderer);
+        //if(this.playAction){
+          /*
+        if((this.animationController.currentAnimation.scene === 'Home-Scene-Animation')){
+          //console.log('asdf')
+
+          this.action.play();
+          //this.mixer.update(time);          
+        }
+
+        this.mixer.update(time);          
+        */
         this.composer.render();
 
         return this.composer.readBuffer.texture;
-        }
+      }
 
     //}
 

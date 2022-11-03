@@ -1,0 +1,72 @@
+
+@font-face {
+  font-family: ft;
+  src: url('font.ttf') format('ttf');
+}
+
+html, body
+{
+  margin: 0;
+  user-select: none;
+  --webkit-user-select: none;
+  background-color: black;
+}
+
+section {
+  position: absolute;
+  font-size: 1.1em;
+  width: 100%;
+  z-index: 2;
+  text-align: center;
+  opacity: 0.9;
+  display: flex;
+  flex-direction: column;
+}
+
+.service-page-title{
+  top: 120;
+  position: sticky;
+  color: white;
+  font-size: 3em;
+  text-decoration: underline;
+  margin: auto;
+  font-family: ft;
+  opacity: 0.8;
+}
+
+.service-page-second-title{
+  min-height: 100vh;
+  font-size: 1.8em;
+  flex-direction: column;
+  display: flex;
+  justify-content: center;
+  color: white;
+  text-decoration: underline;
+  font-family: ft;
+  opacity: 0;
+  will-change: opacity;
+  transition: opacity 0.5s;
+}
+
+.services-page-description{
+  font-size: 1.8em;
+  text-decoration: none;
+  justify-content: center;
+  color: white;
+  font-family: ft;
+}
+
+.Home-Page-Section{
+  font-size: 1.8em;
+  text-decoration: none;
+  justify-content: center;
+  color: white;
+  font-family: ft;
+}
+
+
+.active{
+  will-change: opacity;
+  opacity: 1;
+}
+
