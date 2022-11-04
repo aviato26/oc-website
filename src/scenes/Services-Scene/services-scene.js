@@ -172,7 +172,10 @@ export default class ServicesPage
       this.play = false;
       this.progress = 0;
 
-      this.renderer2 = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+      // this method needs to be called to pre-compile the scene before it gets rendered or the animation will lag in the initial call
+      this.renderer.compile(this.scene, this.camera);
+
+      //this.renderer2 = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
 
   });
 
@@ -399,16 +402,19 @@ export default class ServicesPage
     //console.log(this.composer.readBuffer.texture)
     //this.renderdTexture = this.composer.readBuffer.texture;
 
+
+    //this.renderer.compile();
+/*
     this.renderer.setRenderTarget(this.renderer2);
     this.renderer.render(this.scene, this.camera);
     this.renderer.setRenderTarget(null);
     return this.renderer2.texture;
-
+*/
     //console.log(parentRenderer)
 
-    //this.composer.render();
+    this.composer.render();
 
-    //return this.composer.readBuffer.texture;      
+    return this.composer.readBuffer.texture;      
 
     //this.renderdTexture = this.renderT.texture;
   }
