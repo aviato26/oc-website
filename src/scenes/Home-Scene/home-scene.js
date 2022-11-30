@@ -43,13 +43,14 @@ import horseShoeFragment  from './shaders/horseShoeFragment';
 
 export default class HomeScene
 {
-  constructor(parentRenderer)
+  constructor(parentRenderer, animationCallBack)
   {
 
     this.scene = new THREE.Scene();
 
     this.width = window.innerWidth;
     this.height = window.innerHeight;
+
 
 
     this.camera = new THREE.PerspectiveCamera( 45, this.width / this.height, 1, 1000 );
@@ -139,17 +140,16 @@ logoTex.flipY = false;
 //console.log(cpuTex)
 
  this.model.load(cpu, (obj) => {
-  //console.log(obj)
 
   this.loaded = true;
   this.cameraScene = obj;
   this.cameraAnimation = obj.animations;
 
-  this.playAnimation();
 
-  let cam = obj.scene.getObjectByName('Camera');
-  this.c2 = cam.children[0];
-  this.camera = cam.children[0];
+  //let cam = obj.scene.getObjectByName('Camera');
+  //this.c2 = cam.children[0];
+  //this.camera = cam.children[0];
+  this.camera = obj.cameras[0];  
   let cube = obj.scene.getObjectByName('cpu');
   let t = obj.scene.getObjectByName('Text');
   let floor = obj.scene.getObjectByName('floor');
@@ -171,6 +171,8 @@ logoTex.flipY = false;
   //console.log(cube.material)
   cube.material.metalness = 0.3;
   //cube.material.normalMap = cpuNorm;
+
+  //this.playAnimation();
 
   // loop through objects in scene and find all path objects (these are the circuit tracks to the cpu) and replace there material with the wireShader
   
@@ -220,7 +222,16 @@ logoTex.flipY = false;
 
 
   this.scene.add(obj.scene)
+
+  animationCallBack(obj);
+
+  // this method needs to be called to pre-compile the scene before it gets rendered or the animation will lag in the initial call
+  //this.renderer.compile(this.scene, this.camera);
+
 });
+
+
+//console.log((e.loaded / e.currentTarget.response))
 
 this.playAction = false;
 
@@ -236,14 +247,16 @@ document.addEventListener('mousedown', () => {
 
   }
 
+
+
   playAnimation(){
    this.mixer = new THREE.AnimationMixer(this.cameraScene.scene);
    //this.mixer = new THREE.AnimationMixer(this.camera);
    let clips = this.cameraAnimation;
    this.action = this.mixer.clipAction(clips[0]);
-   this.action.setLoop(THREE.LoopOnce);
-   this.action.clampWhenFinished = true;
-   //this.action.play();
+   //this.action.setLoop(THREE.LoopOnce);
+   //this.action.clampWhenFinished = true;
+   this.action.play();
    //this.action.reset();
    //this.mixer.play();
    //console.log(clips)
@@ -253,35 +266,15 @@ document.addEventListener('mousedown', () => {
   }
 
 
-  easeOutElastic(x){
-    const c4 = (2 * Math.PI) / 3;
-    
-    return x === 0
-      ? 0
-      : x === 1
-      ? 1
-      : Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * c4) + 1;
-    }
-
-
 
   getRenderedSceneTexture(time){
 
     this.cpuWireShader.uniforms.time.value += 0.1;
+    //this.mixer.update(time);
     //this.t = performance.now();
 
       if(this.composer){
-        //if(this.playAction){
-          /*
-        if((this.animationController.currentAnimation.scene === 'Home-Scene-Animation')){
-          //console.log('asdf')
 
-          this.action.play();
-          //this.mixer.update(time);          
-        }
-
-        this.mixer.update(time);          
-        */
         this.composer.render();
 
         return this.composer.readBuffer.texture;

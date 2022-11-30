@@ -11,7 +11,7 @@ const postFragmentShader =
     varying vec2 vUv;
 
     void main(){
-/*
+
         vec2 uv = vUv;
         vec2 usersMouse = mouse;
         vec2 usersMouseVel = mouseVel;
@@ -42,13 +42,13 @@ const postFragmentShader =
         vec4 finalColor = 1.0 - (1.0 - color) * (1.0 - originalTex);
 
         vec4 finalTexture = mix(tex, finalColor, abs(usersMouse.x * usersMouseVel.x));
-*/
+/*
         vec2 uv = vUv;
         vec4 tex = texture(tDiffuse, uv);
-        
+  */      
         //gl_FragColor = finalColor;       
-        //gl_FragColor = finalTexture;       
-        gl_FragColor = tex;       
+        gl_FragColor = finalTexture;       
+        //gl_FragColor = tex;       
     }
 `;
 

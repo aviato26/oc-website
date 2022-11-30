@@ -15,7 +15,8 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 //import laptop from './lt-animations.glb';
 //import laptop from './lt2.glb';
 //import laptop from './t1.glb';
-import laptop from './lp3.glb';
+//import laptop from './lp3.glb';
+import laptop from './lp3-with-animations.glb';
 //import laptop from './t1.fbx';
 
 //import laptop from './laptop-with-plants.glb';
@@ -38,12 +39,13 @@ import AnimationController from '../../UIEvents/AnimationController';
 
 export default class ServicesPage
 {
-  constructor(parentRenderer)
+  constructor(parentRenderer, animationCallBack)
   {
     this.scene = new THREE.Scene();
 
     // this camera will be changed once the scene loads but will keep this here for a place holder to pass to the animation controller
     this.camera = new THREE.PerspectiveCamera( 45, this.width / this.height, 1, 1000 );
+
 
     this.renderer = parentRenderer;
     this.renderer.physicallyCorrectLights = true;
@@ -66,12 +68,15 @@ export default class ServicesPage
     this.scene.add(this.flash);
 
 
+
     this.roomMaterial = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+
 
 
     this.model = new GLTFLoader();
 
     this.model.load(laptop, (obj) => {
+
       
       obj.scene.children.map(c => {
 
@@ -87,6 +92,8 @@ export default class ServicesPage
       this.cameraScene = obj;
       this.cameraAnimation = obj.animations;
 
+      animationCallBack(obj);
+
       //console.log(this.cameraAnimation)
 
       this.camera = obj.cameras[0];
@@ -94,6 +101,9 @@ export default class ServicesPage
       this.camera.aspect = window.innerWidth / window.innerHeight;
       this.camera.updateProjectionMatrix();
 
+      this.camera.rotation.x = Math.PI / 2;
+
+      //this.camera.rotation.x += Math.sin(Math.PI / 2);
 
 
       //this.playAnimation(obj);
@@ -106,9 +116,6 @@ export default class ServicesPage
         bloomRadius: 1.
       };
 
-      console.log(obj)
-
-      this.camera.rotation.x += Math.sin(Math.PI / 2);
 
 
       this.composer = new EffectComposer(this.renderer);
@@ -163,9 +170,11 @@ export default class ServicesPage
 
       this.scene.add(obj.scene);
 
-      // adding user interation controller
-      this.UIController();
+
       //this.renderSceneTexture();
+
+    // adding user interation controller
+    this.UIController();
 
       //this.animate();
 
@@ -321,7 +330,8 @@ export default class ServicesPage
    }
    */
 
-  async renderSceneTexture(time){
+  renderSceneTexture(time){
+    //this.renderer.compile(this.scene, this.camera);
 /*
     this.stateClock = this.pageDesciption.timingAnimation(this.pageDesciption.shadow1ContainerBoundary, this.stateClock);
     this.stateClock2 = this.pageDesciption.timingAnimation(this.pageDesciption.shadow2ContainerBoundary, this.stateClock2);
@@ -372,6 +382,7 @@ export default class ServicesPage
 
     //this.mouseVel.multiplyScalar(0.99);
     //console.log(this.mouseVel);
+    //console.log(this.mouse)
 
     this.mouse.multiplyScalar(this.negativeForce);
     this.mouseVel.subVectors(this.mouseLastPos, this.mouse);

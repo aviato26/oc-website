@@ -16,6 +16,8 @@ import UIController from './UIEvents/UIController.js';
 import Math from './MathUtils/mathMain.js'
 
 import AnimationController from './UIEvents/AnimationController';
+import { PropertyMixer } from 'three';
+
 
 
 export default class Main
@@ -118,73 +120,50 @@ export default class Main
     document.body.appendChild( this.renderer.domElement );
 
 
+    // binding method to class since it is being passed as a callback function
+    this.addAnimations = this.addAnimations.bind(this);
+
     // loading Home screen page
-    //this.homeScreen = new HomeScene(this.renderer);
-    this.homeScreen = HomeScene;  
-    //this.homeScreen = null; 
+    this.homeScreen = new HomeScene(this.renderer, this.addAnimations);
 
     // loading services page
-    //this.servicesPage = new ServicesPage(this.renderer);
-    this.servicesPage = ServicesPage; 
+    this.servicesPage = new ServicesPage(this.renderer, this.addAnimations);
 
-    //check();
-    //console.log(this.homeScreen.sceneLoader)
-
-    // adding scene cameras to the animation controller
-    //this.animationController.addScene(this.servicesPage);
-    //this.animationController.addScene(this.homeScreen);
-    //this.animationController.loadedModel(this.servicesPage);
-    //this.animationController.updateCurrentAnimationMixer();
-
-    //console.log(this.animationController)
 
     this.t;
 
 
     this.animate = this.animate.bind(this);
 
-    //this.animate();      
-
-    this.loadModels(this.homeScreen, this.servicesPage, this.renderer, this.animate);
-
-    console.log(this.renderer)
-    /*
-      this.mixer = new THREE.AnimationMixer(this.servicesPage.cameraScene.scene);
-      let clips = this.servicesPage.cameraAnimation;
-      //this.animation = new THREE.AnimationAction(this.mixer, );
-
-      //let clip = new THREE.AnimationClip(clips[0]);
-      this.action = this.mixer.clipAction(clips[0]);
-      this.action.play();
-  */
   }
 
-  async loadModels(model1, model2, renderer, animation){
-    this.homeScreen = await new model1(renderer);
-    this.servicesPage = await new model2(renderer);
-    
-    if(model1 && model2){
+
+
+  addAnimations(scene){    
+
+    // wait for all animations to be loaded before rendering
+    if(this.homeScreen.cameraAnimation && this.servicesPage.cameraAnimation){
       this.animationController = new AnimationController([this.homeScreen, this.servicesPage]);
-      //console.log(a, b)
-      //this.servicePageTexture = this.servicesPage.renderSceneTexture();              
-      animation();
+      this.animate();
     }
+
   }
   
 
 
-  async animate(){
+  animate(){
     requestAnimationFrame( this.animate );
 
     //this.t = this.clock.getElapsedTime();
 
-    //this.t = this.clock.getDelta();
+    this.t = this.clock.getDelta();
     //console.log(this.clock.getElapsedTime())
 
 
     this.stats.update();
     //console.log(this.animationController.cameras);
 
+    this.animationController.updateAnimation();
 
       // must wait for the laptop model to be loaded before we render the scene to texture and apply it to the main scene
       //if(this.servicesPage.composer){
@@ -193,8 +172,8 @@ export default class Main
         //console.log(this.animationController.currentAnimation)
 
         //console.log(this.servicesPage.action.isRunning())
-        this.homeScreenTexture = await this.homeScreen.getRenderedSceneTexture(this.t);
-        this.servicePageTexture = await this.servicesPage.renderSceneTexture(this.t);        
+        this.homeScreenTexture = this.homeScreen.getRenderedSceneTexture(this.t);
+        this.servicePageTexture = this.servicesPage.renderSceneTexture(this.t);        
 
 
 
@@ -236,7 +215,7 @@ export default class Main
 
         this.renderPlaneMaterial.uniforms.progress.value = this.animationController.progressAnimation;     
         this.renderPlaneMaterial.uniforms.time.value = 0.3;
-        
+
         
         //console.log(this.renderPlaneMaterial.uniforms.progress)
 
@@ -245,7 +224,6 @@ export default class Main
         //console.log(this.mathUtils.clamp(this.mathUtils.smoothstep(this.count), 0, 1))
 
         // method to update animation progression variable for the scene transition animation
-        //this.animationController.updateAnimation();
 
         //console.log(performance.now() / 60);
 
