@@ -289,7 +289,6 @@ export default class AnimationController{
             this.states[this.sceneIndex].playAnime(this.timeForward);            
         }           
 
-        console.log(this.states[this.sceneIndex])
         //console.log(this.currentAnimation.scene)
         /*
         if(this.currentAnimation.scene == 'Home-Scene-Downward-Animation' ){
