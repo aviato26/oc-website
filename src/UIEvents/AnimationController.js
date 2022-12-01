@@ -25,12 +25,16 @@ export default class AnimationController{
 
         this.timeDirection = 1;
 
+
+        // need to make a mixer and action for every animation since we are not letting the entire animation play, if not the animation will reset the scene
         this.mixer1 = new AnimationMixer(this.scenes[0].scene);
         this.mixer2 = new AnimationMixer(this.scenes[1].scene);        
+        this.mixer3 = new AnimationMixer(this.scenes[1].scene);        
 
         // animations need to reset after completion or will reset from last position
         this.mixer1.addEventListener('finished', () => this.action.reset());
         this.mixer2.addEventListener('finished', () => this.action2.reset());        
+        this.mixer3.addEventListener('finished', () => this.action3.reset());        
 
         this.currentCamera = 1;
         this.prevCamera = 0;
@@ -62,7 +66,7 @@ export default class AnimationController{
             // checking to see if user has triggered an animation
             if(!this.animating){
                 // checking to see if the user has scrolled fast enough to trigger animation
-                console.log('triggered')
+                //console.log('triggered')
                 if(e.deltaY > 150){
                     this.animating = true;
                     this.updateSceneIndex('Increment');
@@ -199,11 +203,11 @@ export default class AnimationController{
                 //camera: this.scenes[0].camera
             },
             {
-                scene: 'Services-Scene-Animation',
+                scene: 'Services-Scene-Animation-Upward',
                 mixer: this.mixer1,
                 sceneAction: this.action,            
                 playAnime: () => {
-                    this.action2 = this.mixer2.clipAction(this.scenes[1].cameraAnimation[0]);
+                    this.action2 = this.mixer2.clipAction(this.scenes[1].cameraAnimation[1]);
                     this.action2.setLoop(THREE.LoopOnce);                 
                     this.action2.timeScale = this.timeDirection;
                     //this.action2.clampWhenFinished = true;
@@ -218,6 +222,20 @@ export default class AnimationController{
                 playAnime: () => {
                     //console.log('lets dispaly some text')
                 }
+            },
+            {
+                scene: 'Services-Scene-Animation-Downward',
+                mixer: this.mixer1,
+                sceneAction: this.action,            
+                playAnime: () => {
+                    this.action3 = this.mixer3.clipAction(this.scenes[1].cameraAnimation[0]);
+                    this.action3.setLoop(THREE.LoopOnce);                 
+                    this.action3.timeScale = this.timeDirection;
+                    //this.action2.clampWhenFinished = true;
+                    this.action3.play();
+                    this.mixer3.update(this.timeForward);                    
+                },
+                //camera: this.scenes[0].camera
             },
             {
                 scene: 'About-Scene',
@@ -238,7 +256,7 @@ export default class AnimationController{
     }
 
     updateSlideAnimation(){
-        if(this.currentAnimation.scene == 'Home-Scene-Downward-Animation' || this.currentAnimation.scene == 'Services-Scene-Animation' ){
+        if(this.currentAnimation.scene == 'Home-Scene-Downward-Animation' || this.currentAnimation.scene == 'Services-Scene-Animation-Upward' ){
             if(this.timeDirection === 1){
                 gsap.to(this, {
                     progressAnimation: 1,
@@ -271,7 +289,7 @@ export default class AnimationController{
             this.states[this.sceneIndex].playAnime(this.timeForward);            
         }           
 
-        //console.log(this.states[this.sceneIndex])
+        console.log(this.states[this.sceneIndex])
         //console.log(this.currentAnimation.scene)
         /*
         if(this.currentAnimation.scene == 'Home-Scene-Downward-Animation' ){

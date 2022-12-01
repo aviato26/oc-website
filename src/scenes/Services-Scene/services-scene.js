@@ -16,7 +16,8 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 //import laptop from './lt2.glb';
 //import laptop from './t1.glb';
 //import laptop from './lp3.glb';
-import laptop from './lp3-with-animations.glb';
+//import laptop from './lp3-with-animations.glb';
+import laptop from './lp-all-animations.glb';
 //import laptop from './t1.fbx';
 
 //import laptop from './laptop-with-plants.glb';
