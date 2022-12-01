@@ -10,6 +10,7 @@ import Stats from 'three/examples/jsm/libs/stats.module'
 
 import ServicesPage from './scenes/Services-Scene/services-scene';
 import HomeScene from './scenes/Home-Scene/home-scene';
+import AboutScene from './scenes/About-Scene/AboutSceneMain';
 
 import UIController from './UIEvents/UIController.js';
 
@@ -88,6 +89,7 @@ export default class Main
         //tex1: { value: img },
         tex1: { value: null },
         tex2: { value: null },
+        aboutScene: { value: null },
         progress: { value: 0.0 },
         time: { value: 0.0 },
         res: { value: new THREE.Vector2(this.width, this.height) },
@@ -129,6 +131,8 @@ export default class Main
     // loading services page
     this.servicesPage = new ServicesPage(this.renderer, this.addAnimations);
 
+    // loading about page
+    this.aboutPage = new AboutScene(this.renderer, this.addAnimations);
 
     this.t;
 
@@ -142,8 +146,9 @@ export default class Main
   addAnimations(scene){    
 
     // wait for all animations to be loaded before rendering
-    if(this.homeScreen.cameraAnimation && this.servicesPage.cameraAnimation){
-      this.animationController = new AnimationController([this.homeScreen, this.servicesPage]);
+    if(this.homeScreen.cameraAnimation && this.servicesPage.cameraAnimation && this.aboutPage.loaded){
+      this.animationController = new AnimationController([this.homeScreen, this.servicesPage, this.aboutPage]);
+      //console.log(this.aboutPage.renderedTexture())
       this.animate();
     }
 
@@ -180,6 +185,9 @@ export default class Main
         // once scences have been rendered we will place them into the post process material to be rendered to the final mesh
         this.renderPlaneMaterial.uniforms.tex1.value = this.homeScreenTexture;
         this.renderPlaneMaterial.uniforms.tex2.value = this.servicePageTexture;
+        this.renderPlaneMaterial.uniforms.aboutScene.value = this.aboutPage.renderedTexture();
+
+        //this.renderPlaneGeometry.uniforms.aboutScene.value = this.aboutPage.renderedTexture();
 
         //this.renderPlaneMaterial.uniforms.mouse.value = this.mouse;      
 
