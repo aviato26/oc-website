@@ -8,6 +8,7 @@ const horseShoeFragment =
     uniform sampler2D tex1;
     uniform sampler2D tex2;
     uniform sampler2D aboutScene;
+    uniform sampler2D contactScene;
 
     uniform vec2 mouse;
     uniform vec2 res;
@@ -24,7 +25,9 @@ const horseShoeFragment =
       
       vec4 texture1 = texture(tex1, uv);
       vec4 texture2 = texture(tex2, uv);
+     
       vec4 aboutSceneTexture = texture(aboutScene, uv);
+      vec4 contactSceneTexture = texture(contactScene, uv);
 
       float p = progress;
       //float p = sin(time);      
@@ -47,7 +50,8 @@ const horseShoeFragment =
       vec4 finalTextureMix = mix(texture2, texture1, smoothstep(p - 0.4, p + 0.1, uv / 2.0).y);            
      
       //gl_FragColor = finalTextureMix;
-      gl_FragColor = aboutSceneTexture;      
+      //gl_FragColor = aboutSceneTexture;      
+      gl_FragColor = contactSceneTexture;            
     }
 `;
 
