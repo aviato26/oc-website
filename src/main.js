@@ -11,6 +11,7 @@ import Stats from 'three/examples/jsm/libs/stats.module'
 import ServicesPage from './scenes/Services-Scene/services-scene';
 import HomeScene from './scenes/Home-Scene/home-scene';
 import AboutScene from './scenes/About-Scene/AboutSceneMain';
+import ContactScene from './scenes/Contact-Scene/ContactSceneMain';
 
 import UIController from './UIEvents/UIController.js';
 
@@ -90,6 +91,7 @@ export default class Main
         tex1: { value: null },
         tex2: { value: null },
         aboutScene: { value: null },
+        contactScene: { value: null },
         progress: { value: 0.0 },
         time: { value: 0.0 },
         res: { value: new THREE.Vector2(this.width, this.height) },
@@ -134,6 +136,9 @@ export default class Main
     // loading about page
     this.aboutPage = new AboutScene(this.renderer, this.addAnimations);
 
+    // loading contact page
+    this.contactPage = new ContactScene(this.renderer, this.addAnimations);
+
     this.t;
 
 
@@ -146,8 +151,8 @@ export default class Main
   addAnimations(scene){    
 
     // wait for all animations to be loaded before rendering
-    if(this.homeScreen.cameraAnimation && this.servicesPage.cameraAnimation && this.aboutPage.loaded){
-      this.animationController = new AnimationController([this.homeScreen, this.servicesPage, this.aboutPage]);
+    if(this.homeScreen.cameraAnimation && this.servicesPage.cameraAnimation && this.aboutPage.loaded && this.contactPage.loaded){
+      this.animationController = new AnimationController([this.homeScreen, this.servicesPage, this.aboutPage, this.contactPage]);
       //console.log(this.aboutPage.renderedTexture())
       this.animate();
     }
@@ -186,6 +191,7 @@ export default class Main
         this.renderPlaneMaterial.uniforms.tex1.value = this.homeScreenTexture;
         this.renderPlaneMaterial.uniforms.tex2.value = this.servicePageTexture;
         this.renderPlaneMaterial.uniforms.aboutScene.value = this.aboutPage.renderedTexture();
+        this.renderPlaneMaterial.uniforms.contactScene.value = this.contactPage.renderedTexture();        
 
         //this.renderPlaneGeometry.uniforms.aboutScene.value = this.aboutPage.renderedTexture();
 
