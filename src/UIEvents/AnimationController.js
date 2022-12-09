@@ -14,7 +14,12 @@ export default class AnimationController{
         this.playAnimation = false;
 
         // progressAnimation will be used to update the progress variable in the shader material to update the scene transition animation
+        // need to create different animation progression for each scene or mixing the scenes will not work
         this.progressAnimation = 0;
+        this.progressAnimation2 = 0;
+        this.progressAnimation3 = 0;
+
+        this.sceneTextureIndex = 0;
 
         this.sceneIndex = 0;
 
@@ -30,11 +35,17 @@ export default class AnimationController{
         this.mixer1 = new AnimationMixer(this.scenes[0].scene);
         this.mixer2 = new AnimationMixer(this.scenes[1].scene);        
         this.mixer3 = new AnimationMixer(this.scenes[1].scene);        
+        this.aboutSceneMixer1 = new AnimationMixer(this.scenes[2].scene);
+        this.aboutSceneMixer2 = new AnimationMixer(this.scenes[2].scene);        
+        this.contactSceneMixer = new AnimationMixer(this.scenes[3].scene);
 
         // animations need to reset after completion or will reset from last position
         this.mixer1.addEventListener('finished', () => this.action.reset());
         this.mixer2.addEventListener('finished', () => this.action2.reset());        
-        this.mixer3.addEventListener('finished', () => this.action3.reset());        
+        this.mixer3.addEventListener('finished', () => this.action3.reset());       
+        this.aboutSceneMixer1.addEventListener('finished', () => this.aboutSceneAction1.reset());
+        this.aboutSceneMixer2.addEventListener('finished', () => this.aboutSceneAction2.reset());        
+        this.contactSceneMixer.addEventListener('finished', () => this.contactSceneAction.reset()); 
 
         this.currentCamera = 1;
         this.prevCamera = 0;
@@ -62,50 +73,56 @@ export default class AnimationController{
         document.addEventListener('wheel', (e) => {
 
             // switching animating state
-            //console.log('asdf')
             // checking to see if user has triggered an animation
+
             if(!this.animating){
                 // checking to see if the user has scrolled fast enough to trigger animation
                 //console.log('triggered')
                 if(e.deltaY > 150){
                     this.animating = true;
+
+                    this.timeDirection = 1.0;
+
+                    // method to update scenes loaded into mix function in fragment shader
+                    //this.updateSceneTextureIndex();                    
+
                     this.updateSceneIndex('Increment');
                     this.updateAnimationState('Increment');
                     this.currentAnimation = this.states[this.sceneIndex];
 
-                    this.timeDirection = 1.0;
 
-                    this.updateSlideAnimation();
-                    
+                    this.updateSlideAnimation();                    
                     //this.updateAnimation();
 
                     //setTimeout(() => this.animating = false, 800);
                 }
     
                 if(e.deltaY < -150){
-                    this.animating = true;
+                    this.animating = true;                 
+
+                    this.timeDirection = -1.0;
+
+                    // method to update scenes loaded into mix function in fragment shader
+                    //this.updateSceneTextureIndex();                    
+
                     this.updateSceneIndex('Decrement');
                     this.updateAnimationState('Decrement');
                     
                     this.currentAnimation = this.states[this.sceneIndex];
 
-
-                    this.timeDirection = -1.0;
-
                     this.updateSlideAnimation();
-
                     //this.updateAnimation();
                     
                     //setTimeout(() => this.animating = false, 800);
                 }
 
                 
-                this.resetAnimationActions();
+                //this.resetAnimationActions();
 
                 this.currentAnimation = this.states[this.sceneIndex];
+                //console.log(this.progressAnimation)
             }
 
-            //console.log(this.states[this.sceneIndex])
         });
     }
 
@@ -130,10 +147,8 @@ export default class AnimationController{
     
             // need to check scene index to make sure to not go over or under the index
             if(this.sceneIndex > 0 && this.sceneIndex < this.states.length - 1){
-
             // setting animation variable to allow user to trigger the next animation
-            //this.animating = false;
-
+            //this.animating = false;                   
                 //this.playAnimation = true;
                 // creating a lag between user inputs to trigger the scene transitions
                 if(keyState === 'Increment'){
@@ -142,6 +157,7 @@ export default class AnimationController{
                 else if(keyState === 'Decrement'){
                     this.sceneIndex--;
                 }
+
     
             }
 
@@ -152,10 +168,9 @@ export default class AnimationController{
                 // need to check scene index to make sure to not go over or under the index
                 if(this.sceneIndex > 0 && this.sceneIndex < this.states.length - 1){
 
-
                 // setting animation variable to allow user to trigger the next animation
                 this.animating = false;                    
-                    //this.playAnimation = false;                        
+                    //this.playAnimation = false;                                     
                     // creating a lag between user inputs to trigger the scene transitions
                     if(keyState === 'Increment'){
                         this.sceneIndex++;
@@ -163,12 +178,13 @@ export default class AnimationController{
                     else if(keyState === 'Decrement'){
                         this.sceneIndex--;
                     }
-        
+
                 }
 
-            }, 1000);
 
-        }, 1000);
+            }, 1100);
+
+        }, 1100);
 
         //setTimeout(() => this.playAnimation = false, 1500);
     }
@@ -179,17 +195,17 @@ export default class AnimationController{
         // all states and animation indexes for scenes
         this.states = [];
 
-        
-
         this.states = [
             {
                 scene: 'Home-Scene-Text',                
+                sceneIndex: 0,
                 playAnime: (time) => {
                 }
             },
             {
                 scene: 'Home-Scene-Downward-Animation',
                 mixer: this.mixer1,
+                sceneIndex: 0,
                 sceneAction: this.action,
                 playAnime: (time) => {
                     this.action = this.mixer1.clipAction(this.scenes[0].cameraAnimation[0]);
@@ -205,6 +221,7 @@ export default class AnimationController{
             {
                 scene: 'Services-Scene-Animation-Upward',
                 mixer: this.mixer1,
+                sceneIndex: 0,
                 sceneAction: this.action,            
                 playAnime: () => {
                     this.action2 = this.mixer2.clipAction(this.scenes[1].cameraAnimation[1]);
@@ -219,6 +236,7 @@ export default class AnimationController{
             {
                 scene: 'Services-Scene',
                 mixer: this.mixer2,
+                sceneIndex: 0,
                 playAnime: () => {
                     //console.log('lets dispaly some text')
                 }
@@ -226,6 +244,7 @@ export default class AnimationController{
             {
                 scene: 'Services-Scene-Animation-Downward',
                 mixer: this.mixer1,
+                sceneIndex: 1,
                 sceneAction: this.action,            
                 playAnime: () => {
                     this.action3 = this.mixer3.clipAction(this.scenes[1].cameraAnimation[0]);
@@ -238,42 +257,167 @@ export default class AnimationController{
                 //camera: this.scenes[0].camera
             },
             {
+                scene: 'About-Scene-Animation-Upward',
+                sceneIndex: 1,
+                playAnime: () => {
+                    this.aboutSceneAction1 = this.aboutSceneMixer1.clipAction(this.scenes[2].cameraAnimation[1]);
+                    this.aboutSceneAction1.setLoop(THREE.LoopOnce);                 
+                    this.aboutSceneAction1.timeScale = this.timeDirection;
+                    //this.action2.clampWhenFinished = true;
+                    this.aboutSceneAction1.play();
+                    this.aboutSceneMixer1.update(this.timeForward);                    
+                },
+            },
+            {
                 scene: 'About-Scene',
+                sceneIndex: 2,
+                mixer: this.mixer2,
+                playAnime: () => {
+                    //console.log('lets dispaly some text')
+                }
+            },
+
+            {
+                scene: 'About-Scene-Animation-Downward',
+                sceneIndex: 2,
+                playAnime: () => {
+                    this.aboutSceneAction2 = this.aboutSceneMixer1.clipAction(this.scenes[2].cameraAnimation[0]);
+                    this.aboutSceneAction2.setLoop(THREE.LoopOnce);                 
+                    this.aboutSceneAction2.timeScale = this.timeDirection;
+                    //this.action2.clampWhenFinished = true;
+                    this.aboutSceneAction2.play();
+                    this.aboutSceneMixer1.update(this.timeForward);                    
+                },
+            },
+            {
+                scene: 'Contact-Scene-Animation-Upward',
+                sceneIndex: 2,
+                playAnime: () => {
+                    //console.log(this.scenes[3])
+                    this.contactSceneAction = this.contactSceneMixer.clipAction(this.scenes[3].cameraAnimation[0]);
+                    this.contactSceneAction.setLoop(THREE.LoopOnce);                 
+                    this.contactSceneAction.timeScale = this.timeDirection;
+                    //this.action2.clampWhenFinished = true;
+                    this.contactSceneAction.play();
+                    this.contactSceneMixer.update(this.timeForward);                    
+                },
             },
             {
                 scene: 'Contact-Scene',
+                sceneIndex: 2,
+                playAnime: () => {
+                    //console.log(this.scenes[3])
+                    this.contactSceneAction = this.contactSceneMixer.clipAction(this.scenes[3].cameraAnimation[0]);
+                    this.contactSceneAction.setLoop(THREE.LoopOnce);                 
+                    this.contactSceneAction.timeScale = this.timeDirection;
+                    //this.action2.clampWhenFinished = true;
+                    this.contactSceneAction.play();
+                    this.contactSceneMixer.update(this.timeForward);                    
+                },
             }
         ]
 
     }
 
+/*
+    updateSceneTextureIndex(){
+        if(this.currentAnimation.scene == 'Home-Scene-Text' || this.currentAnimation.scene == 'Services-Scene' || this.currentAnimation.scene == 'About-Scene' || this.currentAnimation.scene == 'Contact-Scene'){
 
-    resetAnimationActions(){
-        // this function will reset the animations so they can be played, once they are triggered they only run once so they need to be reset to be allowed to run again
-        if(this.currentAnimation.scene == 'Home-Scene-Text' && this.action){
-            //this.action.reset();            
-        }
+            if(this.timeDirection == 1 && this.sceneTextureIndex < 3){
+                this.sceneTextureIndex++;
+            }
+
+            if(this.timeDirection == -1 && this.sceneTextureIndex > 0){
+                this.sceneTextureIndex--;
+            }
+
+        }   
     }
+*/
 
     updateSlideAnimation(){
-        if(this.currentAnimation.scene == 'Home-Scene-Downward-Animation' || this.currentAnimation.scene == 'Services-Scene-Animation-Upward' ){
+        //console.log(this.currentAnimation)
+        //if(this.currentAnimation.scene == 'Home-Scene-Downward-Animation' || this.currentAnimation.scene == 'Services-Scene-Animation-Upward' || this.currentAnimation.scene == 'Services-Scene-Animation-Downward' || this.currentAnimation.scene == 'About-Scene-Animation-Upward' || this.currentAnimation.scene == 'About-Scene-Animation-Downward' || this.currentAnimation.scene == 'Contact-Scene-Animation-Upward'){
+        if(this.currentAnimation.scene == 'Home-Scene-Downward-Animation' || this.currentAnimation.scene == 'Services-Scene-Animation-Upward'){
             if(this.timeDirection === 1){
+                this.progressAnimation = 0
                 gsap.to(this, {
                     progressAnimation: 1,
                     duration: 0.95,
-                    delay: 0.85,
-                    ease: "expo.out"
+                    delay: .85,
+                    ease: "expo.out",
+                    //onStart: () => console.log('asdf')
+                    //onComplete: () => this.progressAnimation = 0                                
                 });
             }
             if(this.timeDirection === -1){
+                this.progressAnimation = 1;
                 gsap.to(this, {
                     progressAnimation: 0,
                     duration: 0.95,
-                    delay: 0.85,
-                    ease: "expo.out"
+                    delay: .85,
+                    ease: "expo.out",
+                    //onStart: () => this.progressAnimation = 1
+                    // need to reset progressAnimation variable to 0 to be reused
+                    onComplete: () => {}
                 });
             }
         }
+
+
+        if(this.currentAnimation.scene == 'Services-Scene-Animation-Downward' || this.currentAnimation.scene == 'About-Scene-Animation-Upward'){
+            if(this.timeDirection === 1){
+                this.progressAnimation2 = 0
+                gsap.to(this, {
+                    progressAnimation2: 1,
+                    duration: 0.95,
+                    delay: .85,
+                    ease: "expo.out",
+                    //onStart: () => console.log('asdf')
+                    //onComplete: () => this.progressAnimation = 0                                
+                });
+            }
+            if(this.timeDirection === -1){
+                this.progressAnimation2 = 1;
+                gsap.to(this, {
+                    progressAnimation2: 0,
+                    duration: 0.95,
+                    delay: .85,
+                    ease: "expo.out",
+                    //onStart: () => this.progressAnimation = 1
+                    // need to reset progressAnimation variable to 0 to be reused
+                    onComplete: () => {}
+                });
+            }
+        }
+
+
+        if(this.currentAnimation.scene == 'About-Scene-Animation-Downward' || this.currentAnimation.scene == 'Contact-Scene-Animation-Upward'){
+            if(this.timeDirection === 1){
+                this.progressAnimation3 = 0
+                gsap.to(this, {
+                    progressAnimation3: 1,
+                    duration: 0.95,
+                    delay: .85,
+                    ease: "expo.out",
+                    //onStart: () => console.log('asdf')
+                    //onComplete: () => this.progressAnimation = 0                                
+                });
+            }
+            if(this.timeDirection === -1){
+                this.progressAnimation3 = 1;
+                gsap.to(this, {
+                    progressAnimation3: 0,
+                    duration: 0.95,
+                    delay: .85,
+                    ease: "expo.out",
+                    //onStart: () => this.progressAnimation = 1
+                    // need to reset progressAnimation variable to 0 to be reused
+                    //onComplete: () => {}
+                });
+            }
+        }
+
         //this.action.reset();
     }
 
@@ -282,13 +426,18 @@ export default class AnimationController{
         //console.log(this.currentAnimation
 
         this.timeForward = this.time.getDelta();
-        //console.log(this.states[this.sceneIndex])
+        //console.log(this.timeDirection)
+
+        //console.log(this.progressAnimation)
 
         
         if(this.states[this.sceneIndex].playAnime){
             this.states[this.sceneIndex].playAnime(this.timeForward);            
-        }           
-``
+        } 
+
+        this.sceneTextureIndex = this.states[this.sceneIndex].sceneIndex;
+
+
         //console.log(this.currentAnimation.scene)
         /*
         if(this.currentAnimation.scene == 'Home-Scene-Downward-Animation' ){

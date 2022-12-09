@@ -38,7 +38,9 @@ class ContactSceneMain{
 
             this.camera = model.scene.children[0];
 
-            console.log(model)
+            this.cameraAnimation = model.animations;
+
+            //console.log(this.cameraAnimation)
 
             //model.scene.children.map(obj => obj.material = new THREE.MeshBasicMaterial({ color: 0xffffff }))
             model.scene.children[1].material = new THREE.MeshBasicMaterial({ color: 0xffffff })            
@@ -49,6 +51,9 @@ class ContactSceneMain{
             this.camera.updateProjectionMatrix();
 
             this.scene.add(model.scene);
+
+            // this method needs to be called to pre-compile the scene before it gets rendered or the animation will lag in the initial call
+            this.renderer.compile(this.scene, this.camera);
 
             animationControllerCallback(model);
             //console.log(model)

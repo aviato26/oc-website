@@ -88,11 +88,19 @@ export default class Main
       uniforms: {
         //tex1: { value: this.bufferRenderer },
         //tex1: { value: img },
+
+        // scene index will be the index of the desired scene to be rendered
+        sceneIndex: { value: 0 },
+
         tex1: { value: null },
         tex2: { value: null },
         aboutScene: { value: null },
         contactScene: { value: null },
+        
         progress: { value: 0.0 },
+        progress2: { value: 0.0 },
+        progress3: { value: 0.0 },        
+
         time: { value: 0.0 },
         res: { value: new THREE.Vector2(this.width, this.height) },
         mouse: { type: 'vec2', value: new THREE.Vector2(0.0, 0.0)}
@@ -151,7 +159,7 @@ export default class Main
   addAnimations(scene){    
 
     // wait for all animations to be loaded before rendering
-    if(this.homeScreen.cameraAnimation && this.servicesPage.cameraAnimation && this.aboutPage.loaded && this.contactPage.loaded){
+    if(this.homeScreen.cameraAnimation && this.servicesPage.cameraAnimation && this.aboutPage && this.contactPage){
       this.animationController = new AnimationController([this.homeScreen, this.servicesPage, this.aboutPage, this.contactPage]);
       //console.log(this.aboutPage.renderedTexture())
       this.animate();
@@ -228,6 +236,14 @@ export default class Main
         //console.log(this.animationController.progressAnimation);
 
         this.renderPlaneMaterial.uniforms.progress.value = this.animationController.progressAnimation;     
+        this.renderPlaneMaterial.uniforms.progress2.value = this.animationController.progressAnimation2;     
+        this.renderPlaneMaterial.uniforms.progress3.value = this.animationController.progressAnimation3;             
+        
+        //console.log(this.animationController.sceneTextureIndex);
+
+        // loading textures to be displayed depending on user swiping interaction
+        this.renderPlaneMaterial.uniforms.sceneIndex.value = this.animationController.sceneTextureIndex;
+
         this.renderPlaneMaterial.uniforms.time.value = 0.3;
 
         

@@ -9,7 +9,8 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
-import CoffeeSceneModel from './coffee-scene-with-animations.glb';
+//import CoffeeSceneModel from './coffee-scene-with-animations.glb';
+import CoffeeSceneModel from './about-scene-with-animations2.glb';
 
 
 class AboutSceneMain{
@@ -39,6 +40,8 @@ class AboutSceneMain{
 
             this.camera = model.scene.children[0];
 
+            this.cameraAnimation = model.animations;
+
             model.scene.children.map(obj => obj.material = new THREE.MeshBasicMaterial({ color: 0xffffff }))
 
             // need to update camera projection matrix of the rendered texture will be distorted
@@ -47,6 +50,9 @@ class AboutSceneMain{
             this.camera.updateProjectionMatrix();
 
             this.scene.add(model.scene);
+
+            // this method needs to be called to pre-compile the scene before it gets rendered or the animation will lag in the initial call
+            this.renderer.compile(this.scene, this.camera);
 
             animationControllerCallback(model);
             //console.log(model)
