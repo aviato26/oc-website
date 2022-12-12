@@ -1,6 +1,8 @@
 
+import ft from './font.ttf'
+//import rb from './ruby.ttf';
+//const rb = require('./ruby.ttf');
 import '../css/style.css';
-
 
 class PageDesciption{
     constructor(){
@@ -58,8 +60,7 @@ class PageDesciption{
         this.servicesContainer.appendChild(shadow2ParagraphHeader);
         */
 
-        this.addHomeScreenText();
-
+/*
         this.containers = [secondParagraphHeader, thirdParagraphHeader, shadowParagraphHeader, shadow2ParagraphHeader];
 
         const observer = new IntersectionObserver(entries => {
@@ -74,7 +75,7 @@ class PageDesciption{
         });
 
         this.containers.forEach(object => observer.observe(object));
-
+*/
     }
 
 
@@ -105,11 +106,37 @@ class PageDesciption{
         return ele;
     }
 
-
+    // method for creating and appending home page text
     addHomeScreenText(){
+
         //const homePage = this.addElement('h2', 'service-page-second-title', 'Professional Technology Assistance');
-        const homePage = this.addElement('h2', 'Home-Page-Section', 'Professional Technology Assistance');
-        //this.servicesContainer.appendChild(homePage);
+        const homePage = this.addElement('h2', 'page-section', 'Professional Technology Assistance');
+        this.servicesContainer.appendChild(homePage);
+    }
+
+    addServicesScreenText(){
+        const servicesPage = this.addElement('h2', 'page-section', 'All about the services');
+        this.servicesContainer.appendChild(servicesPage);
+    }
+
+    addAboutScreenText(){
+        const aboutPage = this.addElement('h2', 'page-section', 'stuff about us');
+        this.servicesContainer.appendChild(aboutPage);        
+    }
+
+    addContactScreenText(){
+        const contactPage = this.addElement('h2', 'page-section', 'stuff about contacting us');
+        this.servicesContainer.appendChild(contactPage);                
+    }
+
+    unMountText(){
+        // css style needs to be named page desciption to be able to find and remove element from parent container
+        const childElement = document.querySelector('.page-section');
+
+        // checking to see if there are any child nodes appended
+        if(this.servicesContainer.childNodes.length){
+            this.servicesContainer.removeChild(childElement);
+        }
     }
 
 }

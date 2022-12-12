@@ -38,6 +38,9 @@ export default class Main
     this.stats = Stats()
     document.body.appendChild(this.stats.dom)
 
+    // setting title
+    document.title = "Oc Networks Inc";
+
     this.uiController = UIController;
 
     this.width = window.innerWidth;

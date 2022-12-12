@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import gsap from 'gsap';
 import { AnimationMixer } from 'three';
 import { Clock } from 'three';
-
+import PageDesciption from '../scenes/components/services';
 
 export default class AnimationController{
     constructor(scenes){
@@ -12,6 +12,9 @@ export default class AnimationController{
         this.scenes = scenes;
 
         this.playAnimation = false;
+
+        // this class contains all text and methods that will add and remove them
+        this.textSegments = new PageDesciption();
 
         // progressAnimation will be used to update the progress variable in the shader material to update the scene transition animation
         // need to create different animation progression for each scene or mixing the scenes will not work
@@ -64,6 +67,9 @@ export default class AnimationController{
 
         // initialize current animation state
         //this.currentAnimation = this.states[this.sceneIndex];
+
+        // append first text component
+        this.textSegments.addHomeScreenText();
 
         document.addEventListener('touchmove', (e) => {
             //console.log(e.changedTouches[0].clientY)
@@ -144,6 +150,11 @@ export default class AnimationController{
 
         // update scene index and then wait for the scene animation to almost be complete then increment scene index again to start next scene animation
         setTimeout(() => {
+
+            // check if text needs to update
+            if(this.states[this.sceneIndex].updateText){
+                this.states[this.sceneIndex].updateText();            
+            } 
     
             // need to check scene index to make sure to not go over or under the index
             if(this.sceneIndex > 0 && this.sceneIndex < this.states.length - 1){
@@ -157,7 +168,6 @@ export default class AnimationController{
                 else if(keyState === 'Decrement'){
                     this.sceneIndex--;
                 }
-
     
             }
 
@@ -165,8 +175,14 @@ export default class AnimationController{
             setTimeout(() => {
                 this.animating = false;
 
+                // check if text needs to update
+                if(this.states[this.sceneIndex].updateText){
+                    this.states[this.sceneIndex].updateText();            
+                } 
+
                 // need to check scene index to make sure to not go over or under the index
                 if(this.sceneIndex > 0 && this.sceneIndex < this.states.length - 1){
+
 
                 // setting animation variable to allow user to trigger the next animation
                 this.animating = false;                    
@@ -178,9 +194,13 @@ export default class AnimationController{
                     else if(keyState === 'Decrement'){
                         this.sceneIndex--;
                     }
-
+                                       
                 }
 
+                // check if text needs to update
+                if(this.states[this.sceneIndex].updateText){
+                    this.states[this.sceneIndex].updateText();            
+                } 
 
             }, 1100);
 
@@ -199,7 +219,8 @@ export default class AnimationController{
             {
                 scene: 'Home-Scene-Text',                
                 sceneIndex: 0,
-                playAnime: (time) => {
+                updateText: () => {
+                    this.textSegments.addHomeScreenText()
                 }
             },
             {
@@ -207,6 +228,11 @@ export default class AnimationController{
                 mixer: this.mixer1,
                 sceneIndex: 0,
                 sceneAction: this.action,
+
+                updateText: () => {
+                    this.textSegments.unMountText()
+                },
+
                 playAnime: (time) => {
                     this.action = this.mixer1.clipAction(this.scenes[0].cameraAnimation[0]);
                     this.action.setLoop(THREE.LoopOnce);
@@ -223,6 +249,11 @@ export default class AnimationController{
                 mixer: this.mixer1,
                 sceneIndex: 0,
                 sceneAction: this.action,            
+
+                updateText: () => {
+                    this.textSegments.unMountText()
+                },
+
                 playAnime: () => {
                     this.action2 = this.mixer2.clipAction(this.scenes[1].cameraAnimation[1]);
                     this.action2.setLoop(THREE.LoopOnce);                 
@@ -237,6 +268,11 @@ export default class AnimationController{
                 scene: 'Services-Scene',
                 mixer: this.mixer2,
                 sceneIndex: 0,
+
+                updateText: () => {
+                    this.textSegments.addServicesScreenText();
+                },
+
                 playAnime: () => {
                     //console.log('lets dispaly some text')
                 }
@@ -246,6 +282,11 @@ export default class AnimationController{
                 mixer: this.mixer1,
                 sceneIndex: 1,
                 sceneAction: this.action,            
+
+                updateText: () => {
+                    this.textSegments.unMountText()
+                },
+
                 playAnime: () => {
                     this.action3 = this.mixer3.clipAction(this.scenes[1].cameraAnimation[0]);
                     this.action3.setLoop(THREE.LoopOnce);                 
@@ -259,6 +300,11 @@ export default class AnimationController{
             {
                 scene: 'About-Scene-Animation-Upward',
                 sceneIndex: 1,
+
+                updateText: () => {
+                    this.textSegments.unMountText()
+                },
+
                 playAnime: () => {
                     this.aboutSceneAction1 = this.aboutSceneMixer1.clipAction(this.scenes[2].cameraAnimation[1]);
                     this.aboutSceneAction1.setLoop(THREE.LoopOnce);                 
@@ -272,6 +318,8 @@ export default class AnimationController{
                 scene: 'About-Scene',
                 sceneIndex: 2,
                 mixer: this.mixer2,
+                updateText: () => this.textSegments.addAboutScreenText(),
+
                 playAnime: () => {
                     //console.log('lets dispaly some text')
                 }
@@ -280,6 +328,11 @@ export default class AnimationController{
             {
                 scene: 'About-Scene-Animation-Downward',
                 sceneIndex: 2,
+
+                updateText: () => {
+                    this.textSegments.unMountText()
+                },
+
                 playAnime: () => {
                     this.aboutSceneAction2 = this.aboutSceneMixer1.clipAction(this.scenes[2].cameraAnimation[0]);
                     this.aboutSceneAction2.setLoop(THREE.LoopOnce);                 
@@ -292,6 +345,11 @@ export default class AnimationController{
             {
                 scene: 'Contact-Scene-Animation-Upward',
                 sceneIndex: 2,
+
+                updateText: () => {
+                    this.textSegments.unMountText()
+                },
+
                 playAnime: () => {
                     //console.log(this.scenes[3])
                     this.contactSceneAction = this.contactSceneMixer.clipAction(this.scenes[3].cameraAnimation[0]);
@@ -305,6 +363,9 @@ export default class AnimationController{
             {
                 scene: 'Contact-Scene',
                 sceneIndex: 2,
+
+                updateText: () => this.textSegments.addContactScreenText(),
+
                 playAnime: () => {
                     //console.log(this.scenes[3])
                     this.contactSceneAction = this.contactSceneMixer.clipAction(this.scenes[3].cameraAnimation[0]);
