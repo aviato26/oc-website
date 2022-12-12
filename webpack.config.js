@@ -26,7 +26,13 @@ module.exports =
       },
 
       {
-        test: /\.(jpg|fbx|svg|png|pdf|glb|gltf|wasm|jpeg|ttf)$/,
+        /* need to use this type to load fonts not file loader or the font will not load */
+        test: /\.(ttf)$/,
+        type: 'asset/resource'
+      },
+
+      {
+        test: /\.(jpg|fbx|svg|png|pdf|glb|gltf|wasm|jpeg)$/,
         loader: "file-loader"
       },
 /*

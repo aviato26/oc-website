@@ -54,7 +54,7 @@ export default class ServicesPage
     //this.animationController = new AnimationController();
 
     // class for loading interactive elements to the page
-    this.pageDesciption = new PageDesciption();
+    //this.pageDesciption = new PageDesciption();
 
     this.time = 0.0;
     //this.clock = new THREE.Clock();
@@ -166,8 +166,11 @@ export default class ServicesPage
 
 
 
-      this.stateClock = this.pageDesciption.stateClock;
-      this.stateClock2 = this.pageDesciption.stateClock2;
+      this.stateClock = null;
+      this.stateClock2 = null;
+
+      //this.stateClock = this.pageDesciption.stateClock;
+      //this.stateClock2 = this.pageDesciption.stateClock2;
 
       this.scene.add(obj.scene);
 
@@ -242,8 +245,10 @@ export default class ServicesPage
     this.screenShader = new THREE.ShaderMaterial({
       uniforms: {
         time: { value: 0.0 },
-        shadowContainer: { value: this.pageDesciption.shadow1ContainerBoundary },
-        shadowContainer2: { value: this.pageDesciption.shadow2ContainerBoundary },
+        shadowContainer: { value: null },
+        shadowContainer2: { value: null },
+        //shadowContainer: { value: this.pageDesciption.shadow1ContainerBoundary },
+        //shadowContainer2: { value: this.pageDesciption.shadow2ContainerBoundary },        
         errorTexture: { value: new THREE.TextureLoader().load(errorImage, (img) => img.flipY = false) },
         fixedErrorTexture: { value: new THREE.TextureLoader().load(fixedErrorImage, (img) => img.flipY = false) },
         stateClock: { value: 0.0 },
