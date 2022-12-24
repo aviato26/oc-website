@@ -99,7 +99,7 @@ const horseShoeFragment =
      
       //gl_FragColor = finalTextureMix;
       //gl_FragColor = HomeSceneTexture;      
-      gl_FragColor = AboutSceneTexture;            
+      //gl_FragColor = AboutSceneTexture;            
     }
 `;
 
