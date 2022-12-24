@@ -98,7 +98,7 @@ const horseShoeFragment =
       //vec4 finalTextureMix = mix(texture2, texture1, smoothstep(p - 0.4, p + 0.1, uv / 2.0).y);            
      
       //gl_FragColor = finalTextureMix;
-      //gl_FragColor = texture1;      
+      //gl_FragColor = HomeSceneTexture;      
       //gl_FragColor = AboutSceneTexture;            
     }
 `;

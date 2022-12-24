@@ -47,8 +47,8 @@ export default class AnimationController{
         this.mixer2.addEventListener('finished', () => this.action2.reset());        
         this.mixer3.addEventListener('finished', () => this.action3.reset());       
         this.aboutSceneMixer1.addEventListener('finished', () => this.aboutSceneAction1.reset());
-        this.aboutSceneMixer2.addEventListener('finished', () => this.aboutSceneAction2.reset());        
-        this.contactSceneMixer.addEventListener('finished', () => this.contactSceneAction.reset()); 
+        //this.aboutSceneMixer2.addEventListener('finished', () => this.aboutSceneAction2.reset());        
+        //this.contactSceneMixer.addEventListener('finished', () => this.contactSceneAction.reset()); 
 
         this.currentCamera = 1;
         this.prevCamera = 0;
@@ -202,9 +202,9 @@ export default class AnimationController{
                     this.states[this.sceneIndex].updateText();            
                 } 
 
-            }, 1100);
+            }, 1200);
 
-        }, 1100);
+        }, 1200);
 
         //setTimeout(() => this.playAnimation = false, 1500);
     }
@@ -306,7 +306,7 @@ export default class AnimationController{
                 },
 
                 playAnime: () => {
-                    this.aboutSceneAction1 = this.aboutSceneMixer1.clipAction(this.scenes[2].cameraAnimation[1]);
+                    this.aboutSceneAction1 = this.aboutSceneMixer1.clipAction(this.scenes[2].cameraAnimation[0]);
                     this.aboutSceneAction1.setLoop(THREE.LoopOnce);                 
                     this.aboutSceneAction1.timeScale = this.timeDirection;
                     //this.action2.clampWhenFinished = true;
@@ -331,10 +331,10 @@ export default class AnimationController{
 
                 updateText: () => {
                     this.textSegments.unMountText()
-                },
+            },
 
                 playAnime: () => {
-                    this.aboutSceneAction2 = this.aboutSceneMixer1.clipAction(this.scenes[2].cameraAnimation[0]);
+                    this.aboutSceneAction2 = this.aboutSceneMixer1.clipAction(this.scenes[2].cameraAnimation[1]);
                     this.aboutSceneAction2.setLoop(THREE.LoopOnce);                 
                     this.aboutSceneAction2.timeScale = this.timeDirection;
                     //this.action2.clampWhenFinished = true;
