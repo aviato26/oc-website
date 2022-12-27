@@ -16,7 +16,8 @@ const coffeeSmokeFrag = `
         //vec3 uvZoom = vec3(uv, 1.0);        
 
         //uvZoom.y -= fract(fract(fract(time * 0.1 - abs(length(uvZoom.y + 0.5) - fract((time * 0.1 - uvZoom.y )))))) * 0.3;        
-        uvZoom.y -= fract(fract(fract(time * 0.3 - sin(length(uvZoom.y + 0.5) - fract((time * 0.3 - uvZoom.y * uv.y )))))) * 0.3;                
+        //uvZoom.y -= fract(fract(fract(time * 0.3 - sin(length(uvZoom.y + 0.5) - fract((time * 0.3 - uvZoom.y * uv.y )))))) * 0.3;                
+        uvZoom.y -= fract(fract(fract(time * 0.1 - sin(length(uvZoom.y * 0.3) - fract((time * 0.3 - uvZoom.y * uv.y )))))) * 0.3;                                        
         //uvZoom.x -= sin(uvZoom.y * 0.3) * 0.1;
 
         //vec4 numberTexture = texture(tex, uvZoom.xy);
@@ -27,7 +28,8 @@ const coffeeSmokeFrag = `
 
         for(int i = 1; i < 3; i++){
             n = float(i);            
-            uvZoom.y += sin(length(uvZoom * n + uvZoom.x * n - 0.5) + fract(time * uvZoom.y * n * uvZoom.x) * 0.1) * 0.1;
+            //uvZoom.y += sin(length(uvZoom * n + uvZoom.x * n - 0.5) + fract(time * uvZoom.y * n * uvZoom.y) * 0.1) * 0.1;
+            uvZoom.y += sin(length(uvZoom * n + uvZoom.x * n - 0.5) + fract(time * uvZoom.y * n * uvZoom.y) * 0.1) * 0.1;            
             //uvZoom.y -= sin(uvZoom.y * n + uvZoom.x * n) * sin((length(uvZoom * n - 0.1) - uvZoom.y * n)) * fract(length(uvZoom + 0.5) * time * 0.1);                                        
             //smoke += sin(uvZoom.y + uvZoom.x * n * .314) - sin(uvZoom.y + uvZoom.x * n * 0.278) * fract(time * 0.1);
             //smoke += sin(uvZoom.y + uvZoom.x + n) + sin(uvZoom.y + uvZoom.x + n) * sin(fract(time * 0.1 * fract(uvZoom.y * n)));            

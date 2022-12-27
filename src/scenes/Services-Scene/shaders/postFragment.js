@@ -41,7 +41,8 @@ const postFragmentShader =
 
         vec4 finalColor = 1.0 - (1.0 - color) * (1.0 - originalTex);
 
-        vec4 finalTexture = mix(tex, finalColor, abs(usersMouse.x * usersMouseVel.x));
+        //vec4 finalTexture = mix(tex, finalColor, abs(usersMouse.x * usersMouseVel.x));
+        vec4 finalTexture = mix(tex, finalColor, 0.5);        
 /*
         vec2 uv = vUv;
         vec4 tex = texture(tDiffuse, uv);
