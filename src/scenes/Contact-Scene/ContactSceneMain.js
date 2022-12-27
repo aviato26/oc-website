@@ -32,6 +32,11 @@ class ContactSceneMain{
 
         this.loaded = false;
 
+        this.geo = new THREE.BoxGeometry(1, 1, 1);
+        this.material = new THREE.MeshBasicMaterial({ color: 0x331111 });
+        this.mesh = new THREE.Mesh(this.geo, this.material);
+    
+
         this.modelLoader.load(ContactSceneModel, (model) => {
 
             this.loaded = true;
@@ -59,11 +64,12 @@ class ContactSceneMain{
             //console.log(model)
         });
 
+        this.scene.add(this.mesh);
 
+        this.t = 0;
     }
 
     renderedTexture(){
-
 
         this.renderer.setRenderTarget(this.renderBuffer);
         this.renderer.render(this.scene, this.camera);

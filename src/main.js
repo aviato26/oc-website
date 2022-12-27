@@ -162,9 +162,20 @@ export default class Main
   addAnimations(scene){    
 
     // wait for all animations to be loaded before rendering
-    if(this.homeScreen.cameraAnimation && this.servicesPage.cameraAnimation && this.aboutPage && this.contactPage){
+    if(this.homeScreen.cameraAnimation && this.servicesPage.cameraAnimation && this.aboutPage.loaded && this.contactPage){
       this.animationController = new AnimationController([this.homeScreen, this.servicesPage, this.aboutPage, this.contactPage]);
       //console.log(this.aboutPage.renderedTexture())
+      this.renderer.compile(this.scene, this.camera);
+      this.aboutPageTexture = this.aboutPage.renderedTexture()
+      this.renderer.initTexture(this.aboutPageTexture);
+
+      //this.renderer.initTexture(this.homeScreenTexture);
+      //this.renderer.initTexture(this.servicesPageTexture);
+      //this.renderer.initTexture(this.aboutPageTexture);
+      //this.renderer.initTexture(this.contactPageTexture);            
+
+
+
       this.animate();
     }
 
@@ -195,14 +206,16 @@ export default class Main
         //console.log(this.servicesPage.action.isRunning())
         this.homeScreenTexture = this.homeScreen.getRenderedSceneTexture(this.t);
         this.servicePageTexture = this.servicesPage.renderSceneTexture(this.t);        
+        this.aboutPageTexture = this.aboutPage.renderedTexture();
+        this.contactPageTexture = this.contactPage.renderedTexture();
 
 
 
         // once scences have been rendered we will place them into the post process material to be rendered to the final mesh
         this.renderPlaneMaterial.uniforms.tex1.value = this.homeScreenTexture;
         this.renderPlaneMaterial.uniforms.tex2.value = this.servicePageTexture;
-        this.renderPlaneMaterial.uniforms.aboutScene.value = this.aboutPage.renderedTexture();
-        this.renderPlaneMaterial.uniforms.contactScene.value = this.contactPage.renderedTexture();        
+        this.renderPlaneMaterial.uniforms.aboutScene.value = this.aboutPageTexture;
+        this.renderPlaneMaterial.uniforms.contactScene.value = this.contactPageTexture;        
 
         //this.renderPlaneGeometry.uniforms.aboutScene.value = this.aboutPage.renderedTexture();
 
@@ -237,7 +250,7 @@ export default class Main
         //this.renderPlaneMaterial.uniforms.progress.value = this.mathUtils.smoothstep(this.uiController.force);
 
         //console.log(this.animationController.progressAnimation);
-
+        //console.log(this.animationController.progressAnimation2)
         this.renderPlaneMaterial.uniforms.progress.value = this.animationController.progressAnimation;     
         this.renderPlaneMaterial.uniforms.progress2.value = this.animationController.progressAnimation2;     
         this.renderPlaneMaterial.uniforms.progress3.value = this.animationController.progressAnimation3;             

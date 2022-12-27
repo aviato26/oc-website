@@ -17,7 +17,8 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 //import laptop from './t1.glb';
 //import laptop from './lp3.glb';
 //import laptop from './lp3-with-animations.glb';
-import laptop from './lp-all-animations.glb';
+//import laptop from './lp-all-animations.glb';
+import laptop from './lp-animations2.glb';
 //import laptop from './t1.fbx';
 
 //import laptop from './laptop-with-plants.glb';
@@ -185,7 +186,7 @@ export default class ServicesPage
       this.play = false;
       this.progress = 0;
 
-      // this method needs to be called to pre-compile the scene before it gets rendered or the animation will lag in the initial call
+      //this method needs to be called to pre-compile the scene before it gets rendered or the animation will lag in the initial call
       this.renderer.compile(this.scene, this.camera);
 
       //this.renderer2 = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);

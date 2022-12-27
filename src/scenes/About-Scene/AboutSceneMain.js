@@ -23,7 +23,8 @@ import numbersImg from './textures/c2.png';
 //import CoffeeSceneModel from './about-scene-with-animations2.glb';
 //import CoffeeSceneModel from './about-scene.glb';
 //import CoffeeSceneModel from './about-scene-lightmapped.glb';
-import CoffeeSceneModel from './about-scene-lightmapped-new-animations.glb';
+//import CoffeeSceneModel from './about-scene-lightmapped-new-animations.glb';
+import CoffeeSceneModel from './about-scene-new.glb';
 //import lightedFloor from './lighted-floor.png';
 import lightedFloor from './textures/lighted-floor2.png';
 
@@ -45,15 +46,19 @@ class AboutSceneMain{
     constructor(parentRenderer, animationControllerCallback){
         this.scene = new THREE.Scene();
 
-        //this.scene.background = new THREE.Color(0x444444);
+        //this.scene.background = new THREE.Color(0x888888);
 
         this.width = window.innerWidth;
         this.height = window.innerHeight;
 
-        this.environmentMap = new THREE.TextureLoader().load(spaceImg, (img) => {
+        const environmentMap = new THREE.TextureLoader().load(spaceImg, (img) => {
             img.mapping = THREE.EquirectangularReflectionMapping;
+            //return img;
+            this.renderer.initTexture(img);            
             this.scene.environment = img;
         });
+
+
 
         // this camera will be changed once the scene loads but will keep this here for a place holder to pass to the animation controller
         this.camera = new THREE.PerspectiveCamera( 45, this.width / this.height, 1, 1000 );
@@ -65,13 +70,9 @@ class AboutSceneMain{
 
         //this.light = new THREE.DirectionalLight(0x062d89, 5.);
         this.light = new THREE.PointLight(0x062d89, 51.);        
-        //this.light = new THREE.DirectionalLight(0x222222, 4.);        
-        //this.light = new THREE.DirectionalLight(pinkLight, 4.);        
-        //this.light.position.set(170, 1, -10);
-        this.light.position.set(20, 1, 100);        
-        //this.light.target.position.set(10, 1, -50);
 
-        //this.scene.add(this.light);
+        this.light.position.set(20, 1, 100);        
+
 
         this.renderBuffer = new THREE.WebGLRenderTarget(this.width, this.height);
 
@@ -79,14 +80,47 @@ class AboutSceneMain{
 
         this.loaded = false;
 
+        const shadowMap = new THREE.TextureLoader().load(coffeeShadow, (img) => {
+            // uvs in blender are flipped upside down so need to reflip them
+            img.flipY = false;
+
+            /* 
+                the initTexture method preloads the texture so the gpu suffers no over head when the scene is first rendered, if this initially takes to long
+                then the next step might be to convert all the images to ktx2
+            */
+            this.renderer.initTexture(img);
+            return img;
+        });
+
+        const floorTexture = new THREE.TextureLoader().load(lightedFloor, (tex) => {
+            this.renderer.initTexture(tex);
+            return tex;
+        });
+
+        const mathTexture = new THREE.TextureLoader().load(numbersImg, (tex) => {
+            this.renderer.initTexture(tex);
+            return tex;
+        });
+
         this.modelLoader.load(CoffeeSceneModel, (model) => {
 
-            this.loaded = true;
-            //console.log(model.scene.children)
-            //this.camera = model.scene.children[2];
 
             this.cameraAnimation = model.animations;
-            console.log(model)
+
+            //console.log(model.scene)
+            this.camera = model.scene.children[1];
+
+            const material = new THREE.MeshStandardMaterial( { 
+                map: shadowMap,
+                
+                lightMap: shadowMap,
+
+                roughness: 0.2
+
+            } );
+
+
+
 
             model.scene.traverse((e) => {
                 //check for coffee cup, model was not properly named so its name is under circle
@@ -99,21 +133,8 @@ class AboutSceneMain{
                     if(e.name === 'Cube'){
 
                         this.cube = e;
-                        //const mat = new THREE.MeshBasicMaterial({ color: 0x062d89});
-                        //this.cube.material = mat;
 
                         e.material.needsUpdate = true;
-/*
-                        e.material.side = THREE.DoubleSide;
-                        e.material.map = new THREE.TextureLoader().load(backgroundLight, (img) => {
-                            img.flipY = false;
-                            return img;
-                        });                        
-                        e.material.lightMap = new THREE.TextureLoader().load(backgroundLight, (img) => {
-                            img.flipY = false;
-                            return img;
-                        });
-*/
                     }
 
                     if(e.name === 'NurbsPath001'){
@@ -130,24 +151,21 @@ class AboutSceneMain{
                         });
 
                         e.material = this.wireMaterial;
+                        e.material.needsUpdate = true;
                         //console.log(e)
                     }
 
                     if(e.name === 'Plane001'){
                         //console.log(e)
-
-                        const mathTexture = new THREE.TextureLoader().load(numbersImg);
-                        mathTexture.flipY = true;
-                        mathTexture.flipZ = true;
-
                         this.smokeMaterial = new THREE.ShaderMaterial({
 
-                            side: THREE.DoubleSide,
+                            //side: THREE.DoubleSide,
                             transparent: true,
                             
 
                             uniforms: {
                                 tex: { value: mathTexture},
+                                //tex: { value: null},                                
                                 time: { value: 0.0 }
                             },
 
@@ -157,6 +175,7 @@ class AboutSceneMain{
                         })
 
                         e.material = this.smokeMaterial;
+                        e.material.needsUpdate = true;
 
                         // folding the mesh to flip the texture along the x direction
                         e.scale.x = -1;
@@ -165,11 +184,11 @@ class AboutSceneMain{
 
                     if(e.name == 'Plane'){
                         //console.log(e)
-                        const texture = new THREE.TextureLoader();
-                        texture.load(lightedFloor, (tex) => {
-                            const mat = new THREE.MeshBasicMaterial({ map: tex });
-                            e.material = mat;
-                        })
+                        const mat = new THREE.MeshBasicMaterial({ map: floorTexture });
+                        //const mat = new THREE.MeshBasicMaterial({ color: 0x444444 });                        
+                        e.material = mat;
+                        e.material.needsUpdate = true;
+
                         //console.log(texture)
                         //e.material.map = texture;
                     }
@@ -177,25 +196,6 @@ class AboutSceneMain{
                     if(e.name === 'Coffee_Mug001_Mug_White_0'){                    
                     //console.log(e)
                     this.mod = e;
-
-                    const shadowMap = new THREE.TextureLoader();
-                    const roughMap = new THREE.TextureLoader();
-
-                    const material = new THREE.MeshStandardMaterial( { 
-                        map: shadowMap.load(coffeeShadow, (img) => {
-                            // uvs in blender are flipped upside down so need to reflip them
-                            img.flipY = false;
-                            return img;
-                        }), 
-                        
-                        lightMap: shadowMap.load(coffeeShadow, (img) => {
-                            img.flipY = false;
-                            return img;
-                        }),
-
-                        roughness: 0.2
-
-                    } );
 
 
                     material.defines.USE_UV = '';                    
@@ -247,7 +247,7 @@ class AboutSceneMain{
                           
                           //col *= mix(colors, diffuseColor2.xyz, 0.2);
 
-                          diffuseColor2.xyz = mix(col * colors, diffuseColor2.xyz, 0.9);
+                          diffuseColor2.xyz = mix(col * colors, diffuseColor2.xyz - fract(vec3(uv , 1) * 40.0), 0.9);
 
                   
                           vec4 diffuseColor = diffuseColor2;                          
@@ -264,8 +264,9 @@ class AboutSceneMain{
 
 
                     e.material = material;
+              
+               
                 }
-
 
 
             });
@@ -277,7 +278,7 @@ class AboutSceneMain{
             this.camera.aspect = window.innerWidth / window.innerHeight;
             this.camera.updateProjectionMatrix();
 
-            this.scene.add(model.scene);
+            //this.camera.rotation.x = 0;
 
 
             const params = {
@@ -311,25 +312,37 @@ class AboutSceneMain{
 
             // this pass needs to be swapped to the write buffer in order to be rendererd into the texture
             bokeh.needsSwap = true;
-            //bloomPass.needsSwap = true;
+            bloomPass.needsSwap = true;
 
             this.composer.addPass(renderPass);
             //this.composer.addPass(bokeh);
             this.composer.addPass(bloomPass);            
 
-            //console.log(this.model)
+            this.scene.add(model.scene);
+
+            
+            this.loaded = true;
 
             // this method needs to be called to pre-compile the scene before it gets rendered or the animation will lag in the initial call
-            this.renderer.compile(this.scene, this.camera);            
+            //this.renderer.compile(this.scene, this.camera);   
 
-            animationControllerCallback(model);
-            //console.log(model)
+            animationControllerCallback(model)
+            this.renderer.compile(this.scene, this.camera);                 
+
         });
 
-        
+        this.renderBuffer = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, {});
 
         this.time = 0.0;
 
+    }
+
+
+    renderPass(){
+        this.renderer.setRenderTarget(this.renderBuffer);
+        this.renderer.render(this.scene, this.camera);
+        this.renderer.setRenderTarget(null);
+        return this.renderBuffer.texture;
     }
 
     renderedTexture(){
@@ -339,16 +352,15 @@ class AboutSceneMain{
         //this.wireMaterial.uniforms.time.value = this.time;
         this.smokeMaterial.uniforms.time.value = this.time;
         this.mod.material.userData.shader.uniforms.time.value = this.time;
-        //this.cube.rotateX(this.time * 0.001);
-/*
-        this.renderer.setRenderTarget(this.renderBuffer);
-        this.renderer.render(this.scene, this.camera);
-        this.renderer.setRenderTarget(null);
-*/
+
+        //this.camera.rotation.y += this.time * 0.001;
+        
         this.composer.render();
+        //this.renderer.render(this.scene, this.camera);
 
         return this.composer.readBuffer.texture;      
-
+        
+        //return this.renderPass();
         //return this.renderBuffer.texture;
     }
 

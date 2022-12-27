@@ -27,6 +27,7 @@ export default class AnimationController{
         this.sceneIndex = 0;
 
         this.time = new Clock();
+        this.t = 0;
 
         // variable to only trigger one animation event at a time
         this.animating = false;
@@ -52,6 +53,9 @@ export default class AnimationController{
 
         this.currentCamera = 1;
         this.prevCamera = 0;
+
+        console.log(this.scenes[0])
+        //this.testCamera = this
 
         this.animationStates();
 
@@ -335,7 +339,7 @@ export default class AnimationController{
 
                 playAnime: () => {
                     this.aboutSceneAction2 = this.aboutSceneMixer1.clipAction(this.scenes[2].cameraAnimation[1]);
-                    this.aboutSceneAction2.setLoop(THREE.LoopOnce);                 
+                    //this.aboutSceneAction2.setLoop(THREE.LoopOnce);                 
                     this.aboutSceneAction2.timeScale = this.timeDirection;
                     //this.action2.clampWhenFinished = true;
                     this.aboutSceneAction2.play();
@@ -410,6 +414,11 @@ export default class AnimationController{
                     //onStart: () => console.log('asdf')
                     //onComplete: () => this.progressAnimation = 0                                
                 });
+
+                gsap.to(this.scenes[0].camera.rotation, { x: -Math.PI * 2, duration: 2., ease: "back.inOut(1.7)", });
+                //gsap.to(this.scenes[1].camera.rotation, { x: -1.2246467991473532e-16, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", });
+                gsap.to(this.scenes[1].camera.quaternion, { x: 0, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", });                
+
             }
             if(this.timeDirection === -1){
                 this.progressAnimation = 1;
@@ -422,6 +431,13 @@ export default class AnimationController{
                     // need to reset progressAnimation variable to 0 to be reused
                     onComplete: () => {}
                 });
+
+                gsap.to(this.scenes[0].camera.rotation, { x: -Math.PI / 2, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", });
+                gsap.to(this.scenes[1].camera.quaternion, { x: 1, duration: 2., ease: "back.inOut(1.7)", });                                
+                //gsap.to(this.scenes[1].camera.rotation, { x: 1.570796 , duration: 2., ease: "back.inOut(1.7)", });
+                //gsap.to(this.scenes[1].camera.rotation, { x: 0 , duration: 2., ease: "back.inOut(1.7)", });
+                //gsap.to(this.scenes[1].camera.rotation, { x: Math.sin(-Math.PI / 2) , duration: 2., ease: "back.inOut(1.7)", });
+                //console.log(this.scenes[1].camera.rotation)
             }
         }
 
@@ -437,6 +453,11 @@ export default class AnimationController{
                     //onStart: () => console.log('asdf')
                     //onComplete: () => this.progressAnimation = 0                                
                 });
+
+                gsap.to(this.scenes[1].camera.quaternion, { x: -1, duration: 2., ease: "back.inOut(1.7)", });                                
+                //gsap.to(this.scenes[1].camera.rotation, { x: 1.2246467991473532e-16 * 2, duration: 2., ease: "back.inOut(1.7)", });
+                gsap.to(this.scenes[2].camera.rotation, { x: 0, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", });
+
             }
             if(this.timeDirection === -1){
                 this.progressAnimation2 = 1;
@@ -449,6 +470,11 @@ export default class AnimationController{
                     // need to reset progressAnimation variable to 0 to be reused
                     onComplete: () => {}
                 });
+
+                gsap.to(this.scenes[1].camera.quaternion, { x: 0, duration: 2., ease: "back.inOut(1.7)", });                                
+                //gsap.to(this.scenes[1].camera.rotation, { x: Math.PI * 2, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", });
+                gsap.to(this.scenes[2].camera.rotation, { x: 1.570796 , duration: 2., ease: "back.inOut(1.7)", });
+
             }
         }
 
@@ -464,6 +490,10 @@ export default class AnimationController{
                     //onStart: () => console.log('asdf')
                     //onComplete: () => this.progressAnimation = 0                                
                 });
+
+                gsap.to(this.scenes[2].camera.quaternion, { x: -1, duration: 2., ease: "back.inOut(1.7)", });                                
+                gsap.to(this.scenes[3].camera.rotation, { y: 0 , duration: 2., ease: "back.inOut(1.7)", });
+
             }
             if(this.timeDirection === -1){
                 this.progressAnimation3 = 1;
@@ -476,6 +506,9 @@ export default class AnimationController{
                     // need to reset progressAnimation variable to 0 to be reused
                     //onComplete: () => {}
                 });
+
+                gsap.to(this.scenes[2].camera.quaternion, { x: 0, duration: 2., ease: "back.inOut(1.7)", });                                
+                gsap.to(this.scenes[3].camera.rotation, { y: 1.570796 , duration: 2., ease: "back.inOut(1.7)", });
             }
         }
 
@@ -493,7 +526,7 @@ export default class AnimationController{
 
         
         if(this.states[this.sceneIndex].playAnime){
-            this.states[this.sceneIndex].playAnime(this.timeForward);            
+            //this.states[this.sceneIndex].playAnime(this.timeForward);            
         } 
 
         this.sceneTextureIndex = this.states[this.sceneIndex].sceneIndex;
