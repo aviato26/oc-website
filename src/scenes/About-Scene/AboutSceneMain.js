@@ -325,9 +325,9 @@ class AboutSceneMain{
 
             // this method needs to be called to pre-compile the scene before it gets rendered or the animation will lag in the initial call
             //this.renderer.compile(this.scene, this.camera);   
-
+            this.renderer.compile(this.scene, this.camera);   
+            
             animationControllerCallback(model)
-            this.renderer.compile(this.scene, this.camera);                 
 
         });
 
