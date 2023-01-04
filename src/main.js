@@ -36,7 +36,7 @@ export default class Main
     this.clock = new THREE.Clock();
 
     this.stats = Stats()
-    document.body.appendChild(this.stats.dom)
+    //document.body.appendChild(this.stats.dom)
 
     // setting title
     document.title = "Oc Networks Inc";
@@ -131,6 +131,14 @@ export default class Main
     //this.renderer.physicallyCorrectLights = true;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.domElement.style.position = 'fixed';
+
+    this.pixelRatio = (this.cameraAspect < 1.0) ? 2.0 : 1.6;
+  
+    // setting pixel ratio according to screen size, if ratio is set to window.devicePixelRatio performance becomes an issue on bigger screens
+    //this.renderer.setPixelRatio( this.pixelRatio );
+
+    // need to reset pixel ratio for larger screens
+    //this.renderer.setPixelRatio( 0.8 );
 
     document.body.appendChild( this.renderer.domElement );
 
