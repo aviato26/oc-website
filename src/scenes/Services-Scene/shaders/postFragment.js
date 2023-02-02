@@ -31,7 +31,7 @@ const postFragmentShader =
 
             float weight = sin(lerp * 3.14159);
 
-            vec4 sampleT = texture(tDiffuse, uv + center * lerp * .9 );
+            vec4 sampleT = texture(tDiffuse, uv + center * lerp * .29 );
             sampleT.rgb *= sampleT.a;
             color += sampleT * weight;
         }
@@ -41,8 +41,13 @@ const postFragmentShader =
 
         vec4 finalColor = 1.0 - (1.0 - color) * (1.0 - originalTex);
 
-        //vec4 finalTexture = mix(tex, finalColor, abs(usersMouse.x * usersMouseVel.x));
-        vec4 finalTexture = mix(tex, finalColor, 0.5);        
+        float force = usersMouseVel.x;
+        //force *= 0.9;
+
+        //vec4 finalTexture = mix(tex, finalColor, abs(0.9 * (usersMouse.x - usersMouseVel.x)));
+        vec4 finalTexture = mix(tex, finalColor, abs(force));        
+        //vec4 finalTexture = mix(tex, finalColor, abs(sin(time)));        
+        //vec4 finalTexture = mix(tex, finalColor, 0.);                
 /*
         vec2 uv = vUv;
         vec4 tex = texture(tDiffuse, uv);

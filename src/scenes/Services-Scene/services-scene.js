@@ -7,7 +7,12 @@ import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
+
+import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader';
+
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
+
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 //import laptop from './laptop2.glb';
 //import laptop from './lp2.glb';
@@ -18,7 +23,14 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 //import laptop from './lp3.glb';
 //import laptop from './lp3-with-animations.glb';
 //import laptop from './lp-all-animations.glb';
-import laptop from './lp-animations2.glb';
+//import laptop from './lp-animations2.glb';
+//import laptop from './lp3.glb';
+//import laptop from './lp4.glb';
+//import laptop from './lp5.glb';
+//import laptop from './lp51.glb';
+import laptop from './lp52.glb';
+//import laptop from './lp4Ktx.glb';
+//import laptop from './compressed-scene.drc';
 //import laptop from './t1.fbx';
 
 //import laptop from './laptop-with-plants.glb';
@@ -37,6 +49,26 @@ import css from '../css/style.css'
 import errorImage from './textures/error.png';
 import fixedErrorImage from './textures/fixed-blue-screen.png';
 
+
+import deskcolor   from './textures/dl.png';
+import deskLightMap from './textures/dl2.png';
+
+import lpLightMap from './textures/lp-light-map.png';
+import laptopRoughmap from './textures/lp-roughmap.png';
+import laptopNormalmap from './textures/lp-normal.png';
+import lp2 from './textures/lm2.png';
+
+import light2 from './textures/lp2.png';
+
+import tableRoughmap from './textures/Table/dl2.jpg';
+import tableColor from './textures/dl.png';
+
+import deskLight from './textures/desk-light.jpg';
+
+import env from './textures/galaxy.jpg';
+//import env from './textures/pink.jpeg';
+
+
 import AnimationController from '../../UIEvents/AnimationController';
 
 export default class ServicesPage
@@ -45,82 +77,109 @@ export default class ServicesPage
   {
     this.scene = new THREE.Scene();
 
+    const wallLightMap = new THREE.TextureLoader().load(env, (img) => {
+      //img.flipY = false;
+      img.mapping = THREE.EquirectangularReflectionMapping;
+      //img.encoding = THREE.sRGBEncoding;
+
+      this.scene.environment = img;
+      //this.scene.backgroundIntensity = 12;      
+    })
+
     // this camera will be changed once the scene loads but will keep this here for a place holder to pass to the animation controller
     this.camera = new THREE.PerspectiveCamera( 45, this.width / this.height, 1, 1000 );
 
 
     this.renderer = parentRenderer;
-    this.renderer.physicallyCorrectLights = true;
 
-    //this.animationController = new AnimationController();
+    //this.renderer.physicallyCorrectLights = true;
+    this.renderer.outputEncoding = THREE.sRGBEncoding;
+    //this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    //this.renderer.toneMapping = THREE.LinearToneMapping;    
+    //this.renderer.toneMapping = THREE.ReinhardToneMapping;        
+    this.renderer.toneMapping = THREE.CineonToneMapping;            
 
-    // class for loading interactive elements to the page
-    //this.pageDesciption = new PageDesciption();
+    // variable to switch on when scene is in frame to activate this scenes camera controls and switch off when scene is not being rendered
+    this.cameraActive = false;
+
+    this.sceneLoaded = false;
 
     this.time = 0.0;
-    //this.clock = new THREE.Clock();
 
     const blueLight = 0x062d89;
+    const pinkLight = 0xFF00E9;
 
-
-    //this.flash = new THREE.PointLight(blueLight, 80, 300, 1.7);
-    this.flash = new THREE.AmbientLight(blueLight, 1);
-
-    
-    this.scene.add(this.flash);
-
+    this.mouse = new THREE.Vector2(0, 0);
+    this.mouseLastPos = new THREE.Vector2(0, 0);
+    this.mouseDiff = new THREE.Vector2(0, 0);
+    this.mVel = new THREE.Vector2(0, 0);
 
 
     this.roomMaterial = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
 
 
-
     this.model = new GLTFLoader();
+    //this.ktx2Loader = new KTX2Loader();
+    //this.model.setKTX2Loader(this.ktx2Loader);
+    //this.model = new DRACOLoader();
 
     this.model.load(laptop, (obj) => {
 
-      
-      obj.scene.children.map(c => {
 
-        if(c.name === 'Plane'){
-          c.material = this.addScreenShader();
+      obj.scene.traverse((obj) => {
+
+        if(obj.name === 'Cube'){
+          //const wallLightMap = new THREE.TextureLoader().load(wallLight, (img) => img.flipY = false)
+          //const mat = new THREE.MeshBasicMaterial({map: wallLightMap, side: THREE.DoubleSide });
+          const mat = new THREE.MeshStandardMaterial({side: THREE.DoubleSide, metalness: 1.0, roughness: .6 });          
+          //c.material.map = new THREE.TextureLoader().load(wallLight);
+          //c.material.side = THREE.DoubleSide;
+          obj.material = mat;         
+          //c.marterial.side = THREE.DoubleSide;
+          //c.material.side = 3
+          obj.material.needsUpdate = true;
+        }
+
+        if(obj.name === 'Plane'){
+          this.sceenPos = obj.position;
+          obj.material = this.addScreenShader();
           this.pivot = new THREE.Object3D();
-          this.pivot.position.copy(c.position);
+          this.pivot.position.copy(obj.position);
         }
 
       })
 
       //console.log(obj)
-      this.cameraScene = obj;
-      this.cameraAnimation = obj.animations;
-
-      animationCallBack(obj);
 
       //console.log(this.cameraAnimation)
 
       this.camera = obj.cameras[0];
-      this.camera.fov = 35;
+      //this.camera.fov = 35;
+      //this.camera.fov = 60;      
       this.camera.aspect = window.innerWidth / window.innerHeight;
+
+      //this.camera.rotation.x = Math.PI;
+      //this.camera.rotation.x = Math.PI * 2;      
+      
       this.camera.updateProjectionMatrix();
 
-      this.camera.rotation.x = Math.PI / 2;
+      //this.controls = new OrbitControls(this.camera, this.renderer.domElement)
 
       //this.camera.rotation.x += Math.sin(Math.PI / 2);
 
-
-      //this.playAnimation(obj);
-      //this.mixer.update(.53);
-
       const params = {
-        exposure: 1.,
-        bloomStrength: .25,
-        bloomThreshold: 0,
+        exposure: 3.,
+        bloomStrength: .2,
+        bloomThreshold: 0.3,
         bloomRadius: 1.
       };
 
 
 
       this.composer = new EffectComposer(this.renderer);
+      // composer must not render to screen in order to save all the passes to pass through to store as a texture
+      //this.composer.renderToScreen = false;
+
       const renderPass = new RenderPass(this.scene, this.camera);
   
       const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
@@ -130,7 +189,7 @@ export default class ServicesPage
 
       const bokeh = new BokehPass(this.scene, this.camera, {
         focus: 1.,
-        aperture: 0.005,
+        aperture: 0.01,
         maxblur: 0.01,
 
         width: window.innerWidth,
@@ -154,106 +213,51 @@ export default class ServicesPage
   
       this.shaderPass = new ShaderPass(this.postMaterial);
 
-
+      // this pass needs to be swapped to the write buffer in order to be rendererd into the texture
+      //bokeh.needsSwap = true;
+      //bloomPass.needsSwap = true;
 
       
       this.composer.addPass(renderPass);
       this.composer.addPass(this.shaderPass);
-      this.composer.addPass(bloomPass);
       this.composer.addPass(bokeh);
-
-
-
-
-
-
-      this.stateClock = null;
-      this.stateClock2 = null;
-
-      //this.stateClock = this.pageDesciption.stateClock;
-      //this.stateClock2 = this.pageDesciption.stateClock2;
+      this.composer.addPass(bloomPass);      
 
       this.scene.add(obj.scene);
+      
+      //this.composer.render();
+      //this.renderer.initTexture(this.composer.readBuffer.texture)
 
+      this.sceneLoaded = true;
+
+      //this method needs to be called to pre-compile the scene before it gets rendered or the animation will lag in the initial call
+      this.renderer.compile(this.scene.children[0], this.camera);
 
       //this.renderSceneTexture();
+      //this.preRender();
 
-    // adding user interation controller
-    this.UIController();
+      //3this.renderer2 = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+
+
+      animationCallBack(this.scene, this.camera);
+
+
 
       //this.animate();
 
-      this.play = false;
-      this.progress = 0;
-
-      //this method needs to be called to pre-compile the scene before it gets rendered or the animation will lag in the initial call
-      this.renderer.compile(this.scene, this.camera);
-
-      //this.renderer2 = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
-
   });
 
-
-
-  //this.initPost();
-
-
-  this.t = 0;
-  //this.renderSceneTexture();
   
   }
 
-  initPost(){
-
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-
-    this.postScene = new THREE.Scene();
-
-    this.postTexture = new THREE.WebGLRenderTarget(width, height, {
-      minFilter: THREE.LinearFilter,
-      magFilter: THREE.LinearFilter,
-      format: THREE.RGBAFormat
-    });
-
-    this.postCamera = new THREE.OrthographicCamera( 1 / - 2, 1 / 2, 1 / 2, 1 / - 2, -1000, 1000 );
-
-    //this.postCamera.position.z += 10;
-
-    this.postGeo = new THREE.PlaneGeometry(1, 1);
-
-    this.postMaterial = new THREE.ShaderMaterial({
-      uniforms: {
-        postTex: { value: null },
-        time: { value: 0.0 },
-        cameraPos: { value: new THREE.Vector3(0) },
-        mouse: { value: this.mouse },
-        mouseVel: { value: this.mouseVel }
-      },
-
-      fragmentShader: postFragmentShader,
-      vertexShader: postVertexShader
-    });
-
-    this.shaderPass = new ShaderPass(this.postMaterial);
-
-
-  }
 
   addScreenShader(){
-
 
     this.screenShader = new THREE.ShaderMaterial({
       uniforms: {
         time: { value: 0.0 },
-        shadowContainer: { value: null },
-        shadowContainer2: { value: null },
-        //shadowContainer: { value: this.pageDesciption.shadow1ContainerBoundary },
-        //shadowContainer2: { value: this.pageDesciption.shadow2ContainerBoundary },        
         errorTexture: { value: new THREE.TextureLoader().load(errorImage, (img) => img.flipY = false) },
         fixedErrorTexture: { value: new THREE.TextureLoader().load(fixedErrorImage, (img) => img.flipY = false) },
-        stateClock: { value: 0.0 },
-        stateClock2: { value: 0.0}
       },
 
       vertexShader: screenVertexShader,
@@ -265,176 +269,59 @@ export default class ServicesPage
   }
 
 
-  UIController(){
-    this.mouse = new THREE.Vector2(0, 0);
-    this.mouseLastPos = new THREE.Vector2(0, 0);
-    this.currentMouse = new THREE.Vector2(0, 0);
-    this.mouseVel = new THREE.Vector2(0, 0);
-    this.mouseDown = false;
+  updateCamera(mousePos){
 
-    this.negativeForce = 1.0;
-/*
-    document.addEventListener('mousedown', () => {
-      this.mouseDown = true;
-      this.negativeForce = 1.0;
-    });
-    document.addEventListener('mouseup', () => {
-      this.mouseDown = false;
+    //this.camera.lookAt(this.sceenPos);
+    //console.log(this.camera.rotation)    
+    if(this.cameraActive){
+      this.mouse.x = mousePos.x;
 
-      this.negativeForce = -0.8;
-
-      console.log(this.animationController.currentAnimation)
-      // resetting to cause a flicker of light after user lets go of mouse
-      this.mouseLastPos.set(0, 0);
-    });
-
-    document.addEventListener('mousemove', (e) => {
-      if(this.mouseDown){
-        this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-        this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-      }
-    });
-    */
+      // updating camera position according to users mouse position along the x axis
+      this.camera.position.x = mousePos.x * 0.8;
+  
+      // keeping the camera looking at the laptop no matter where the cameras position is placed
+      this.camera.lookAt(this.sceenPos);
+    }
   }
 
-
-  setStateClock(){
-    
-    (this.pageDesciption.shadow1ContainerBoundary) ? this.stateClock += 0.1 : this.stateClock = 0.0;
-    (this.pageDesciption.shadow2ContainerBoundary) ? this.stateClock2 += 0.1 : this.stateClock2 = 0.0;
-
-
+  activateCameraControls(){
+    this.cameraActive = !this.cameraActive;
   }
 
-  playAnimation(){
-    //this.mixer = new THREE.AnimationMixer(obj.scene);
-    this.mixer = new THREE.AnimationMixer(this.cameraScene.scene);
-    this.mixer.timeScale = .50;
-    //this.mixer = new THREE.AnimationMixer(this.camera);
-    let clips = this.cameraAnimation;
-    //this.animation = new THREE.AnimationAction(this.mixer, );
-
-    //let clip = new THREE.AnimationClip(clips[0]);
-    //this.action = this.mixer.clipAction(clips[0]);
-    //this.action.setLoop(THREE.LoopOnce);
-    //this.action.clampWhenFinished = true;
-    //this.action.play();
-    //console.log(this.mixer)
-    //this.action.paused = true;
-    //console.log(this.action.time)
-    //this.clock = new THREE.Clock();
-   }
-
-   /*
-   progressBar(){
-    if(this.mixer.time > 1.5){
-      //this.mixer.time = 0;
-      this.mixer.update(-this.clock.getDelta());
-    }
-    else{
-      this.mixer.update(this.clock.getDelta());
-    }
-   }
-   */
 
   renderSceneTexture(time){
-    //this.renderer.compile(this.scene, this.camera);
-/*
-    this.stateClock = this.pageDesciption.timingAnimation(this.pageDesciption.shadow1ContainerBoundary, this.stateClock);
-    this.stateClock2 = this.pageDesciption.timingAnimation(this.pageDesciption.shadow2ContainerBoundary, this.stateClock2);
-*/
-    //this.d += 0.1;
 
-    //console.log(this.d);
+    this.time += 1 / 60;
 
-
-    //this.pageDesciption.timingAnimation(this.pageDesciption.shadow1ContainerBoundary, this.stateClock);
-
-    //if(this.play){
-      /*
-    if(this.animationController.currentAnimation.scene == 'Services-Scene'){      
-
-      this.action = this.mixer.clipAction(this.cameraAnimation[0]);
-      this.action.setLoop(THREE.LoopOnce);
-      this.action.clampWhenFinished = true;
-
-      this.action.play();
-
-      //console.log(this.mixer.time);          
-    }
-    */
-    //this.mixer.update(time);  
-/*
-    this.screenShader.uniforms.time.value = this.time;
-
-    this.screenShader.uniforms.shadowContainer.value = this.pageDesciption.shadow1ContainerBoundary;
-    this.screenShader.uniforms.shadowContainer2.value = this.pageDesciption.shadow2ContainerBoundary;
-*/
-    //this.screenShader.uniforms.shadowContainer.value = false;
-    //this.screenShader.uniforms.shadowContainer2.value = false;
-
-    //console.log(this.stateClock, this.stateClock2)
-/*
-    this.screenShader.uniforms.stateClock.value = this.stateClock;
-    this.screenShader.uniforms.stateClock2.value = this.stateClock2;
-*/
-    //this.cubeMaterial.uniforms.camera.value = this.camera.position;
-
-    //this.renderer.setRenderTarget(this.postTexture);
-    //this.renderer.render(this.scene, this.camera);
-
-    //this.postMaterial.uniforms.postTex.value = this.postTexture.texture;
+    // getting mouse vel and adding dampener to slowly dissepate mVel
     
-   //this.postMaterial.uniforms.cameraPos.value = this.camera.position;
+    this.mouseDiff.subVectors(this.mouse, this.mouseLastPos);
+    this.mVel.add(this.mouseDiff);
+    this.mVel.multiplyScalar(0.94);
 
-    //this.mouseVel.multiplyScalar(0.99);
-    //console.log(this.mouseVel);
-    //console.log(this.mouse)
+    // postMaterial for the blur bloom effect
+    this.postMaterial.uniforms.time.value = this.time;
+    this.postMaterial.uniforms.mouse.value = this.mouse;
+    this.postMaterial.uniforms.mouseVel.value = this.mVel;    
 
-    this.mouse.multiplyScalar(this.negativeForce);
-    this.mouseVel.subVectors(this.mouseLastPos, this.mouse);
+    // after getting velocity setting last mouse position to current mouse position
     this.mouseLastPos.copy(this.mouse);
 
+    // updating time for the blue screen of death to switch images
+    //this.screenShader.uniforms.time.value = this.time;
 
-    //this.currentMouse.add(this.mouseVel);
-    //this.currentMouse.multiplyScalar(0.97);
-
-    this.postMaterial.uniforms.mouse.value = this.mouse;
-    this.postMaterial.uniforms.mouseVel.value = this.currentMouse;
-
-    this.postMaterial.uniforms.time.value = this.time;
-
-
-
-    //this.stats.update();
-
-    //this.controls.update();
-
-
-    //this.renderer.setRenderTarget(null);
-
-    //this.camera.position.x = Math.sin(this.mouse.x) * 0.2;
-
-    //this.camera.rotation.y = Math.sin(this.mouse.x) * 0.3;
-
-    //console.log(this.composer.readBuffer.texture)
-    //this.renderdTexture = this.composer.readBuffer.texture;
-
-
-    //this.renderer.compile();
-/*
+    this.composer.render();
+    /*
     this.renderer.setRenderTarget(this.renderer2);
     this.renderer.render(this.scene, this.camera);
     this.renderer.setRenderTarget(null);
+    
     return this.renderer2.texture;
-*/
-    //console.log(parentRenderer)
+    */
 
-    this.composer.render();
 
     return this.composer.readBuffer.texture;      
 
-    //this.renderdTexture = this.renderT.texture;
   }
 
 }

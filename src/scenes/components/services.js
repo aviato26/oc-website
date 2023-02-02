@@ -1,7 +1,5 @@
 
-import ft from './font.ttf'
-//import rb from './ruby.ttf';
-//const rb = require('./ruby.ttf');
+
 import '../css/style.css';
 
 class PageDesciption{
