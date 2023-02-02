@@ -5,8 +5,8 @@ const horseShoeFragment =
 `
     //precision mediump float;
 
-    uniform sampler2D tex1;
-    uniform sampler2D tex2;
+    uniform sampler2D homeScene;
+    uniform sampler2D servicesScene;
     uniform sampler2D aboutScene;
     uniform sampler2D contactScene;
 
@@ -32,8 +32,8 @@ const horseShoeFragment =
 
       vec2 m = mouse.xy;
       
-      vec4 HomeSceneTexture = texture(tex1, uv);
-      vec4 ServicesSceneTexture = texture(tex2, uv);
+      vec4 HomeSceneTexture = texture(homeScene, uv);
+      vec4 ServicesSceneTexture = texture(servicesScene, uv);
       vec4 AboutSceneTexture = texture(aboutScene, uv);
       vec4 ContactSceneTexture = texture(contactScene, uv);
 
@@ -99,6 +99,7 @@ const horseShoeFragment =
      
       //gl_FragColor = finalTextureMix;
       //gl_FragColor = HomeSceneTexture;      
+      //gl_FragColor = ServicesSceneTexture;            
       //gl_FragColor = AboutSceneTexture;            
       //gl_FragColor = ContactSceneTexture;                  
     }

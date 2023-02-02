@@ -30,7 +30,7 @@ class ContactSceneMain{
 
         this.modelLoader = new GLTFLoader();
 
-        this.loaded = false;
+        this.sceneLoaded = false;
 
         this.geo = new THREE.BoxGeometry(1, 1, 1);
         this.material = new THREE.MeshBasicMaterial({ color: 0x331111 });
@@ -38,8 +38,6 @@ class ContactSceneMain{
     
 
         this.modelLoader.load(ContactSceneModel, (model) => {
-
-            this.loaded = true;
 
             this.camera = model.scene.children[0];
 
@@ -57,10 +55,12 @@ class ContactSceneMain{
 
             this.scene.add(model.scene);
 
-            // this method needs to be called to pre-compile the scene before it gets rendered or the animation will lag in the initial call
-            this.renderer.compile(this.scene, this.camera);
+            this.sceneLoaded = true;
 
-            animationControllerCallback(model);
+            // this method needs to be called to pre-compile the scene before it gets rendered or the animation will lag in the initial call
+            //this.renderer.compile(this.scene, this.camera);
+
+            animationControllerCallback(this.scene, this.camera);
             //console.log(model)
         });
 

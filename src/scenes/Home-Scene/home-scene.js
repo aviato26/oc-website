@@ -53,7 +53,7 @@ export default class HomeScene
     this.width = window.innerWidth;
     this.height = window.innerHeight;
 
-
+    this.sceneLoaded = false;
 
     this.camera = new THREE.PerspectiveCamera( 45, this.width / this.height, 1, 1000 );
 
@@ -262,12 +262,14 @@ const bloomProps = {
   //floor.material.emissiveIntensity = 2;
   floor.material.emissiveIntensity = .3;
 
+  this.sceneLoaded = true;
 
   this.scene.add(obj.scene)
 
   //this.playAnimation();
 
-  animationCallBack(obj);
+
+  animationCallBack(this.scene, this.camera);
 
   // this method needs to be called to pre-compile the scene before it gets rendered or the animation will lag in the initial call
   //this.renderer.compile(this.scene, this.camera);
@@ -312,7 +314,7 @@ document.addEventListener('mousedown', () => {
 
 
 
-  getRenderedSceneTexture(time){
+  getRenderedSceneTexture(){
 
     this.time += 0.1;
 
@@ -325,17 +327,10 @@ document.addEventListener('mousedown', () => {
     //this.mixer.update(time);
     //this.t = performance.now();
 
-      if(this.composer){
+    this.composer.render();
 
-        this.composer.render();
-
-        return this.composer.readBuffer.texture;
-      }
-
-    //}
-
-
-  };
+    return this.composer.readBuffer.texture;
+  }
 
 }
 

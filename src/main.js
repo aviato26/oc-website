@@ -15,10 +15,7 @@ import ContactScene from './scenes/Contact-Scene/ContactSceneMain';
 
 import UIController from './UIEvents/UIController.js';
 
-import Math from './MathUtils/mathMain.js'
-
 import AnimationController from './UIEvents/AnimationController';
-import { PropertyMixer } from 'three';
 
 
 
@@ -36,7 +33,7 @@ export default class Main
     this.clock = new THREE.Clock();
 
     this.stats = Stats()
-    //document.body.appendChild(this.stats.dom)
+    document.body.appendChild(this.stats.dom)
 
     // setting title
     document.title = "Oc Networks Inc";
@@ -66,6 +63,8 @@ export default class Main
       //console.log(window.scrollY + window.innerHeight, totalHeight)
     });
 */
+
+/*
     document.addEventListener('mousemove', (e) => {
 
       let x = ((e.clientX / window.innerWidth)) - 0.5;
@@ -83,7 +82,7 @@ export default class Main
       this.mouse.x = x;
       this.mouse.y = y;
     })
-
+*/
 
     this.renderPlaneGeometry = new THREE.PlaneGeometry(2, 2);
 
@@ -95,8 +94,8 @@ export default class Main
         // scene index will be the index of the desired scene to be rendered
         sceneIndex: { value: 0 },
 
-        tex1: { value: null },
-        tex2: { value: null },
+        homeScene: { value: null },
+        servicesScene: { value: null },
         aboutScene: { value: null },
         contactScene: { value: null },
         
@@ -112,24 +111,21 @@ export default class Main
 
       fragmentShader: mainSceneFragmentShader,          
       vertexShader: mainSceneVertexShader
-    })
+    });
 
     this.renderPlaneMesh = new THREE.Mesh(this.renderPlaneGeometry, this.renderPlaneMaterial);
     this.scene.add(this.renderPlaneMesh);
 
     this.renderer = new THREE.WebGLRenderer({
-      //antialias: true,
+      //antialias: false,
+      antialias: true,      
       //minFilter: THREE.LinearFilter,
       //magFilter: THREE.LinearFilter,
-      format: THREE.RGBAFormat,
-      type: THREE.FloatType,
-      depthBuffer: true
-      //stencilBuffer: false
     });
 
     this.renderer.setSize( window.innerWidth, window.innerHeight );
     //this.renderer.physicallyCorrectLights = true;
-    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    //this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.domElement.style.position = 'fixed';
 
     this.pixelRatio = (this.cameraAspect < 1.0) ? 2.0 : 1.6;
@@ -138,7 +134,7 @@ export default class Main
     //this.renderer.setPixelRatio( this.pixelRatio );
 
     // need to reset pixel ratio for larger screens
-    //this.renderer.setPixelRatio( 0.8 );
+    //this.renderer.setPixelRatio( 0.7 );
 
     document.body.appendChild( this.renderer.domElement );
 
@@ -162,26 +158,33 @@ export default class Main
 
 
     this.animate = this.animate.bind(this);
-
   }
 
 
 
-  addAnimations(scene){    
+  addAnimations(scene, camera){    
 
-    // wait for all animations to be loaded before rendering
-    if(this.homeScreen.cameraAnimation && this.servicesPage.cameraAnimation && this.aboutPage.loaded && this.contactPage){
+    if(this.homeScreen.sceneLoaded && this.servicesPage.sceneLoaded && this.aboutPage.sceneLoaded && this.contactPage.sceneLoaded){
       this.animationController = new AnimationController([this.homeScreen, this.servicesPage, this.aboutPage, this.contactPage]);
-      //console.log(this.aboutPage.renderedTexture())
-      this.renderer.compile(this.scene, this.camera);
-      this.aboutPageTexture = this.aboutPage.renderedTexture()
-      this.renderer.initTexture(this.aboutPageTexture);
 
-      //this.renderer.initTexture(this.homeScreenTexture);
-      //this.renderer.initTexture(this.servicesPageTexture);
-      //this.renderer.initTexture(this.aboutPageTexture);
-      //this.renderer.initTexture(this.contactPageTexture);            
+      /* 
+        pre-rendering all scenes to send them to gpu before user views scene, doing this will make scene transitions
+        smooth since the scene has already been rendered and in gpu memory so the loading of the scene will happen before
+        the user gets to it. the scenes camera needs to start with all major geometry and texture in scene so this information
+        will be sent to the gpu during pre-compiling then the camera viewing angle and position can be adjusted, if
+        all objects and materials are not in initial pre-rendered camera view then anything that comes into the cameras view during
+        animation will be loaded (this is where the initial studdering and frame drops were coming from since the scene was being pre-rendered but with main objects (laptop, coffee mug...) being out of camera view) 
+      */
 
+      this.homeScreenTexture = this.homeScreen.getRenderedSceneTexture(this.t);
+      this.servicePageTexture = this.servicesPage.renderSceneTexture(this.t);        
+      this.aboutPageTexture = this.aboutPage.renderedTexture();
+      this.contactPageTexture = this.contactPage.renderedTexture();
+
+
+      // once scene has been rendered moving camera to look away from objects so it will have the rotating animation
+      this.servicesPage.camera.rotateX(Math.PI / 2);
+      this.aboutPage.camera.rotateX(Math.PI / 2);
 
 
       this.animate();
@@ -202,8 +205,8 @@ export default class Main
 
     this.stats.update();
     //console.log(this.animationController.cameras);
-
-    this.animationController.updateAnimation();
+    //console.log(this.animationController);
+      this.animationController.updateAnimation();
 
       // must wait for the laptop model to be loaded before we render the scene to texture and apply it to the main scene
       //if(this.servicesPage.composer){
@@ -220,11 +223,11 @@ export default class Main
 
 
         // once scences have been rendered we will place them into the post process material to be rendered to the final mesh
-        this.renderPlaneMaterial.uniforms.tex1.value = this.homeScreenTexture;
-        this.renderPlaneMaterial.uniforms.tex2.value = this.servicePageTexture;
+        this.renderPlaneMaterial.uniforms.homeScene.value = this.homeScreenTexture;
+        this.renderPlaneMaterial.uniforms.servicesScene.value = this.servicePageTexture;
         this.renderPlaneMaterial.uniforms.aboutScene.value = this.aboutPageTexture;
         this.renderPlaneMaterial.uniforms.contactScene.value = this.contactPageTexture;        
-
+    
         //this.renderPlaneGeometry.uniforms.aboutScene.value = this.aboutPage.renderedTexture();
 
         //this.renderPlaneMaterial.uniforms.mouse.value = this.mouse;      
@@ -259,6 +262,8 @@ export default class Main
 
         //console.log(this.animationController.progressAnimation);
         //console.log(this.animationController.progressAnimation2)
+
+        
         this.renderPlaneMaterial.uniforms.progress.value = this.animationController.progressAnimation;     
         this.renderPlaneMaterial.uniforms.progress2.value = this.animationController.progressAnimation2;     
         this.renderPlaneMaterial.uniforms.progress3.value = this.animationController.progressAnimation3;             
@@ -269,7 +274,7 @@ export default class Main
         this.renderPlaneMaterial.uniforms.sceneIndex.value = this.animationController.sceneTextureIndex;
 
         this.renderPlaneMaterial.uniforms.time.value = 0.3;
-
+        
         
         //console.log(this.renderPlaneMaterial.uniforms.progress)
 
@@ -283,7 +288,6 @@ export default class Main
 
         this.renderer.render( this.scene, this.camera );      
       //}
-
 
   };
 

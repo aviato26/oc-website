@@ -61,7 +61,7 @@ class AboutSceneMain{
 
 
         // this camera will be changed once the scene loads but will keep this here for a place holder to pass to the animation controller
-        this.camera = new THREE.PerspectiveCamera( 45, this.width / this.height, 1, 1000 );
+        //this.camera = new THREE.PerspectiveCamera( 45, this.width / this.height, 1, 1000 );
     
         this.renderer = parentRenderer;
         this.renderer.physicallyCorrectLights = true;
@@ -78,7 +78,7 @@ class AboutSceneMain{
 
         this.modelLoader = new GLTFLoader();
 
-        this.loaded = false;
+        this.sceneLoaded = false;
 
         const shadowMap = new THREE.TextureLoader().load(coffeeShadow, (img) => {
             // uvs in blender are flipped upside down so need to reflip them
@@ -88,17 +88,17 @@ class AboutSceneMain{
                 the initTexture method preloads the texture so the gpu suffers no over head when the scene is first rendered, if this initially takes to long
                 then the next step might be to convert all the images to ktx2
             */
-            this.renderer.initTexture(img);
+            //this.renderer.initTexture(img);
             return img;
         });
 
         const floorTexture = new THREE.TextureLoader().load(lightedFloor, (tex) => {
-            this.renderer.initTexture(tex);
+            //this.renderer.initTexture(tex);
             return tex;
         });
 
         const mathTexture = new THREE.TextureLoader().load(numbersImg, (tex) => {
-            this.renderer.initTexture(tex);
+            //this.renderer.initTexture(tex);
             return tex;
         });
 
@@ -107,8 +107,8 @@ class AboutSceneMain{
 
             this.cameraAnimation = model.animations;
 
-            //console.log(model.scene)
-            this.camera = model.scene.children[1];
+            //console.log(model)
+            this.camera = model.cameras[0];
 
             const material = new THREE.MeshStandardMaterial( { 
                 map: shadowMap,
@@ -125,10 +125,6 @@ class AboutSceneMain{
             model.scene.traverse((e) => {
                 //check for coffee cup, model was not properly named so its name is under circle
                 //if(e.name === 'Sketchfab_model'){
-
-                    if(e.name === 'Camera'){
-                        this.camera = e;
-                    }
 
                     if(e.name === 'Cube'){
 
@@ -278,7 +274,7 @@ class AboutSceneMain{
             this.camera.aspect = window.innerWidth / window.innerHeight;
             this.camera.updateProjectionMatrix();
 
-            //this.camera.rotation.x = 0;
+            this.scene.add(model.scene);            
 
 
             const params = {
@@ -294,6 +290,7 @@ class AboutSceneMain{
             this.composer.renderToScreen = false;
 
             const renderPass = new RenderPass(this.scene, this.camera);
+            //const renderPass = new RenderPass(model.scene, this.camera);            
         
             const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
             bloomPass.threshold = params.bloomThreshold;
@@ -318,16 +315,17 @@ class AboutSceneMain{
             //this.composer.addPass(bokeh);
             this.composer.addPass(bloomPass);            
 
-            this.scene.add(model.scene);
-
             
-            this.loaded = true;
+            this.sceneLoaded = true;
 
-            // this method needs to be called to pre-compile the scene before it gets rendered or the animation will lag in the initial call
-            //this.renderer.compile(this.scene, this.camera);   
-            this.renderer.compile(this.scene, this.camera);   
-            
-            animationControllerCallback(model)
+            //console.log(model.scene)
+
+            //this.scene.add(model.scene);
+
+            // this method needs to be called to pre-compile the scene to have uniforms ready to be updated
+            this.renderer.compile(this.scene.children[0], this.camera);               
+
+            animationControllerCallback(this.scene, this.camera);
 
         });
 
@@ -352,8 +350,6 @@ class AboutSceneMain{
         //this.wireMaterial.uniforms.time.value = this.time;
         this.smokeMaterial.uniforms.time.value = this.time;
         this.mod.material.userData.shader.uniforms.time.value = this.time;
-
-        //this.camera.rotation.y += this.time * 0.001;
         
         this.composer.render();
         //this.renderer.render(this.scene, this.camera);

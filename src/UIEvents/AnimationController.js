@@ -6,6 +6,8 @@ import { AnimationMixer, NoToneMapping } from 'three';
 import { Clock } from 'three';
 import PageDesciption from '../scenes/components/services';
 
+import MouseControl from '../scenes/components/MouseControl';
+
 export default class AnimationController{
     constructor(scenes){
 
@@ -34,20 +36,19 @@ export default class AnimationController{
 
         this.timeDirection = 1;
 
-        //this.textAnimationTimeLine = gsap;
-
-
         this.currentCamera = 1;
         this.prevCamera = 0;
 
-        //this.testCamera = this
-
         this.animationStates();
+
+        this.mouseControl = new MouseControl();
+
+        this.laptopWheelControl = this.laptopWheelControl.bind(this);
+
+        this.currentAnimation = this.states[this.sceneIndex];
 
         this.init();
 
-        this.currentAnimation = this.states[this.sceneIndex];
-        //console.log(this.currentAnimation)
     }
 
     
@@ -59,24 +60,26 @@ export default class AnimationController{
         this.aboutPageText = this.textSegments.addAboutScreenText();
         this.contactPageText = this.textSegments.addContactScreenText();
 
-        //this.textAnimationTimeLine = gsap.timeline({});
 
         this.titleTextAnimationForward(this.homePageText);
+        //this.titleTextAnimationForward(this.servicesPageText);        
+        //this.titleTextAnimationForward(this.servicesDescription);                
 
+        this.servicesScene = this.scenes[1];
 
-        document.addEventListener('touchmove', (e) => {
+        this.mouseControl.mouseMove(this.servicesScene);
 
-        });
+        this.mouseControl.wheelEvent(this.laptopWheelControl);
+    }
 
-
-        document.addEventListener('wheel', (e) => {
-
+    laptopWheelControl(e){
             // switching animating state
             // checking to see if user has triggered an animation
+            //console.log(e)
 
             if(!this.animating){
+
                 // checking to see if the user has scrolled fast enough to trigger animation
-                //console.log('triggered')
                 if(e.deltaY > 150){
                     this.animating = true;
 
@@ -91,9 +94,6 @@ export default class AnimationController{
 
 
                     this.updateSlideAnimation();                    
-                    //this.updateAnimation();
-
-                    //setTimeout(() => this.animating = false, 800);
                 }
     
                 if(e.deltaY < -150){
@@ -110,21 +110,11 @@ export default class AnimationController{
                     this.currentAnimation = this.states[this.sceneIndex];
 
                     this.updateSlideAnimation();
-                    //this.updateAnimation();
-                    
-                    //setTimeout(() => this.animating = false, 800);
                 }
 
-                
-                //this.resetAnimationActions();
-
                 this.currentAnimation = this.states[this.sceneIndex];
-                //console.log(this.progressAnimation)
             }
-
-        });
     }
-
 
     updateSceneIndex(state){
         // check to see if the deltaY variable in the wheel event is increasing, if so increment the scene index 
@@ -251,7 +241,7 @@ export default class AnimationController{
 
 
     updateSlideAnimation(){
-        //console.log(this.currentAnimation)
+
         //if(this.currentAnimation.scene == 'Home-Scene-Downward-Animation' || this.currentAnimation.scene == 'Services-Scene-Animation-Upward' || this.currentAnimation.scene == 'Services-Scene-Animation-Downward' || this.currentAnimation.scene == 'About-Scene-Animation-Upward' || this.currentAnimation.scene == 'About-Scene-Animation-Downward' || this.currentAnimation.scene == 'Contact-Scene-Animation-Upward'){
         if(this.currentAnimation.scene == 'Home-Scene-Downward-Animation' || this.currentAnimation.scene == 'Services-Scene-Animation-Upward'){
             if(this.timeDirection === 1){
@@ -267,11 +257,12 @@ export default class AnimationController{
 
                 //gsap.to(this.scenes[0].camera.rotation, { x: -Math.PI * 2, duration: 2., ease: "back.inOut(1.7)", onStart: () => { this.hideTextAnimation(this.homePageText) }});
                 gsap.to(this.scenes[0].camera.rotation, { x: -Math.PI * 2, duration: 2., ease: "back.inOut(1.7)", onStart: () => { this.titleTextAnimationBackward(this.homePageText) }});                
-                //gsap.to(this.scenes[1].camera.rotation, { x: -1.2246467991473532e-16, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", });
-                gsap.to(this.scenes[1].camera.quaternion, { x: 0, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {
+                
+                gsap.to(this.scenes[1].camera.rotation, { x: -0.21988, y: 0, z: 0 , delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                    
+                    //this.servicesScene.activateCameraControls();            
                     this.titleTextAnimationForward(this.servicesPageText);
                     this.textAnimationForward(this.servicesDescription);
-                }});                
+                }});                                
 
             }
             if(this.timeDirection === -1){
@@ -337,7 +328,8 @@ export default class AnimationController{
                     //onComplete: () => {}
                 });
 
-                gsap.to(this.scenes[1].camera.quaternion, { x: 0, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {
+                //gsap.to(this.scenes[1].camera.quaternion, { x: 0, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {
+                gsap.to(this.scenes[1].camera.rotation, { x: -0.21988, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                    
                          this.titleTextAnimationForward(this.servicesPageText);
                          this.titleTextAnimationForward(this.servicesDescription); 
                     }
