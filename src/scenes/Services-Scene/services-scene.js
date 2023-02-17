@@ -5,40 +5,16 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-import Stats from 'three/examples/jsm/libs/stats.module';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-
-import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader';
 
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
-//import laptop from './laptop2.glb';
-//import laptop from './lp2.glb';
-//import laptop from './lt-two-animations.glb';
-//import laptop from './lt-animations.glb';
-//import laptop from './lt2.glb';
-//import laptop from './t1.glb';
-//import laptop from './lp3.glb';
-//import laptop from './lp3-with-animations.glb';
-//import laptop from './lp-all-animations.glb';
-//import laptop from './lp-animations2.glb';
-//import laptop from './lp3.glb';
-//import laptop from './lp4.glb';
-//import laptop from './lp5.glb';
-//import laptop from './lp51.glb';
-//import laptop from './lp52.glb';
+
 //import laptop from './lp53.glb';
 import laptop from './lp53Draco.glb';
-//import laptop from './lp4Ktx.glb';
-//import laptop from './compressed-scene.drc';
-//import laptop from './t1.fbx';
 
-//import laptop from './laptop-with-plants.glb';
-//import laptop from './laptop-final.glb';
-
-import PageDesciption from '../components/services.js';
 
 import postFragmentShader from './shaders/postFragment.js';
 import postVertexShader from './shaders/postVertex.js';
@@ -50,28 +26,9 @@ import css from '../css/style.css'
 
 import errorImage from './textures/error.png';
 import fixedErrorImage from './textures/fixed-blue-screen.png';
-
-
-import deskcolor   from './textures/dl.png';
-import deskLightMap from './textures/dl2.png';
-
-import lpLightMap from './textures/lp-light-map.png';
-import laptopRoughmap from './textures/lp-roughmap.png';
-import laptopNormalmap from './textures/lp-normal.png';
-import lp2 from './textures/lm2.png';
-
-import light2 from './textures/lp2.png';
-
-import tableRoughmap from './textures/Table/dl2.jpg';
-import tableColor from './textures/dl.png';
-
-import deskLight from './textures/desk-light.jpg';
-
 import env from './textures/galaxy.jpg';
+
 //import env from './textures/pink.jpeg';
-
-
-import AnimationController from '../../UIEvents/AnimationController';
 
 export default class ServicesPage
 {

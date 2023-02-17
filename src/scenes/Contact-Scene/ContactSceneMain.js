@@ -41,10 +41,6 @@ class ContactSceneMain{
 
         this.sceneLoaded = false;
 
-        this.geo = new THREE.BoxGeometry(1, 1, 1);
-        this.material = new THREE.MeshBasicMaterial({ color: 0x331111 });
-        this.mesh = new THREE.Mesh(this.geo, this.material);
-
         this.tunnelShader = new THREE.ShaderMaterial({
             uniforms: {
                 time: { value: 0 }

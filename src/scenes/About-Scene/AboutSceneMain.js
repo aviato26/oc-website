@@ -10,36 +10,14 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
-//import spaceImg from './textures/neonLights.jpeg';
 import spaceImg from './textures/floor-emission.png';
 
-//import numbersImg from './textures/math.png';
-//import numbersImg from './textures/tech.png';
-//import numbersImg from './textures/c2.png';
-//import numbersImg from './textures/cVec.png';
-import numbersImg from './textures/c2.png';
-//import spaceImg from './textures/floor-emission.png';
 
-//import CoffeeSceneModel from './coffee-scene-with-animations.glb';
-//import CoffeeSceneModel from './about-scene-with-animations2.glb';
-//import CoffeeSceneModel from './about-scene.glb';
-//import CoffeeSceneModel from './about-scene-lightmapped.glb';
-//import CoffeeSceneModel from './about-scene-lightmapped-new-animations.glb';
-//import CoffeeSceneModel from './about-scene-new.glb';
-//import CoffeeSceneModel from './as2.glb';
-//import CoffeeSceneModel from './as3.glb';
+import numbersImg from './textures/c2.png';
+
 import CoffeeSceneModel from './aboutSceneDraco.glb';
-//import lightedFloor from './lighted-floor.png';
-import lightedFloor from './textures/lighted-floor2.png';
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-
-import coffeeShadow from './textures/Mug_Shadow.png';
-
-import backgroundLight from './textures/background-light.png';
-
-import coffeeFragmentShader from './shaders/coffee-fragment';
-import coffeeVertexShader from './shaders/coffee-vertex';
 
 import wireFragmentShader from './shaders/wire-fragment';
 import wireVertexShader from './shaders/wire-vertex';
@@ -91,22 +69,7 @@ class AboutSceneMain{
 
         this.sceneLoaded = false;
 
-        const shadowMap = new THREE.TextureLoader().load(coffeeShadow, (img) => {
-            // uvs in blender are flipped upside down so need to reflip them
-            img.flipY = false;
 
-            /* 
-                the initTexture method preloads the texture so the gpu suffers no over head when the scene is first rendered, if this initially takes to long
-                then the next step might be to convert all the images to ktx2
-            */
-            //this.renderer.initTexture(img);
-            return img;
-        });
-
-        const floorTexture = new THREE.TextureLoader().load(lightedFloor, (tex) => {
-            //this.renderer.initTexture(tex);
-            return tex;
-        });
 
         const mathTexture = new THREE.TextureLoader().load(numbersImg, (tex) => {
             //this.renderer.initTexture(tex);
@@ -122,16 +85,6 @@ class AboutSceneMain{
 
             //console.log(model)
             this.camera = model.cameras[0];
-
-            const material = new THREE.MeshStandardMaterial( { 
-                map: shadowMap,
-                
-                lightMap: shadowMap,
-
-                roughness: 0.2
-
-            } );
-
 
 
 
