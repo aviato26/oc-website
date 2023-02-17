@@ -29,7 +29,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 //import laptop from './lp5.glb';
 //import laptop from './lp51.glb';
 //import laptop from './lp52.glb';
-import laptop from './lp53.glb';
+//import laptop from './lp53.glb';
+import laptop from './lp53Draco.glb';
 //import laptop from './lp4Ktx.glb';
 //import laptop from './compressed-scene.drc';
 //import laptop from './t1.fbx';
@@ -118,8 +119,13 @@ export default class ServicesPage
 
     this.roomMaterial = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
 
+    const dracoLoader = new DRACOLoader();
+		dracoLoader.setDecoderPath('/draco/');
+		dracoLoader.setDecoderConfig( { type: 'js' } );
+
 
     this.model = new GLTFLoader();
+    this.model.setDRACOLoader(dracoLoader);    
     //this.ktx2Loader = new KTX2Loader();
     //this.model.setKTX2Loader(this.ktx2Loader);
     //this.model = new DRACOLoader();
@@ -309,7 +315,7 @@ export default class ServicesPage
     this.mouseLastPos.copy(this.mouse);
 
     // updating time for the blue screen of death to switch images
-    //this.screenShader.uniforms.time.value = this.time;
+    this.screenShader.uniforms.time.value = this.time * 0.5;
 
     this.composer.render();
     /*
