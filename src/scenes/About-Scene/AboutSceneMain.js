@@ -24,9 +24,13 @@ import numbersImg from './textures/c2.png';
 //import CoffeeSceneModel from './about-scene.glb';
 //import CoffeeSceneModel from './about-scene-lightmapped.glb';
 //import CoffeeSceneModel from './about-scene-lightmapped-new-animations.glb';
-import CoffeeSceneModel from './about-scene-new.glb';
+//import CoffeeSceneModel from './about-scene-new.glb';
+//import CoffeeSceneModel from './as2.glb';
+import CoffeeSceneModel from './as3.glb';
 //import lightedFloor from './lighted-floor.png';
 import lightedFloor from './textures/lighted-floor2.png';
+
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 import coffeeShadow from './textures/Mug_Shadow.png';
 
@@ -99,6 +103,8 @@ class AboutSceneMain{
 
         const mathTexture = new THREE.TextureLoader().load(numbersImg, (tex) => {
             //this.renderer.initTexture(tex);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
             return tex;
         });
 
@@ -129,6 +135,7 @@ class AboutSceneMain{
                     if(e.name === 'Cube'){
 
                         this.cube = e;
+                        this.cube.material = new THREE.MeshBasicMaterial({ color: 0x000010 });
 
                         e.material.needsUpdate = true;
                     }
@@ -151,13 +158,14 @@ class AboutSceneMain{
                         //console.log(e)
                     }
 
-                    if(e.name === 'Plane001'){
+                    //if(e.name === 'Plane001'){
+                    if(e.name === 'c2'){                        
                         //console.log(e)
                         this.smokeMaterial = new THREE.ShaderMaterial({
 
-                            //side: THREE.DoubleSide,
+                            side: THREE.DoubleSide,
                             transparent: true,
-                            
+                            blending: THREE.AdditiveBlending,
 
                             uniforms: {
                                 tex: { value: mathTexture},
@@ -174,14 +182,15 @@ class AboutSceneMain{
                         e.material.needsUpdate = true;
 
                         // folding the mesh to flip the texture along the x direction
-                        e.scale.x = -1;
+                        //e.scale.x = -1;
+                        //e.scale.set(0.1, 0.1, 0.1);
 
                     }
 
-                    if(e.name == 'Plane'){
+                    if(e.name == 'Cube001'){
                         //console.log(e)
-                        const mat = new THREE.MeshBasicMaterial({ map: floorTexture });
-                        //const mat = new THREE.MeshBasicMaterial({ color: 0x444444 });                        
+                        //const mat = new THREE.MeshBasicMaterial({ map: floorTexture });
+                        const mat = new THREE.MeshBasicMaterial({ color: 0x00001 });                        
                         e.material = mat;
                         e.material.needsUpdate = true;
 
@@ -194,9 +203,9 @@ class AboutSceneMain{
                     this.mod = e;
 
 
-                    material.defines.USE_UV = '';                    
+                    this.mod.material.defines.USE_UV = '';                    
 
-                    material.onBeforeCompile = shader => {
+                    this.mod.material.onBeforeCompile = shader => {
 
                         //shader.vertexShader = 'varying vec2 uv' + shader.vertexShader;
                   
@@ -211,7 +220,7 @@ class AboutSceneMain{
                       ` + shader.fragmentShader;
                   
                           shader.fragmentShader = shader.fragmentShader.replace(/vec4 diffuseColor.*;/, `
-                  
+       /*
                           // Normalized pixel coordinates (from 0 to 1)
                           vec2 uv = vUv;
 
@@ -248,19 +257,56 @@ class AboutSceneMain{
                   
                           vec4 diffuseColor = diffuseColor2;                          
                           //vec4 diffuseColor = vec4(diffuse, 1); 
+                        */
+
+
+                          // Normalized pixel coordinates (from 0 to 1)
+                          vec2 uv = vUv;
+
+                          vec2 uv2 = fract(uv * 40.0);
+                                    
+                          uv2.x -= fract(uv2.x + (time * 0.5) - uv.x * uv.x - uv2.x * uv.x);                                                    
+
+                          
+                          float dist = 1.0 / length(uv2 - 0.5);                          
+                          
+                          dist *= .3;                          
+                      
+                          // Time varying pixel color
+                          vec3 col = vec3(dist);
+
+
+                          float r = 1.;
+                          float g = 0.0;
+                          float b = 0.815;
+
+                          vec3 colors = vec3(r, g, b);
+
+                          vec4 diffuseColor2 = vec4(colors, 1.);
+                          vec4 diffuseColor = vec4(diffuse, opacity);                          
+                          
+                          //col *= mix(colors, diffuseColor2.xyz, 0.2);
+
+                          diffuseColor2.xyz *= col * log(col);      
+
+                  
+                          //fragColor = diffuseColor2;           
+                          diffuseColor += diffuseColor2 + (vec4(diffuse, opacity) * 0.3);    
+
+
 
                           `)
                   
-                        material.userData.shader = shader;
+                        this.mod.material.userData.shader = shader;
                   
                       }
 
 
-                    material.needsUpdate = true;
+                    //material.needsUpdate = true;
 
 
-                    e.material = material;
-              
+                    //e.material = material;
+  
                
                 }
 
@@ -276,12 +322,11 @@ class AboutSceneMain{
 
             this.scene.add(model.scene);            
 
-
             const params = {
-                exposure: 3.,
+                exposure: 1.,
                 bloomStrength: .5,
-                bloomThreshold: 0.1,
-                bloomRadius: .5
+                bloomThreshold: 0.001,
+                bloomRadius: .0
               };
 
             this.composer = new EffectComposer(this.renderer);
@@ -296,6 +341,7 @@ class AboutSceneMain{
             bloomPass.threshold = params.bloomThreshold;
             bloomPass.strength = params.bloomStrength;
             bloomPass.radius = params.bloomRadius;
+
       
             const bokeh = new BokehPass(this.scene, this.camera, {
                 focus: 2.,    
@@ -309,18 +355,19 @@ class AboutSceneMain{
 
             // this pass needs to be swapped to the write buffer in order to be rendererd into the texture
             bokeh.needsSwap = true;
-            bloomPass.needsSwap = true;
+            //bloomPass.needsSwap = true;
 
             this.composer.addPass(renderPass);
-            //this.composer.addPass(bokeh);
+            this.composer.addPass(bokeh);
             this.composer.addPass(bloomPass);            
 
-            
             this.sceneLoaded = true;
 
             //console.log(model.scene)
 
             //this.scene.add(model.scene);
+
+            //this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
             // this method needs to be called to pre-compile the scene to have uniforms ready to be updated
             this.renderer.compile(this.scene.children[0], this.camera);               
@@ -343,13 +390,17 @@ class AboutSceneMain{
         return this.renderBuffer.texture;
     }
 
-    renderedTexture(){
-        this.time += 1.0 / 60.0;
+    renderedTexture(t){
+        //this.time += 1.0 / 60.0;
 
         //this.controlls.update();
         //this.wireMaterial.uniforms.time.value = this.time;
-        this.smokeMaterial.uniforms.time.value = this.time;
-        this.mod.material.userData.shader.uniforms.time.value = this.time;
+        //this.smokeMaterial.uniforms.time.value = this.time;
+        //this.mod.material.userData.shader.uniforms.time.value = this.time;
+        //console.log(t)
+
+        this.smokeMaterial.uniforms.time.value = t;
+        this.mod.material.userData.shader.uniforms.time.value = t;        
         
         this.composer.render();
         //this.renderer.render(this.scene, this.camera);

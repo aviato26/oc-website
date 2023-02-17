@@ -134,7 +134,7 @@ export default class Main
     //this.renderer.setPixelRatio( this.pixelRatio );
 
     // need to reset pixel ratio for larger screens
-    //this.renderer.setPixelRatio( 0.7 );
+    //this.renderer.setPixelRatio( 0.8 );
 
     document.body.appendChild( this.renderer.domElement );
 
@@ -155,6 +155,7 @@ export default class Main
     this.contactPage = new ContactScene(this.renderer, this.addAnimations);
 
     this.t;
+    this.t2 = 0
 
 
     this.animate = this.animate.bind(this);
@@ -178,14 +179,14 @@ export default class Main
 
       this.homeScreenTexture = this.homeScreen.getRenderedSceneTexture(this.t);
       this.servicePageTexture = this.servicesPage.renderSceneTexture(this.t);        
-      this.aboutPageTexture = this.aboutPage.renderedTexture();
+      this.aboutPageTexture = this.aboutPage.renderedTexture(this.t2);
       this.contactPageTexture = this.contactPage.renderedTexture();
 
 
-      // once scene has been rendered moving camera to look away from objects so it will have the rotating animation
+      // once scene has been rendered moving camera to look away from objects so it will be set for the rotating animation
       this.servicesPage.camera.rotateX(Math.PI / 2);
-      this.aboutPage.camera.rotateX(Math.PI / 2);
-
+      this.aboutPage.camera.quaternion.w = 0.206;
+      this.aboutPage.camera.quaternion.x = 1.082;      
 
       this.animate();
     }
@@ -200,6 +201,7 @@ export default class Main
     //this.t = this.clock.getElapsedTime();
 
     this.t = this.clock.getDelta();
+    this.t2 = this.clock.getElapsedTime();
     //console.log(this.clock.getElapsedTime())
 
 
@@ -217,7 +219,7 @@ export default class Main
         //console.log(this.servicesPage.action.isRunning())
         this.homeScreenTexture = this.homeScreen.getRenderedSceneTexture(this.t);
         this.servicePageTexture = this.servicesPage.renderSceneTexture(this.t);        
-        this.aboutPageTexture = this.aboutPage.renderedTexture();
+        this.aboutPageTexture = this.aboutPage.renderedTexture(this.t2);
         this.contactPageTexture = this.contactPage.renderedTexture();
 
 

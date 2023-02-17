@@ -10,40 +10,44 @@ const coffeeSmokeFrag = `
 
     varying vec2 vUv;
 
+
+    float sdBox( in vec2 p, in vec2 b )
+    {
+        vec2 d = abs(p)-b;
+        return length(max(d,0.0)) + min(max(d.x,d.y),0.0);
+    }
+
+
     void main(){
         vec2 uv = vUv;
-        vec3 uvZoom = vec3(uv * .7, 1.0);
-        //vec3 uvZoom = vec3(uv, 1.0);        
+        vec2 uv2 = vUv;
 
-        //uvZoom.y -= fract(fract(fract(time * 0.1 - abs(length(uvZoom.y + 0.5) - fract((time * 0.1 - uvZoom.y )))))) * 0.3;        
-        //uvZoom.y -= fract(fract(fract(time * 0.3 - sin(length(uvZoom.y + 0.5) - fract((time * 0.3 - uvZoom.y * uv.y )))))) * 0.3;                
-        uvZoom.y -= fract(fract(fract(time * 0.1 - sin(length(uvZoom.y * 0.3) - fract((time * 0.3 - uvZoom.y * uv.y )))))) * 0.3;                                        
-        //uvZoom.x -= sin(uvZoom.y * 0.3) * 0.1;
+        //vec3 uvZoom = vec3(uv * .7, 1.0);
+        vec3 uvZoom = vec3(uv, 1.0);        
 
-        //vec4 numberTexture = texture(tex, uvZoom.xy);
+        vec2 uv3 = uv * 1.5;
+        vec2 cHalf = vec2(0.5,0.9);
+        vec2 cTheta = cHalf-uv3;
+        float d = length(cTheta) * 2.0;
+    
+        float s = sin(d-time * 0.2) * 1.0;
+        uv3.y += cTheta.y + s;
+        uv3.x += fract(uv3.x * 1.) + (sin(time * .1));
+        uv3 *= 1.3;
+        gl_FragColor = texture(tex , uv3);
+        //gl_FragColor *= sin(time - uv3.y * uv3.y * uv3.x);  
+        //gl_FragColor *= sin(time - uv3.y - exp(uv3.y));          
 
-        vec2 smoke = vec2(0);
-        float n;
+        //gl_FragColor *= sin(time - length(uv.y) - exp(uv3.y));                  
+        //gl_FragColor *= sin(time - length(uv3.y * uv.y + 0.02) - exp(uv3.y));          
+        //gl_FragColor *= sin(time - length(uv3.y * uv.y) - exp(uv3.y));                  
 
+        //gl_FragColor *= abs(sin(uv.y * uv.y)) + uv.y;                       
+        //gl_FragColor *= sin(uv.y) + abs(sin(time));                               
+        gl_FragColor *= abs(sin(time + uv3.y) * sin(uv.y) * sin(uv3.y)) * (uv3.y * uv.y) + length(uv.y) + 0.2;
 
-        for(int i = 1; i < 3; i++){
-            n = float(i);            
-            //uvZoom.y += sin(length(uvZoom * n + uvZoom.x * n - 0.5) + fract(time * uvZoom.y * n * uvZoom.y) * 0.1) * 0.1;
-            uvZoom.y += sin(length(uvZoom * n + uvZoom.x * n - 0.5) + fract(time * uvZoom.y * n * uvZoom.y) * 0.1) * 0.1;            
-            //uvZoom.y -= sin(uvZoom.y * n + uvZoom.x * n) * sin((length(uvZoom * n - 0.1) - uvZoom.y * n)) * fract(length(uvZoom + 0.5) * time * 0.1);                                        
-            //smoke += sin(uvZoom.y + uvZoom.x * n * .314) - sin(uvZoom.y + uvZoom.x * n * 0.278) * fract(time * 0.1);
-            //smoke += sin(uvZoom.y + uvZoom.x + n) + sin(uvZoom.y + uvZoom.x + n) * sin(fract(time * 0.1 * fract(uvZoom.y * n)));            
-        }
-
-        //smoke *= abs(sin(time * 0.1) - length(uvZoom));
-
-        vec4 numberTexture = texture(tex, uvZoom.xy);
-
-        //numberTexture.a -= sqrt((uvZoom.y + .006) + length((sin(uvZoom.y) * cos(uvZoom.x)) + fract(time * 0.9 - (smoke.y)))) - 0.4;
-        //numberTexture.a -= length(smoke * uvZoom.xy);
-        
-        //gl_FragColor = vec4(0. ,g , 0. , .1);
-        gl_FragColor = numberTexture;
+        //gl_FragColor = vec4(uv , 0. , 1.1);
+        //gl_FragColor = numberTexture;
     }
 
 `

@@ -28,7 +28,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 //import laptop from './lp4.glb';
 //import laptop from './lp5.glb';
 //import laptop from './lp51.glb';
-import laptop from './lp52.glb';
+//import laptop from './lp52.glb';
+import laptop from './lp53.glb';
 //import laptop from './lp4Ktx.glb';
 //import laptop from './compressed-scene.drc';
 //import laptop from './t1.fbx';
