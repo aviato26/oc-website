@@ -58,6 +58,7 @@ export default class AnimationController{
         this.servicesPageText = this.textSegments.addServicesScreenText();
         this.servicesDescription = this.textSegments.addServicesDescription();
         this.aboutPageText = this.textSegments.addAboutScreenText();
+        this.aboutPageDescription = this.textSegments.addAboutScreenDescription();
         this.contactPageText = this.textSegments.addContactScreenText();
 
 
@@ -311,8 +312,10 @@ export default class AnimationController{
                     }
                 });                                
                 //gsap.to(this.scenes[1].camera.rotation, { x: 1.2246467991473532e-16 * 2, duration: 2., ease: "back.inOut(1.7)", });
-                gsap.to(this.scenes[2].camera.rotation, { x: 0, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {
+                //gsap.to(this.scenes[2].camera.rotation, { x: 2.277, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {
+                gsap.to(this.scenes[2].camera.quaternion, { w: 0.405, x: 0.885, y: -0.208, z: -0.095, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                    
                     this.titleTextAnimationForward(this.aboutPageText);
+                    this.textAnimationForward(this.aboutPageDescription);
                 }});
 
             }
@@ -335,7 +338,11 @@ export default class AnimationController{
                     }
                 });                                
                 //gsap.to(this.scenes[1].camera.rotation, { x: Math.PI * 2, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", });
-                gsap.to(this.scenes[2].camera.rotation, { x: 1.570796 , duration: 2., ease: "back.inOut(1.7)", onStart: () => this.titleTextAnimationBackward(this.aboutPageText)});
+                //gsap.to(this.scenes[2].camera.rotation, { x: 1.570796 , duration: 2., ease: "back.inOut(1.7)", onStart: () => this.titleTextAnimationBackward(this.aboutPageText)});
+                gsap.to(this.scenes[2].camera.quaternion, { w: 0.206, x: 1.082, duration: 2., ease: "back.inOut(1.7)", onStart: () => {
+                    this.titleTextAnimationBackward(this.aboutPageText)
+                    this.textAnimationBackward(this.aboutPageDescription);
+                }});                
 
 /*
                 gsap.to(this.scenes[1].camera.quaternion, { x: 0, duration: 2., ease: "back.inOut(1.7)", });                                
@@ -358,10 +365,12 @@ export default class AnimationController{
                     //onComplete: () => this.progressAnimation = 0                                
                 });
 
-                gsap.to(this.scenes[2].camera.quaternion, { x: -1, duration: 2., ease: "back.inOut(1.7)", onStart: () => this.titleTextAnimationBackward(this.aboutPageText) });                                
+                gsap.to(this.scenes[2].camera.quaternion, { w: 0.905 , x: 0.585, duration: 2., ease: "back.inOut(1.7)", onStart: () => {
+                    this.titleTextAnimationBackward(this.aboutPageText);
+                    this.textAnimationBackward(this.aboutPageDescription);
+                }});                                
                 //gsap.to(this.scenes[1].camera.rotation, { x: 1.2246467991473532e-16 * 2, duration: 2., ease: "back.inOut(1.7)", });
                 gsap.to(this.scenes[3].camera.rotation, { y: 0, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => this.titleTextAnimationForward(this.contactPageText) });
-
                 //gsap.to(this.scenes[2].camera.quaternion, { x: -1, duration: 2., ease: "back.inOut(1.7)", });                                
                 //gsap.to(this.scenes[3].camera.rotation, { y: 0 , duration: 2., ease: "back.inOut(1.7)", });
 
@@ -382,7 +391,10 @@ export default class AnimationController{
                 //gsap.to(this.scenes[1].camera.rotation, { x: 1.2246467991473532e-16 * 2, duration: 2., ease: "back.inOut(1.7)", });
                 //gsap.to(this.scenes[3].camera.rotation, { x: 0, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onStart: () => this.titleTextAnimationBackward(this.contactPageText) });
 
-                gsap.to(this.scenes[2].camera.quaternion, { x: 0, duration: 2., ease: "back.inOut(1.7)", onComplete: () => this.titleTextAnimationForward(this.aboutPageText) });                                
+                gsap.to(this.scenes[2].camera.quaternion, { w: 0.405, x: 0.885, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {
+                    this.titleTextAnimationForward(this.aboutPageText); 
+                    this.textAnimationForward(this.aboutPageDescription);
+                }});                                
                 //gsap.to(this.scenes[3].camera.rotation, { y: 1.570796 , duration: 2., ease: "back.inOut(1.7)", onStart: () => this.titleTextAnimationBackward(this.contactPageText) });
                 gsap.to(this.scenes[3].camera.rotation, { y: 1.570796 , duration: 2., ease: "back.inOut(1.7)", onStart: () => this.titleTextAnimationBackward(this.contactPageText) });                
             }
