@@ -8,6 +8,7 @@ import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
 //import spaceImg from './textures/neonLights.jpeg';
 import spaceImg from './textures/floor-emission.png';
@@ -26,7 +27,8 @@ import numbersImg from './textures/c2.png';
 //import CoffeeSceneModel from './about-scene-lightmapped-new-animations.glb';
 //import CoffeeSceneModel from './about-scene-new.glb';
 //import CoffeeSceneModel from './as2.glb';
-import CoffeeSceneModel from './as3.glb';
+//import CoffeeSceneModel from './as3.glb';
+import CoffeeSceneModel from './aboutSceneDraco.glb';
 //import lightedFloor from './lighted-floor.png';
 import lightedFloor from './textures/lighted-floor2.png';
 
@@ -80,7 +82,12 @@ class AboutSceneMain{
 
         this.renderBuffer = new THREE.WebGLRenderTarget(this.width, this.height);
 
+        const dracoLoader = new DRACOLoader();
+		dracoLoader.setDecoderPath('/draco/');
+		dracoLoader.setDecoderConfig( { type: 'js' } );
+
         this.modelLoader = new GLTFLoader();
+        this.modelLoader.setDRACOLoader(dracoLoader);        
 
         this.sceneLoaded = false;
 

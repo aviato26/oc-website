@@ -5,34 +5,53 @@ const path = require('path');
 module.exports =
 {
   mode: 'development',
-  entry: './src/main.js',
+  //entry: './src/main.js',
+  entry: {
+    index: './src/main.js',
+  },
 
   output:
   {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'main.js'
+    filename: 'main.js',
+    publicPath: '/'
   },
-
+/*
+  resolve: {
+       fallback: {
+         "fs": false,
+    //     "tls": false,
+    //     "net": false,
+    //     "http": require.resolve("stream-http"),
+    //     "https": false,
+    //     "zlib": require.resolve("browserify-zlib") ,
+         "path": require.resolve("path-browserify"),
+    //     "stream": require.resolve("stream-browserify"),
+    //     "util": require.resolve("util/"),
+       }
+    },
+*/
   module:
   {
     rules:
     [
+      /*
       {
         test: /\.js?$/,
         include:
         [
-          path.resolve(__dirname, 'src')
+          path.resolve(__dirname, 'src/draco')
         ]
       },
-
+      */
       {
         /* need to use this type to load fonts not file loader or the font will not load */
-        test: /\.(ttf)$/,
+        test: /\.(ttf|wasm)$/,
         type: 'asset/resource'
       },
 
       {
-        test: /\.(jpg|fbx|svg|png|pdf|glb|gltf|wasm|jpeg|drc)$/,
+        test: /\.(jpg|fbx|svg|png|pdf|glb|gltf|jpeg|drc)$/,
         loader: "file-loader"
       },
 /*
@@ -40,7 +59,7 @@ module.exports =
         test: /\.exec\.js$/,
         use:[ 'script-loader' ],
         include: [
-          path.resolve(__dirname, 'node_modules/three/examples/js/libs/ammo.wasm.js')
+          path.resolve(__dirname, 'src/draco/')
         ]
       },
 */
@@ -61,7 +80,7 @@ module.exports =
   {
     port: 3000,
     static:{
-      directory: path.join(__dirname, 'dist'),
+      directory: path.join(__dirname, 'src'),
     },
     hot: true
   }

@@ -370,7 +370,8 @@ export default class AnimationController{
                     this.textAnimationBackward(this.aboutPageDescription);
                 }});                                
                 //gsap.to(this.scenes[1].camera.rotation, { x: 1.2246467991473532e-16 * 2, duration: 2., ease: "back.inOut(1.7)", });
-                gsap.to(this.scenes[3].camera.rotation, { y: 0, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => this.titleTextAnimationForward(this.contactPageText) });
+                //gsap.to(this.scenes[3].camera.rotation, { y: 0, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => this.titleTextAnimationForward(this.contactPageText) });
+                gsap.to(this.scenes[3].camera.rotation, { x: 0, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => this.titleTextAnimationForward(this.contactPageText) });                
                 //gsap.to(this.scenes[2].camera.quaternion, { x: -1, duration: 2., ease: "back.inOut(1.7)", });                                
                 //gsap.to(this.scenes[3].camera.rotation, { y: 0 , duration: 2., ease: "back.inOut(1.7)", });
 
@@ -396,7 +397,8 @@ export default class AnimationController{
                     this.textAnimationForward(this.aboutPageDescription);
                 }});                                
                 //gsap.to(this.scenes[3].camera.rotation, { y: 1.570796 , duration: 2., ease: "back.inOut(1.7)", onStart: () => this.titleTextAnimationBackward(this.contactPageText) });
-                gsap.to(this.scenes[3].camera.rotation, { y: 1.570796 , duration: 2., ease: "back.inOut(1.7)", onStart: () => this.titleTextAnimationBackward(this.contactPageText) });                
+                //gsap.to(this.scenes[3].camera.rotation, { y: 1.570796 , duration: 2., ease: "back.inOut(1.7)", onStart: () => this.titleTextAnimationBackward(this.contactPageText) });                
+                gsap.to(this.scenes[3].camera.rotation, { x: Math.PI / 2 , duration: 2., ease: "back.inOut(1.7)", onStart: () => this.titleTextAnimationBackward(this.contactPageText) });                                
             }
         }
 

@@ -108,7 +108,6 @@ class PageDesciption{
         charArray.map(c => {
             div = document.createElement('div');
             div.className = className;
-            console.log(className)
             textNode = document.createTextNode(`${c}`);
             div.appendChild(textNode);
 

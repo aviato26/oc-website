@@ -6,6 +6,8 @@ import '../css/style.css';
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
+
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
@@ -26,7 +28,8 @@ import spaceImg from './textures/neonLights.jpeg';
 //import cpu from './cpu-design3c22.glb';
 //import cpu from './updated-cpu-final.glb';
 //import cpu from './cpu2.glb';
-import cpu from './cpu3.glb';
+//import cpu from './cpu3.glb';
+import cpu from './cpu3Draco.glb';
 //import cpu from './cpu4.glb';
 
 import AnimationController from '../../UIEvents/AnimationController';
@@ -78,10 +81,13 @@ this.environmentMap = new THREE.TextureLoader().load(spaceImg, (img) => {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
 
-
-
+const dracoLoader = new DRACOLoader();
+dracoLoader.setDecoderPath('/draco/');
+dracoLoader.setDecoderConfig( { type: 'js' } );
 
 this.model = new GLTFLoader();
+this.model.setDRACOLoader(dracoLoader);        
+
 const cpuTex = new THREE.TextureLoader().load(cpuTexture);
 const cpuNorm = new THREE.TextureLoader().load(cpuNormal);
 const cpuRough = new THREE.TextureLoader().load(cpuRoughness);

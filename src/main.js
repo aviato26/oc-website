@@ -187,6 +187,7 @@ export default class Main
       this.servicesPage.camera.rotateX(Math.PI / 2);
       this.aboutPage.camera.quaternion.w = 0.206;
       this.aboutPage.camera.quaternion.x = 1.082;      
+      this.contactPage.camera.rotation.x = Math.PI / 2;
 
       this.animate();
     }
@@ -208,7 +209,7 @@ export default class Main
     this.stats.update();
     //console.log(this.animationController.cameras);
     //console.log(this.animationController);
-      this.animationController.updateAnimation();
+    this.animationController.updateAnimation();
 
       // must wait for the laptop model to be loaded before we render the scene to texture and apply it to the main scene
       //if(this.servicesPage.composer){
@@ -216,7 +217,7 @@ export default class Main
       //if(this.servicesPage.composer && this.homeScreen.composer){        
         //console.log(this.animationController.currentAnimation)
 
-        //console.log(this.servicesPage.action.isRunning())
+            //console.log(this.servicesPage.action.isRunning())
         this.homeScreenTexture = this.homeScreen.getRenderedSceneTexture(this.t);
         this.servicePageTexture = this.servicesPage.renderSceneTexture(this.t);        
         this.aboutPageTexture = this.aboutPage.renderedTexture(this.t2);
