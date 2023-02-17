@@ -15,35 +15,17 @@ import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
 import { SavePass } from 'three/examples/jsm/postprocessing/SavePass.js';
 
 
-import cpuTexture from './textures/cpu/cpu-base-color.png';
-import cpuNormal from './textures/cpu/cpu-normal.png';
-import cpuRoughness from './textures/cpu/cpu-roughness.png';
-
 import logoTexture from './textures/logo.png';
-
 import floorTexture from './textures/floorTex.jpg';
+import spaceImg from './textures/neonLights2.jpeg';
 
-import spaceImg from './textures/neonLights.jpeg';
-
-//import cpu from './cpu-design3c22.glb';
-//import cpu from './updated-cpu-final.glb';
-//import cpu from './cpu2.glb';
-//import cpu from './cpu3.glb';
 import cpu from './cpu3Draco.glb';
-//import cpu from './cpu4.glb';
-
-import AnimationController from '../../UIEvents/AnimationController';
 
 import vertexShader from './shaders/vertex.js';
 import fragmentShader from './shaders/fragment.js';
 
 import floorFragmentShader from './shaders/floor/floorFragmentShader.js';
 import floorVertexShader from './shaders/floor/floorVertexShader.js';
-
-import rainShader from './shaders/rainShader.js';
-import starShader from './shaders/starsFragmentShader.js';
-import warpFragmentShader from './shaders/warpFragmentShader';
-import horseShoeFragment  from './shaders/horseShoeFragment';
 
 
 export default class HomeScene
@@ -88,20 +70,11 @@ dracoLoader.setDecoderConfig( { type: 'js' } );
 this.model = new GLTFLoader();
 this.model.setDRACOLoader(dracoLoader);        
 
-const cpuTex = new THREE.TextureLoader().load(cpuTexture);
-const cpuNorm = new THREE.TextureLoader().load(cpuNormal);
-const cpuRough = new THREE.TextureLoader().load(cpuRoughness);
 
 const floorTex = new THREE.TextureLoader().load(floorTexture);
 
 const logoTex = new THREE.TextureLoader().load(logoTexture);
 
-
-const cpuMaterial = new THREE.MeshStandardMaterial({
-  map: cpuTex,
-  normalMap: cpuNorm,
-  roughnessMap: cpuRough
-});
 
 const floorMaterial = new THREE.MeshStandardMaterial({
   color: 0xff0000
@@ -124,14 +97,6 @@ this.cpuWireShader = new THREE.ShaderMaterial({
   vertexShader: floorVertexShader
 })
 
-cpuTex.flipY = false;
-cpuTex.encoding = THREE.sRGBEncoding;
-
-cpuNorm.flipY = false;
-cpuTex.encoding = THREE.sRGBEncoding;
-
-cpuRough.flipY = false;
-cpuTex.encoding = THREE.sRGBEncoding;
 
 floorTex.flipY = false;
 floorTex.encoding = THREE.sRGBEncoding;
