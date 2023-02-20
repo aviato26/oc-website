@@ -6,6 +6,8 @@ export default class MouseControl{
         //this.init();
         this.mousePos = { x: 0, y: 0 };
         this.mouseLastPos = { x: 0, y: 0 };
+        this.mobilePos = {x: 0, y: 0};
+        this.mobilePosDiff = {x: 0, y: 0};
     }
 
     init(){
@@ -13,10 +15,25 @@ export default class MouseControl{
         this.mouseMove();
     }
 
-    mobileControls(){
-        document.addEventListener('touchmove', () => {
+    mobileControls(callback){
 
+        document.addEventListener('touchstart', (e) => {
+            this.mobilePos.y = e.touches[0].clientY;
         });
+
+        document.addEventListener('touchmove', (e) => {
+            this.mobilePosDiff.y = this.mobilePos.y - e.touches[0].clientY;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            this.mobileSceneUpdate(callback);
+        });
+    }
+
+    mobileSceneUpdate(callback){
+        if(this.mobilePosDiff.y > 50. || this.mobilePosDiff.y < -50. ){
+            callback(this.mobilePosDiff.y);
+        }
     }
 
     wheelEvent(wheelControl){

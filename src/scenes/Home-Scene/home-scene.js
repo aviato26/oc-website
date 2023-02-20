@@ -141,11 +141,16 @@ logoTex.flipY = false;
 
   // setting the cameras aspect ratio to the ratio of the screen size so the rendered texture will never be distorted
   this.camera.aspect = this.width / this.height;
+  //console.log(this.camera.aspect)
 
   // mobile setting for the camera field of view
-  //this.camera.fov = 70;
+  //this.camera.fov = 75;
 
-  this.camera.fov = 50;
+  //this.camera.fov = 50;
+
+  // setting the camera field of view based on the camera aspect (this is basically checks if the screen is mobile or larger device)
+  this.camera.fov = (this.camera.aspect < 1) ? 75 : 50;
+
   this.camera.updateProjectionMatrix();
 
   //console.log(cube.material)
