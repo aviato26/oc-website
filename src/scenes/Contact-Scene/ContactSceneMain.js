@@ -139,8 +139,11 @@ class ContactSceneMain{
             //model.scene.children[1].material = new THREE.MeshBasicMaterial({ color: 0xffffff })            
 
             // need to update camera projection matrix of the rendered texture will be distorted
-            //this.camera.fov = 20;
+            //this.camera.fov = 30;
             this.camera.aspect = window.innerWidth / window.innerHeight;
+
+            this.camera.fov = (this.camera.aspect < 1) ? 30 : this.camera.fov;    
+
             this.camera.updateProjectionMatrix();
 
             this.scene.add(model.scene);

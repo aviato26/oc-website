@@ -70,6 +70,8 @@ export default class AnimationController{
 
         this.mouseControl.mouseMove(this.servicesScene);
 
+        this.mouseControl.mobileControls(this.laptopWheelControl);
+
         this.mouseControl.wheelEvent(this.laptopWheelControl);
     }
 
@@ -79,9 +81,9 @@ export default class AnimationController{
             //console.log(e)
 
             if(!this.animating){
-
+                console.log(e);
                 // checking to see if the user has scrolled fast enough to trigger animation
-                if(e.deltaY > 150){
+                if(e.deltaY > 150 || e > 50){
                     this.animating = true;
 
                     this.timeDirection = 1.0;
@@ -97,7 +99,7 @@ export default class AnimationController{
                     this.updateSlideAnimation();                    
                 }
     
-                if(e.deltaY < -150){
+                if(e.deltaY < -150 || e < -50){
                     this.animating = true;                 
 
                     this.timeDirection = -1.0;

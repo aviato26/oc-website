@@ -118,9 +118,10 @@ export default class ServicesPage
       //console.log(this.cameraAnimation)
 
       this.camera = obj.cameras[0];
-      //this.camera.fov = 35;
-      //this.camera.fov = 60;      
+
       this.camera.aspect = window.innerWidth / window.innerHeight;
+
+      this.camera.fov = (this.camera.aspect < 1) ? 45 : this.camera.fov;    
 
       //this.camera.rotation.x = Math.PI;
       //this.camera.rotation.x = Math.PI * 2;      
