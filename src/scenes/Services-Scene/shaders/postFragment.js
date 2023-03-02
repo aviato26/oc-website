@@ -37,7 +37,7 @@ const postFragmentShader =
         }
 
         color.a = 1.0;
-        color.rgb /= 4.;
+        color.rgb /= 2.;
 
         vec4 finalColor = 1.0 - (1.0 - color) * (1.0 - originalTex);
 

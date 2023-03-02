@@ -5,19 +5,15 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
-import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
 import spaceImg from './textures/floor-emission.png';
 
-
 import numbersImg from './textures/c2.png';
 
 import CoffeeSceneModel from './aboutSceneDraco.glb';
-
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 import wireFragmentShader from './shaders/wire-fragment';
 import wireVertexShader from './shaders/wire-vertex';
@@ -49,6 +45,7 @@ class AboutSceneMain{
     
         this.renderer = parentRenderer;
         this.renderer.physicallyCorrectLights = true;
+        //this.renderer.useLegacyLights = true;
 
         const pinkLight = 0xFF00E9;
 
@@ -95,7 +92,7 @@ class AboutSceneMain{
                     if(e.name === 'Cube'){
 
                         this.cube = e;
-                        this.cube.material = new THREE.MeshBasicMaterial({ color: 0x000010 });
+                        this.cube.material = new THREE.MeshStandardMaterial({ color: 0x555555, side: THREE.DoubleSide, metalness: 0.1, roughness: .6 });          
 
                         e.material.needsUpdate = true;
                     }
@@ -115,12 +112,10 @@ class AboutSceneMain{
 
                         e.material = this.wireMaterial;
                         e.material.needsUpdate = true;
-                        //console.log(e)
                     }
 
                     //if(e.name === 'Plane001'){
                     if(e.name === 'c2'){                        
-                        //console.log(e)
                         this.smokeMaterial = new THREE.ShaderMaterial({
 
                             side: THREE.DoubleSide,
@@ -258,6 +253,7 @@ class AboutSceneMain{
                           `)
                   
                         this.mod.material.userData.shader = shader;
+                        this.mod.material.envMapIntensity = 0.1;
                   
                       }
 
@@ -298,16 +294,16 @@ class AboutSceneMain{
             // composer must not render to screen in order to save all the passes to pass through to store as a texture
             this.composer.renderToScreen = false;
 
-            const renderPass = new RenderPass(this.scene, this.camera);
+            this.renderPass = new RenderPass(this.scene, this.camera);
             //const renderPass = new RenderPass(model.scene, this.camera);            
         
-            const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
-            bloomPass.threshold = params.bloomThreshold;
-            bloomPass.strength = params.bloomStrength;
-            bloomPass.radius = params.bloomRadius;
+            this.bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+            this.bloomPass.threshold = params.bloomThreshold;
+            this.bloomPass.strength = params.bloomStrength;
+            this.bloomPass.radius = params.bloomRadius;
 
       
-            const bokeh = new BokehPass(this.scene, this.camera, {
+            this.bokeh = new BokehPass(this.scene, this.camera, {
                 focus: 2.,    
                 //aperture: .01,
                 aperture: .00011,    
@@ -318,20 +314,16 @@ class AboutSceneMain{
             });
 
             // this pass needs to be swapped to the write buffer in order to be rendererd into the texture
-            bokeh.needsSwap = true;
+            this.bokeh.needsSwap = true;
             //bloomPass.needsSwap = true;
 
-            this.composer.addPass(renderPass);
-            this.composer.addPass(bokeh);
-            this.composer.addPass(bloomPass);            
+            this.composer.addPass(this.renderPass);
+            this.composer.addPass(this.bokeh);
+            this.composer.addPass(this.bloomPass);            
+
+            this.passes = [this.renderPass, this.bokeh, this.bloomPass];
 
             this.sceneLoaded = true;
-
-            //console.log(model.scene)
-
-            //this.scene.add(model.scene);
-
-            //this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
             // this method needs to be called to pre-compile the scene to have uniforms ready to be updated
             this.renderer.compile(this.scene.children[0], this.camera);               
@@ -347,32 +339,18 @@ class AboutSceneMain{
     }
 
 
-    renderPass(){
-        this.renderer.setRenderTarget(this.renderBuffer);
-        this.renderer.render(this.scene, this.camera);
-        this.renderer.setRenderTarget(null);
-        return this.renderBuffer.texture;
+    renderScene(t){
+
+        this.time += 1 / 60;
+
+        this.smokeMaterial.uniforms.time.value = this.time;
+        this.mod.material.userData.shader.uniforms.time.value = this.time;        
     }
 
-    renderedTexture(t){
-        //this.time += 1.0 / 60.0;
-
-        //this.controlls.update();
-        //this.wireMaterial.uniforms.time.value = this.time;
-        //this.smokeMaterial.uniforms.time.value = this.time;
-        //this.mod.material.userData.shader.uniforms.time.value = this.time;
-        //console.log(t)
-
-        this.smokeMaterial.uniforms.time.value = t;
-        this.mod.material.userData.shader.uniforms.time.value = t;        
-        
+    initialRender(){
         this.composer.render();
-        //this.renderer.render(this.scene, this.camera);
 
         return this.composer.readBuffer.texture;      
-        
-        //return this.renderPass();
-        //return this.renderBuffer.texture;
     }
 
 }

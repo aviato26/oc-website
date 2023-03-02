@@ -56,7 +56,7 @@ export default class ServicesPage
     //this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     //this.renderer.toneMapping = THREE.LinearToneMapping;    
     //this.renderer.toneMapping = THREE.ReinhardToneMapping;        
-    this.renderer.toneMapping = THREE.CineonToneMapping;            
+    //this.renderer.toneMapping = THREE.CineonToneMapping;            
 
     // variable to switch on when scene is in frame to activate this scenes camera controls and switch off when scene is not being rendered
     this.cameraActive = false;
@@ -72,7 +72,6 @@ export default class ServicesPage
     this.mouseLastPos = new THREE.Vector2(0, 0);
     this.mouseDiff = new THREE.Vector2(0, 0);
     this.mVel = new THREE.Vector2(0, 0);
-
 
     this.roomMaterial = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
 
@@ -93,11 +92,7 @@ export default class ServicesPage
       obj.scene.traverse((obj) => {
 
         if(obj.name === 'Cube'){
-          //const wallLightMap = new THREE.TextureLoader().load(wallLight, (img) => img.flipY = false)
-          //const mat = new THREE.MeshBasicMaterial({map: wallLightMap, side: THREE.DoubleSide });
-          const mat = new THREE.MeshStandardMaterial({side: THREE.DoubleSide, metalness: 1.0, roughness: .6 });          
-          //c.material.map = new THREE.TextureLoader().load(wallLight);
-          //c.material.side = THREE.DoubleSide;
+          const mat = new THREE.MeshStandardMaterial({ color: 0x555555, side: THREE.DoubleSide, metalness: 0.1, roughness: .6 });          
           obj.material = mat;         
           //c.marterial.side = THREE.DoubleSide;
           //c.material.side = 3
@@ -145,14 +140,14 @@ export default class ServicesPage
       // composer must not render to screen in order to save all the passes to pass through to store as a texture
       //this.composer.renderToScreen = false;
 
-      const renderPass = new RenderPass(this.scene, this.camera);
+      this.renderPass = new RenderPass(this.scene, this.camera);
   
-      const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
-      bloomPass.threshold = params.bloomThreshold;
-      bloomPass.strength = params.bloomStrength;
-      bloomPass.radius = params.bloomRadius;
+      this.bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+      this.bloomPass.threshold = params.bloomThreshold;
+      this.bloomPass.strength = params.bloomStrength;
+      this.bloomPass.radius = params.bloomRadius;
 
-      const bokeh = new BokehPass(this.scene, this.camera, {
+      this.bokeh = new BokehPass(this.scene, this.camera, {
         focus: 1.,
         aperture: 0.01,
         maxblur: 0.01,
@@ -183,10 +178,12 @@ export default class ServicesPage
       //bloomPass.needsSwap = true;
 
       
-      this.composer.addPass(renderPass);
+      this.composer.addPass(this.renderPass);
       this.composer.addPass(this.shaderPass);
-      this.composer.addPass(bokeh);
-      this.composer.addPass(bloomPass);      
+      this.composer.addPass(this.bokeh);
+      this.composer.addPass(this.bloomPass);      
+
+      this.passes = [this.renderPass, this.shaderPass, this.bokeh, this.bloomPass];
 
       this.scene.add(obj.scene);
       
@@ -196,7 +193,7 @@ export default class ServicesPage
       this.sceneLoaded = true;
 
       //this method needs to be called to pre-compile the scene before it gets rendered or the animation will lag in the initial call
-      this.renderer.compile(this.scene.children[0], this.camera);
+      this.renderer.compile(this.scene, this.camera);
 
       //this.renderSceneTexture();
       //this.preRender();
@@ -212,6 +209,7 @@ export default class ServicesPage
 
   });
 
+  this.cameraAnimating = true;
   
   }
 
@@ -235,15 +233,14 @@ export default class ServicesPage
 
 
   updateCamera(mousePos){
-
-    //this.camera.lookAt(this.sceenPos);
-    //console.log(this.camera.rotation)    
-    if(this.cameraActive){
+    if(!this.cameraAnimating){
       this.mouse.x = mousePos.x;
 
       // updating camera position according to users mouse position along the x axis
       this.camera.position.x = mousePos.x * 0.8;
-  
+ 
+      this.camera.position.x = Math.min(Math.max(this.camera.position.x, -.5), .5);      
+      
       // keeping the camera looking at the laptop no matter where the cameras position is placed
       this.camera.lookAt(this.sceenPos);
     }
@@ -254,7 +251,7 @@ export default class ServicesPage
   }
 
 
-  renderSceneTexture(time){
+  renderScene(time){
 
     this.time += 1 / 60;
 
@@ -262,7 +259,7 @@ export default class ServicesPage
     
     this.mouseDiff.subVectors(this.mouse, this.mouseLastPos);
     this.mVel.add(this.mouseDiff);
-    this.mVel.multiplyScalar(0.94);
+    this.mVel.multiplyScalar(0.9);
 
     // postMaterial for the blur bloom effect
     this.postMaterial.uniforms.time.value = this.time;
@@ -273,20 +270,16 @@ export default class ServicesPage
     this.mouseLastPos.copy(this.mouse);
 
     // updating time for the blue screen of death to switch images
-    this.screenShader.uniforms.time.value = this.time * 0.5;
+    this.screenShader.uniforms.time.value = this.time;
 
+    //this.composer.render();
+
+    //return this.composer.readBuffer.texture;      
+
+  }
+
+  initialRender(){
     this.composer.render();
-    /*
-    this.renderer.setRenderTarget(this.renderer2);
-    this.renderer.render(this.scene, this.camera);
-    this.renderer.setRenderTarget(null);
-    
-    return this.renderer2.texture;
-    */
-
-
-    return this.composer.readBuffer.texture;      
-
   }
 
 }

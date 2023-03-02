@@ -1,4 +1,6 @@
 
+import * as THREE from 'three';
+import { Vector3 } from 'three';
 
 export default class MouseControl{
     constructor(){
@@ -8,11 +10,17 @@ export default class MouseControl{
         this.mouseLastPos = { x: 0, y: 0 };
         this.mobilePos = {x: 0, y: 0};
         this.mobilePosDiff = {x: 0, y: 0};
+        this.mouseDiff = { x:0 , y:0 };
+
+        this.userMouseDown = false;
+
+        this.init();
     }
 
     init(){
-        this.wheelEvent();
-        this.mouseMove();
+        //this.wheelEvent();
+        //this.mouseMove();
+        this.updateLargeDeviceScenes();
     }
 
     mobileControls(callback){
@@ -42,12 +50,29 @@ export default class MouseControl{
         });
     }
 
-    mouseMove(camera){
-        document.addEventListener('mousemove', (e) => {
-            this.mousePos.x = ((e.clientX / window.innerWidth) * 2) - 1;
-            this.mousePos.y = ((e.clientY / window.innerHeight) * 2) - 1;
-            camera.updateCamera(this.mousePos, e.clientX);
+    updateLargeDeviceScenes(){
+
+        document.addEventListener('mousedown', (e) => {
+            this.userMouseDown = true;
         });
+
+        document.addEventListener('mouseup', () => {
+            this.userMouseDown = false;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if(this.userMouseDown){
+                this.mousePos.x = ((e.clientX / window.innerWidth) * 2) - 1;
+                this.mouseDiff.x += e.movementX * 0.001;
+            }
+        });
+    }
+
+    addFrictionDecay(){
+        if(!this.userMouseDown){
+            this.mouseDiff.x *= 0.7;
+            this.mousePos.x *= 0.7;
+        }
     }
 
 }
