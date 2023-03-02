@@ -8,6 +8,7 @@ const floorFragmentShader =
 
     uniform sampler2D tex;
     uniform float time;
+    uniform float mouseInput;
 
     varying vec2 vUv;
 
@@ -30,30 +31,14 @@ const floorFragmentShader =
 
         color.rgb *= oColor * 120.0;
 
-        //color *= vOpacity;
 
-        //color.a = min(1.0, color.a) * .15;
-        //color.a = min(1.0, color.a) * .5;
         color.a = min(1.0, color.a) * 20.5;
-/*
-        float disc = length(v);
-
-        uv.x += time / 25.0;
-
-        uv.x *= 5.0;
-        uv.y += sin(time);
-        //uv.y *= 1.4;
-
-        //float s = sin(uv.x * 16.0) / 2.0 + 0.5;
-        float s = sin(uv.x * 16.0) / 2.0 + 0.5;        
-*/
-        //color.a += smoothstep(0., 0.9, abs(s-uv.y));
 
 
 
         vec3 col2 = vec3(r, b, b);
             
-        float dis = 5.0;
+        float dis = 5.0 - mouseInput;
         float width = 0.01;
         float blur = .7;
         vec3 lineColor = vec3(.5, .4, 1.4);
@@ -62,14 +47,16 @@ const floorFragmentShader =
         float angle = tan(o.y + o.x);
         float l = length(o);
         float offset = l + (angle/(2. * 3.14)) * dis;
-        float circles=mod(offset - time * 0.9, dis);
+        //float circles = mod(offset - time * 0.9, dis);
+        float circles = mod(offset - time, dis);        
         color.a = (smoothstep(circles-blur,circles,width)-smoothstep(circles,circles+blur,width)) * lineColor.r;
         color.a += .3;
 
 
 
         //gl_FragColor = vec4(smoothstep(0.0, 0.3, abs(s-uv.y)));
-        gl_FragColor = color;
+        //gl_FragColor = color * 1.5;
+        gl_FragColor = color;        
         //gl_FragColor = vec4(col2, 1.0);
     }
 `;

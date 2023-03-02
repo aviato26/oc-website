@@ -10,7 +10,6 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 import tunnelModel2 from './tunnel2.glb';
 
@@ -28,7 +27,7 @@ class ContactSceneMain{
         //this.camera = new THREE.PerspectiveCamera( 45, this.width / this.height, 1, 1000 );
     
         this.renderer = parentRenderer;
-        this.renderer.physicallyCorrectLights = true;
+        //this.renderer.physicallyCorrectLights = true;
 
         this.renderBuffer = new THREE.WebGLRenderTarget(this.width, this.height);
 
@@ -146,11 +145,15 @@ class ContactSceneMain{
 
             this.camera.updateProjectionMatrix();
 
+            this.composer = new EffectComposer(this.renderer);
+
+            this.renderPass = new RenderPass(this.scene, this.camera);
+
+            this.passes = [this.renderPass];
+
             this.scene.add(model.scene);
 
             this.sceneLoaded = true;
-
-            //this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 
             //this method needs to be called to pre-compile the scene before it gets rendered or the animation will lag in the initial call
             //this.renderer.compile(this.scene, this.camera);
@@ -162,19 +165,14 @@ class ContactSceneMain{
         this.t = 0;
     }
 
-    renderedTexture(){
-
-        this.renderer.setRenderTarget(this.renderBuffer);
-        this.renderer.render(this.scene, this.camera);
-        this.renderer.setRenderTarget(null);
-
+    renderScene(){
         this.t += 0.01;
 
         this.tunnelShader.uniforms.time.value = this.t;
+    }
 
-        //this.camera.rotation.x += 0.01;
-
-        return this.renderBuffer.texture;
+    initialRender(){
+        this.composer.render();
     }
 
 }

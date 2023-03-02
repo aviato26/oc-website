@@ -4,25 +4,27 @@
 import * as THREE from 'three';
 import '../css/style.css';
 
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { Scene, PerspectiveCamera, Vector2, ShaderMaterial, WebGLRenderTarget, Vector3 } from 'three'
+import { TextureLoader, EquirectangularReflectionMapping, DoubleSide, AdditiveBlending, sRGBEncoding  } from 'three';
 
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
+
 
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
-import { SavePass } from 'three/examples/jsm/postprocessing/SavePass.js';
+import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 
 
 import logoTexture from './textures/logo.png';
 import floorTexture from './textures/floorTex.jpg';
 import spaceImg from './textures/neonLights2.jpeg';
 
-import cpu from './cpu3Draco.glb';
-
-import vertexShader from './shaders/vertex.js';
-import fragmentShader from './shaders/fragment.js';
+//import cpu from './cpu3Draco.glb';
+import cpu from './cpu.glb';
 
 import floorFragmentShader from './shaders/floor/floorFragmentShader.js';
 import floorVertexShader from './shaders/floor/floorVertexShader.js';
@@ -33,24 +35,20 @@ export default class HomeScene
   constructor(parentRenderer, animationCallBack)
   {
 
-    this.scene = new THREE.Scene();
+    this.scene = new Scene();
 
     this.width = window.innerWidth;
     this.height = window.innerHeight;
 
     this.sceneLoaded = false;
 
-    this.camera = new THREE.PerspectiveCamera( 45, this.width / this.height, 1, 1000 );
+    this.camera = new PerspectiveCamera( 45, this.width / this.height, 1, 1000 );
 
-    this.mouse = new THREE.Vector2(0, 0);
+    this.mouse = new Vector2(0, 0);
 
-    // class to control the triggers for animations
-    //this.animationController = new AnimationController();
 
-    //console.log(this.animationController.currentAnimation)
-
-this.environmentMap = new THREE.TextureLoader().load(spaceImg, (img) => {
-    img.mapping = THREE.EquirectangularReflectionMapping;
+this.environmentMap = new TextureLoader().load(spaceImg, (img) => {
+    img.mapping = EquirectangularReflectionMapping;
     this.scene.environment = img;
   });
 
@@ -60,7 +58,7 @@ this.environmentMap = new THREE.TextureLoader().load(spaceImg, (img) => {
     //this.clock = new THREE.Clock();
 
     this.renderer = parentRenderer;
-    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    //this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
 
 const dracoLoader = new DRACOLoader();
@@ -71,27 +69,24 @@ this.model = new GLTFLoader();
 this.model.setDRACOLoader(dracoLoader);        
 
 
-const floorTex = new THREE.TextureLoader().load(floorTexture);
+const floorTex = new TextureLoader().load(floorTexture);
 
-const logoTex = new THREE.TextureLoader().load(logoTexture);
+const logoTex = new TextureLoader().load(logoTexture);
 
 
-const floorMaterial = new THREE.MeshStandardMaterial({
-  color: 0xff0000
-});
-
-this.cpuWireShader = new THREE.ShaderMaterial({
+this.cpuWireShader = new ShaderMaterial({
   uniforms:{
     //tex: { value: floorTex },
     tex: { value: logoTex },
+    mouseInput: { value: 0.0 },
     time: { value: 0.0 }
   },
 
-  side: THREE.DoubleSide,
+  side: DoubleSide,
   transparent: true,
   //depthTest: false,
   depthWrite: true,
-  blending: THREE.AdditiveBlending,
+  blending: AdditiveBlending,
 
   fragmentShader: floorFragmentShader,
   vertexShader: floorVertexShader
@@ -99,7 +94,7 @@ this.cpuWireShader = new THREE.ShaderMaterial({
 
 
 floorTex.flipY = false;
-floorTex.encoding = THREE.sRGBEncoding;
+floorTex.encoding = sRGBEncoding;
 //floorTex.encoding = THREE.BasicDepthPacking
 //floorTex.encoding = THREE.RGBADepthPacking
 
@@ -114,52 +109,31 @@ logoTex.flipY = false;
   this.cameraAnimation = obj.animations;
 
 
-  //let cam = obj.scene.getObjectByName('Camera');
-  //this.c2 = cam.children[0];
-  //this.camera = cam.children[0];
   this.camera = obj.cameras[0];  
-  let cube = obj.scene.getObjectByName('cpu');
+  this.cpu = obj.scene.getObjectByName('cpu');
   this.t = obj.scene.getObjectByName('Text');
-  //this.t = obj.scene.getObjectByName('Text001');
-  let floor = obj.scene.getObjectByName('floor');
-  let wires = obj.scene.getObjectByName('path7');
+  this.floor = obj.scene.getObjectByName('floor');
+  this.wires = obj.scene.getObjectByName('path7');
 
-  //console.log(this.camera)
-  //console.log(t);
-  //t.material.metalness = 1.0;
 
   this.t.material.emissiveIntensity = .5;
   this.t.material.metalness = 1.5;
   this.t.material.roughness = 0;
 
+  this.cpu.material.envMapIntensity = 0.3;
+  this.cpu.material.metalness = .9;
+  //cube.material.roughness = 0.3;  
 
-/*
-  this.t.children[0].material.emissiveIntensity = .0;
-  this.t.children[0].material.metalness = 2.0;
-  this.t.children[0].material.roughness = 0;
-  */
 
   // setting the cameras aspect ratio to the ratio of the screen size so the rendered texture will never be distorted
   this.camera.aspect = this.width / this.height;
-  //console.log(this.camera.aspect)
 
-  // mobile setting for the camera field of view
-  //this.camera.fov = 75;
-
-  //this.camera.fov = 50;
 
   // setting the camera field of view based on the camera aspect (this is basically checks if the screen is mobile or larger device)
   this.camera.fov = (this.camera.aspect < 1) ? 75 : 50;
 
   this.camera.updateProjectionMatrix();
 
-  //console.log(cube.material)
-  cube.material.metalness = .3;
-  //cube.material.roughness = 0.;  
-
-  //cube.material.normalMap = cpuNorm;
-
-  //this.playAnimation();
 
   // loop through objects in scene and find all path objects (these are the circuit tracks to the cpu) and replace there material with the wireShader
   obj.scene.children.map(c => {
@@ -168,144 +142,124 @@ logoTex.flipY = false;
     }
   })
   
-  //console.log(obj)
 
-  //console.log(wires)
-  //cube.material.encoding = THREE.sRGBEncoding;
-
-  //wires.material = this.logoShader;
-
-  //this.composer = new EffectComposer(this.bufferRenderer);
   this.composer = new EffectComposer(this.renderer);  
 
   // composer must not render to screen in order to save all the passes to pass through to store as a texture
   this.composer.renderToScreen = false;
-  this.composer.addPass(new RenderPass(this.scene, this.camera));
 
-  let bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
-/*
-  let bokehPass = new BokehPass(this.scene, this.camera, {
-    //focus: 3.5,
-    focus: 4.0,    
+  this.bloomPass = new UnrealBloomPass(new Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+
+  this.bokehPass = new BokehPass(this.scene, this.camera, {
+    focus: 4,  
+    //focus: 3.5,      
     //aperture: .01,
     aperture: .01,    
     maxblur: 0.01
   })
-*/
-/*
-  let bokehPass = new BokehPass(this.scene, this.camera, {
-    //focus: 3.5,
-    focus: 4.0,    
-    //aperture: .01,
-    aperture: .007,    
-    maxblur: 0.01
-  })
-*/
-  let bokehPass = new BokehPass(this.scene, this.camera, {
-    //focus: 2.9999999987,  
-    focus: 4,      
-    aperture: .01,
-    //aperture: .007,    
-    maxblur: 0.05
-  })
 
-/*
-  let bloomProps = {
-    strength: 0.7,
-    radius: 0,
-    threshold: 0
-  }
-*/
 
-const bloomProps = {
+this.bloomProps = {
     strength: .7,
-    radius: 1,
+    //radius: 1,
+    radius: 1,    
     threshold: 0
   }
 
-  bloomPass.threshold = bloomProps.threshold;
-  bloomPass.strength = bloomProps.strength;
-  bloomPass.radius = bloomProps.radius;
+  this.bloomPass.threshold = this.bloomProps.threshold;
+  this.bloomPass.strength = this.bloomProps.strength;
+  this.bloomPass.radius = this.bloomProps.radius;
 
   // this pass needs to be swapped to the write buffer in order to be rendererd into the texture
-  bokehPass.needsSwap = true;
+  this.bokehPass.needsSwap = true;
 
-  this.composer.addPass(bloomPass);
-  this.composer.addPass(bokehPass);
+  this.scenePass = new RenderPass(this.scene, this.camera)
+  //scenePass.clear = false;
+  //scenePass.renderToScreen = false;
+  //scenePass.clearDepth = true  
 
 
-  floor.material.emissiveMap = floorTex;
+  this.composer.addPass(this.scenePass);
+  this.composer.addPass(this.bloomPass);
+  this.composer.addPass(this.bokehPass);
+  //this.composer.addPass(fxaa);
+
+  this.passes = [this.scenePass, this.bloomPass, this.bokehPass]
+
+
+  this.floor.material.emissiveMap = floorTex;
   //floor.material.emissiveIntensity = 2;
-  floor.material.emissiveIntensity = .3;
+  this.floor.material.emissiveIntensity = .3;
 
   this.sceneLoaded = true;
 
   this.scene.add(obj.scene)
 
-  //this.playAnimation();
-
-
-  animationCallBack(this.scene, this.camera);
 
   // this method needs to be called to pre-compile the scene before it gets rendered or the animation will lag in the initial call
-  //this.renderer.compile(this.scene, this.camera);
+  this.renderer.compile(this.scene, this.camera);
+
+  animationCallBack(this.scene, this.camera);
 
 });
 
 
-//console.log((e.loaded / e.currentTarget.response))
-
 this.playAction = false;
+
+this.cameraAnimating = false;
 
 this.time = 0;
 
-/*
-document.addEventListener('mousedown', () => {
-  this.playAction = true;
-})
-*/
+this.target = new WebGLRenderTarget(window.innerWidth, window.innerHeight);
 
-    //this.camera.position.z = 10;
+}
 
-  }
+updateCamera(mousePos){
+    if(!this.cameraAnimating){
+      // updating camera position according to users mouse position along the x axis
+      this.camera.position.x += mousePos.x * 0.1;
 
-
-
-  playAnimation(){
-   this.mixer = new THREE.AnimationMixer(this.cameraScene.scene);
-   //this.mixer = new THREE.AnimationMixer(this.camera);
-   let clips = this.cameraAnimation;
-   this.action = this.mixer.clipAction(clips[0]);
-   this.action.setLoop(THREE.LoopPingPong);
-   this.action.timeScale = 0.03;
-   //this.action.clampWhenFinished = true;
-   this.action.play();
-   //this.action.reset();
-   //this.mixer.play();
-   //console.log(clips)
-    //let clip = new THREE.AnimationClip(clips);
-   //let action = this.mixer.clipAction(clips[0]);
-   //action.play();
-  }
+      // keeping camera looking at the cpu model even when the position is being updated
+      this.camera.lookAt(new Vector3(this.cpu.position.x, this.cpu.position.y - 0.3 , this.cpu.position.z));    
+    }
+}
 
 
+addRenderPass(scene, camera){
 
-  getRenderedSceneTexture(){
+  this.composer.passes = [];
+
+  this.composer.passes = scene.composer.passes;
+
+}
+
+
+  renderScene(){
 
     this.time += 0.1;
 
+    // this uniform is for the time based pulse through the wires
     this.cpuWireShader.uniforms.time.value = this.time;
-    //this.t.material.emissiveIntensity = Math.abs(Math.sin(this.time * 0.1)) * 0.2;    
-    //this.t.material.emissiveIntensity += Math.sin(this.time * 0.5) * 0.002;    
-    //this.t.children[0].material.emissiveIntensity = Math.abs(Math.sin(this.time * 0.1)) * 0.2;
-    //this.t.children[0].material.emissiveIntensity += Math.sin(this.time * 0.5) * 0.002;    
 
-    //this.mixer.update(time);
-    //this.t = performance.now();
+    // clamping the mouse position uniform which will brighten the circuit wires
+    this.cpuWireShader.uniforms.mouseInput.value = Math.min(Math.max(Math.abs(this.camera.position.x) * 12, 0.), 4.);
 
-    this.composer.render();
+    // increasing bloom strength based on user control movement
+    this.bloomPass.strength += Math.abs(this.camera.position.x) * 0.7;
 
-    return this.composer.readBuffer.texture;
+    // this will continually decrement the bloom strength and camera position
+    this.bloomPass.strength *= 0.9;
+    this.camera.position.x *= 0.9;
+
+    // clamping the bloom strength and camera position
+    this.bloomPass.strength = Math.min(Math.max(this.bloomPass.strength, 0.7), 1.5);                                
+    //this.camera.position.x = Math.min(Math.max(this.camera.position.x, -1.5), 1.5);  
+
+    // keeping camera looking at the cpu model even when the position is being updated
+    //this.camera.lookAt(new Vector3(this.cpu.position.x, this.cpu.position.y - 0.3 , this.cpu.position.z));
+
+    //this.composer.render();
+    //return this.composer.readBuffer.texture;
   }
 
 }

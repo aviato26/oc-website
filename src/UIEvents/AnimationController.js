@@ -1,19 +1,20 @@
 
 
-import * as THREE from 'three';
+//import * as THREE from 'three';
 import gsap from 'gsap';
-import { AnimationMixer, NoToneMapping } from 'three';
 import { Clock } from 'three';
 import PageDesciption from '../scenes/components/services';
 
 import MouseControl from '../scenes/components/MouseControl';
 
 export default class AnimationController{
-    constructor(scenes){
+    constructor(scenes, updateCurrentRenderPass){
 
         this.scenes = scenes;
 
         this.playAnimation = false;
+
+        this.updateScenePass = updateCurrentRenderPass;
 
         // this class contains all text and methods that will add and remove them
         this.textSegments = new PageDesciption();
@@ -41,11 +42,15 @@ export default class AnimationController{
 
         this.animationStates();
 
+        this.one = true;
+
         this.mouseControl = new MouseControl();
 
         this.laptopWheelControl = this.laptopWheelControl.bind(this);
 
         this.currentAnimation = this.states[this.sceneIndex];
+
+        this.currentScenePasses = this.scenes[0].passes;
 
         this.init();
 
@@ -68,11 +73,14 @@ export default class AnimationController{
 
         this.servicesScene = this.scenes[1];
 
-        this.mouseControl.mouseMove(this.servicesScene);
 
         this.mouseControl.mobileControls(this.laptopWheelControl);
 
         this.mouseControl.wheelEvent(this.laptopWheelControl);
+
+        //this.mouseControl.updateLargeDeviceScenes(this.scenes[0].camera, this.scenes[0]);
+        //this.mouseControl.updateLargeDeviceScenes();     
+           
     }
 
     laptopWheelControl(e){
@@ -81,7 +89,6 @@ export default class AnimationController{
             //console.log(e)
 
             if(!this.animating){
-                console.log(e);
                 // checking to see if the user has scrolled fast enough to trigger animation
                 if(e.deltaY > 150 || e > 50){
                     this.animating = true;
@@ -136,7 +143,6 @@ export default class AnimationController{
 
         // update scene index and then wait for the scene animation to almost be complete then increment scene index again to start next scene animation
         setTimeout(() => {
-
     
             // need to check scene index to make sure to not go over or under the index
             if(this.sceneIndex > 0 && this.sceneIndex < this.states.length - 1){
@@ -156,10 +162,10 @@ export default class AnimationController{
 
             setTimeout(() => {
                 this.animating = false;
+                this.one = !this.one;
 
                 // need to check scene index to make sure to not go over or under the index
                 if(this.sceneIndex > 0 && this.sceneIndex < this.states.length - 1){
-
 
                 // setting animation variable to allow user to trigger the next animation
                 this.animating = false;                    
@@ -252,19 +258,27 @@ export default class AnimationController{
                 gsap.to(this, {
                     progressAnimation: 1,
                     duration: 0.95,
-                    delay: .85,
+                    //delay: .85,
+                    delay: .15,                    
                     ease: "expo.out",
                     //onStart: () => console.log('asdf')
-                    //onComplete: () => this.progressAnimation = 0                                
+                    onComplete: () => this.updateScenePass(this.scenes[1])
                 });
 
                 //gsap.to(this.scenes[0].camera.rotation, { x: -Math.PI * 2, duration: 2., ease: "back.inOut(1.7)", onStart: () => { this.hideTextAnimation(this.homePageText) }});
-                gsap.to(this.scenes[0].camera.rotation, { x: -Math.PI * 2, duration: 2., ease: "back.inOut(1.7)", onStart: () => { this.titleTextAnimationBackward(this.homePageText) }});                
+                gsap.to(this.scenes[0].camera.rotation, { x: -Math.PI * 2, duration: 2., ease: "back.inOut(1.7)", onStart: () => { 
+                    this.titleTextAnimationBackward(this.homePageText) 
+                    //console.log(this.scenes[0].addRenderPass)                                                            
+                    this.scenes[0].cameraAnimating = true;
+                    this.scenes[1].cameraAnimating = true;
+                }});                
                 
                 gsap.to(this.scenes[1].camera.rotation, { x: -0.21988, y: 0, z: 0 , delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                    
                     //this.servicesScene.activateCameraControls();            
                     this.titleTextAnimationForward(this.servicesPageText);
                     this.textAnimationForward(this.servicesDescription);
+                    //this.scenes[0].cameraAnimating = false;
+                    this.scenes[1].cameraAnimating = false;                    
                 }});                                
 
             }
@@ -273,18 +287,23 @@ export default class AnimationController{
                 gsap.to(this, {
                     progressAnimation: 0,
                     duration: 0.95,
-                    delay: .85,
+                    //delay: .85,
+                    delay: .15,                          
                     ease: "expo.out",
+                    onComplete: () => this.updateScenePass(this.scenes[0])                    
                 });
-/*
-                gsap.to(this.scenes[0].camera.rotation, { x: -1.41023394099018, delay: 0.2, duration: 2., ease: "back.inOut(1.7)",  onComplete: () => this.revealTextAnimation(this.homePageText) });
-                gsap.to(this.scenes[1].camera.quaternion, { x: 1, duration: 2., ease: "back.inOut(1.7)", onStart: () => this.hideTextAnimation(this.servicesPageText) });                                
-                */
-                //gsap.to(this.scenes[0].camera.rotation, { x: -1.41023394099018, delay: 0.2, duration: 2., ease: "back.inOut(1.7)",  onComplete: () => this.titleTextAnimationForward(this.homePageText) });               
-                gsap.to(this.scenes[0].camera.rotation, { x: -1.5708067381850939, delay: 0.2, duration: 2., ease: "back.inOut(1.7)",  onComplete: () => this.titleTextAnimationForward(this.homePageText) });
+
+                gsap.to(this.scenes[0].camera.rotation, { x: -1.5708067381850939, delay: 0.2, duration: 2., ease: "back.inOut(1.7)",  onComplete: () => {
+                    this.titleTextAnimationForward(this.homePageText) 
+                    this.scenes[0].cameraAnimating = false;
+                    //this.scenes[1].cameraAnimating = true;
+                }
+            });
                 gsap.to(this.scenes[1].camera.quaternion, { x: 1, duration: 2., ease: "back.inOut(1.7)", onStart: () => {
                         this.titleTextAnimationBackward(this.servicesPageText) 
-                        this.textAnimationBackward(this.servicesDescription);       
+                        this.textAnimationBackward(this.servicesDescription);  
+                        this.scenes[0].cameraAnimating = true;                             
+                        this.scenes[1].cameraAnimating = true;     
                     }
                 });                                
 
@@ -298,23 +317,19 @@ export default class AnimationController{
                 gsap.to(this, {
                     progressAnimation2: 1,
                     duration: 0.95,
-                    delay: .85,
+                    delay: .15,
                     ease: "expo.out",
                     //onStart: () => console.log('asdf')
-                    //onComplete: () => this.progressAnimation = 0                                
+                    onComplete: () => this.updateScenePass(this.scenes[2])                               
                 });
-/*
-                gsap.to(this.scenes[1].camera.quaternion, { x: -1, duration: 2., ease: "back.inOut(1.7)", });                                
-                //gsap.to(this.scenes[1].camera.rotation, { x: 1.2246467991473532e-16 * 2, duration: 2., ease: "back.inOut(1.7)", });
-                gsap.to(this.scenes[2].camera.rotation, { x: 0, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", });
-*/
+
                 gsap.to(this.scenes[1].camera.quaternion, { x: -1, duration: 2., ease: "back.inOut(1.7)", onStart: () => {
                         this.titleTextAnimationBackward(this.servicesPageText);
                         this.textAnimationBackward(this.servicesDescription); 
+                        this.scenes[1].cameraAnimating = true;                             
                     }
                 });                                
-                //gsap.to(this.scenes[1].camera.rotation, { x: 1.2246467991473532e-16 * 2, duration: 2., ease: "back.inOut(1.7)", });
-                //gsap.to(this.scenes[2].camera.rotation, { x: 2.277, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {
+
                 gsap.to(this.scenes[2].camera.quaternion, { w: 0.405, x: 0.885, y: -0.208, z: -0.095, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                    
                     this.titleTextAnimationForward(this.aboutPageText);
                     this.textAnimationForward(this.aboutPageDescription);
@@ -326,31 +341,26 @@ export default class AnimationController{
                 gsap.to(this, {
                     progressAnimation2: 0,
                     duration: 0.95,
-                    delay: .85,
+                    delay: .15,
                     ease: "expo.out",
                     //onStart: () => this.progressAnimation = 1
                     // need to reset progressAnimation variable to 0 to be reused
-                    //onComplete: () => {}
+                    onComplete: () => this.updateScenePass(this.scenes[1])
                 });
 
                 //gsap.to(this.scenes[1].camera.quaternion, { x: 0, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {
                 gsap.to(this.scenes[1].camera.rotation, { x: -0.21988, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                    
                          this.titleTextAnimationForward(this.servicesPageText);
                          this.titleTextAnimationForward(this.servicesDescription); 
+                         this.scenes[1].cameraAnimating = false;                                                      
                     }
                 });                                
-                //gsap.to(this.scenes[1].camera.rotation, { x: Math.PI * 2, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", });
-                //gsap.to(this.scenes[2].camera.rotation, { x: 1.570796 , duration: 2., ease: "back.inOut(1.7)", onStart: () => this.titleTextAnimationBackward(this.aboutPageText)});
+
                 gsap.to(this.scenes[2].camera.quaternion, { w: 0.206, x: 1.082, duration: 2., ease: "back.inOut(1.7)", onStart: () => {
                     this.titleTextAnimationBackward(this.aboutPageText)
                     this.textAnimationBackward(this.aboutPageDescription);
                 }});                
 
-/*
-                gsap.to(this.scenes[1].camera.quaternion, { x: 0, duration: 2., ease: "back.inOut(1.7)", });                                
-                //gsap.to(this.scenes[1].camera.rotation, { x: Math.PI * 2, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", });
-                gsap.to(this.scenes[2].camera.rotation, { x: 1.570796 , duration: 2., ease: "back.inOut(1.7)", });
-*/
             }
         }
 
@@ -361,21 +371,18 @@ export default class AnimationController{
                 gsap.to(this, {
                     progressAnimation3: 1,
                     duration: 0.95,
-                    delay: .85,
+                    delay: .15,
                     ease: "expo.out",
                     //onStart: () => console.log('asdf')
-                    //onComplete: () => this.progressAnimation = 0                                
+                    onComplete: () => this.updateScenePass(this.scenes[3])                                
                 });
 
                 gsap.to(this.scenes[2].camera.quaternion, { w: 0.905 , x: 0.585, duration: 2., ease: "back.inOut(1.7)", onStart: () => {
                     this.titleTextAnimationBackward(this.aboutPageText);
                     this.textAnimationBackward(this.aboutPageDescription);
                 }});                                
-                //gsap.to(this.scenes[1].camera.rotation, { x: 1.2246467991473532e-16 * 2, duration: 2., ease: "back.inOut(1.7)", });
-                //gsap.to(this.scenes[3].camera.rotation, { y: 0, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => this.titleTextAnimationForward(this.contactPageText) });
+
                 gsap.to(this.scenes[3].camera.rotation, { x: 0, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => this.titleTextAnimationForward(this.contactPageText) });                
-                //gsap.to(this.scenes[2].camera.quaternion, { x: -1, duration: 2., ease: "back.inOut(1.7)", });                                
-                //gsap.to(this.scenes[3].camera.rotation, { y: 0 , duration: 2., ease: "back.inOut(1.7)", });
 
             }
             if(this.timeDirection === -1){
@@ -383,23 +390,16 @@ export default class AnimationController{
                 gsap.to(this, {
                     progressAnimation3: 0,
                     duration: 0.95,
-                    delay: .85,
+                    delay: .15,
                     ease: "expo.out",
-                    //onStart: () => this.progressAnimation = 1
-                    // need to reset progressAnimation variable to 0 to be reused
-                    //onComplete: () => {}
+                    onComplete: () => this.updateScenePass(this.scenes[2])
                 });
-
-                //gsap.to(this.scenes[2].camera.quaternion, { x: -1, duration: 2., ease: "back.inOut(1.7)", onComplete: () => this.titleTextAnimationForward(this.aboutPageText) });                                
-                //gsap.to(this.scenes[1].camera.rotation, { x: 1.2246467991473532e-16 * 2, duration: 2., ease: "back.inOut(1.7)", });
-                //gsap.to(this.scenes[3].camera.rotation, { x: 0, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onStart: () => this.titleTextAnimationBackward(this.contactPageText) });
 
                 gsap.to(this.scenes[2].camera.quaternion, { w: 0.405, x: 0.885, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {
                     this.titleTextAnimationForward(this.aboutPageText); 
                     this.textAnimationForward(this.aboutPageDescription);
                 }});                                
-                //gsap.to(this.scenes[3].camera.rotation, { y: 1.570796 , duration: 2., ease: "back.inOut(1.7)", onStart: () => this.titleTextAnimationBackward(this.contactPageText) });
-                //gsap.to(this.scenes[3].camera.rotation, { y: 1.570796 , duration: 2., ease: "back.inOut(1.7)", onStart: () => this.titleTextAnimationBackward(this.contactPageText) });                
+
                 gsap.to(this.scenes[3].camera.rotation, { x: Math.PI / 2 , duration: 2., ease: "back.inOut(1.7)", onStart: () => this.titleTextAnimationBackward(this.contactPageText) });                                
             }
         }
@@ -478,6 +478,11 @@ export default class AnimationController{
     updateAnimation(){    
 
         this.sceneTextureIndex = this.states[this.sceneIndex].sceneIndex;
+
+        this.mouseControl.addFrictionDecay();
+
+        this.scenes[0].updateCamera(this.mouseControl.mouseDiff);
+        this.scenes[1].updateCamera(this.mouseControl.mouseDiff);        
 
     }
 }
