@@ -87,12 +87,11 @@ class AboutSceneMain{
 
             model.scene.traverse((e) => {
                 //check for coffee cup, model was not properly named so its name is under circle
-                //if(e.name === 'Sketchfab_model'){
 
                     if(e.name === 'Cube'){
 
                         this.cube = e;
-                        this.cube.material = new THREE.MeshStandardMaterial({ color: 0x555555, side: THREE.DoubleSide, metalness: 0.1, roughness: .6 });          
+                        this.cube.material = new THREE.MeshStandardMaterial({ color: 0x444444, side: THREE.DoubleSide, metalness: 0.1, roughness: .6 });          
 
                         e.material.needsUpdate = true;
                     }
@@ -124,7 +123,7 @@ class AboutSceneMain{
 
                             uniforms: {
                                 tex: { value: mathTexture},
-                                //tex: { value: null},                                
+                                displacement: { value: 0},                                
                                 time: { value: 0.0 }
                             },
 
@@ -165,6 +164,7 @@ class AboutSceneMain{
                         //shader.vertexShader = 'varying vec2 uv' + shader.vertexShader;
                   
                         shader.uniforms.time = { value: 0};
+                        shader.uniforms.displacement = { value: new THREE.Vector2(0) };
                   
                         shader.fragmentShader = shader.fragmentShader.replace(/#include <uv_pars_fragment>.*;/, `
                         varying vec2 vUv;
@@ -172,6 +172,7 @@ class AboutSceneMain{
                   
                       shader.fragmentShader = `
                       uniform float time;
+                      uniform vec2 displacement;
                       ` + shader.fragmentShader;
                   
                           shader.fragmentShader = shader.fragmentShader.replace(/vec4 diffuseColor.*;/, `
@@ -218,11 +219,11 @@ class AboutSceneMain{
                           // Normalized pixel coordinates (from 0 to 1)
                           vec2 uv = vUv;
 
-                          vec2 uv2 = fract(uv * 40.0);
+                          vec2 uv2 = fract(uv * 140.0);
                                     
-                          uv2.x -= fract(uv2.x + (time * 0.5) - uv.x * uv.x - uv2.x * uv.x);                                                    
+                          uv2.x -= fract(uv2.x + (time * 0.5 + (displacement.x)) - uv.x * uv.x - uv2.x * uv.x); 
+                          //uv2.x -= fract(uv2.x + (time * 0.5) - uv.x * uv.x - uv2.x * uv.x); 
 
-                          
                           float dist = 1.0 / length(uv2 - 0.5);                          
                           
                           dist *= .3;                          
@@ -272,8 +273,6 @@ class AboutSceneMain{
             //model.scene.children.map(obj => obj.material = new THREE.MeshBasicMaterial({ color: 0xffffff }))
 
             // need to update camera projection matrix of the rendered texture will be distorted
-            //this.camera.fov = 20;
-            //this.camera.fov = 30;            
             this.camera.aspect = window.innerWidth / window.innerHeight;
 
             this.camera.fov = (this.camera.aspect < 1) ? 30 : this.camera.fov;    
@@ -315,7 +314,7 @@ class AboutSceneMain{
 
             // this pass needs to be swapped to the write buffer in order to be rendererd into the texture
             this.bokeh.needsSwap = true;
-            //bloomPass.needsSwap = true;
+            //this.bloomPass.needsSwap = true;
 
             this.composer.addPass(this.renderPass);
             this.composer.addPass(this.bokeh);
@@ -332,10 +331,20 @@ class AboutSceneMain{
 
         });
 
-        this.renderBuffer = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, {});
 
+        this.displacement = new THREE.Vector2(0);
         this.time = 0.0;
+        this.animating = false;
 
+    }
+
+    updateDisplacement(pos, mouseDown){
+        this.displacement.x += Math.abs(pos.x) * 0.06;
+        // the y value will be used for the smoke animation, this needs to be different than the x since it will need to 
+        // be decremented when the user stops moving controls
+        //this.displacement.y += Math.abs(pos.x) * 0.06;        
+        this.displacement.y += Math.abs(pos.x) * 0.1;                
+        this.animating = mouseDown;
     }
 
 
@@ -343,8 +352,14 @@ class AboutSceneMain{
 
         this.time += 1 / 60;
 
+        if(!this.animating){
+            this.displacement.y *= 0.97;
+        }
+
         this.smokeMaterial.uniforms.time.value = this.time;
+        this.smokeMaterial.uniforms.displacement.value = this.displacement.y;        
         this.mod.material.userData.shader.uniforms.time.value = this.time;        
+        this.mod.material.userData.shader.uniforms.displacement.value = this.displacement;        
     }
 
     initialRender(){

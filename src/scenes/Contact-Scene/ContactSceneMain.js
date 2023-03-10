@@ -6,12 +6,12 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
 
-import tunnelModel2 from './tunnel2.glb';
+//import tunnelModel2 from './tunnel2.glb';
+import tunnelModel2 from './t3.glb';
 
 
 class ContactSceneMain{
@@ -29,8 +29,6 @@ class ContactSceneMain{
         this.renderer = parentRenderer;
         //this.renderer.physicallyCorrectLights = true;
 
-        this.renderBuffer = new THREE.WebGLRenderTarget(this.width, this.height);
-
         const dracoLoader = new DRACOLoader();
 		dracoLoader.setDecoderPath('/draco/');
 		dracoLoader.setDecoderConfig( { type: 'js' } );
@@ -38,11 +36,16 @@ class ContactSceneMain{
         this.modelLoader = new GLTFLoader();
         this.modelLoader.setDRACOLoader(dracoLoader);
 
+        this.mouse = new THREE.Vector2(0);
+
         this.sceneLoaded = false;
+
+        //this.texture = new THREE.TextureLoader().load();
 
         this.tunnelShader = new THREE.ShaderMaterial({
             uniforms: {
-                time: { value: 0 }
+                time: { value: 0 },
+                mouse: { value: this.mouse},
             },
 
             side: THREE.DoubleSide,
@@ -50,53 +53,74 @@ class ContactSceneMain{
             vertexShader: `
 
                 varying vec2 vUv;
+                uniform vec2 mouse;
+                uniform float time;
 
                 void main(){
 
                     vUv = uv;
 
-                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1);
+                    vec3 pos = position;
+
+                    float t = time;
+                    float s = sin(pos.y + mouse.x);                    
+                    float c = cos(pos.y + mouse.x);
+                
+
+                    mat3 rot = mat3(
+                      vec3(c, s, 0),
+                      vec3(-s, c, 0),
+                      vec3(0., 0, 1.)      
+                    );
+
+                    //pos *= rot;
+
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1);
                 }
             `,
 
             fragmentShader: `
                 uniform float time;
+                uniform vec2 mouse;
 
                 varying vec2 vUv;
 
                 void main(){
-                    vec2 uv = vUv;                    
-                    uv -= 0.5;
+                    vec2 uv = vUv;
+
+                    uv.x -= 0.5;
                     
-                    uv *= 10.0;
+                    uv *= 16.0;
+                    uv.y += fract(mouse.x * time * 1.3);
                     
-                    vec2 uv2 = fract(uv * 4.0) - 0.5;
-                    uv2 *= uv + vec2(cos(time + uv.x), sin(time + uv.y));
+                    vec2 uv2 = fract(uv * 8.) + 0.5;
+
+                    //uv2 *= uv * vec2(cos(time + uv.x), sin(time + uv.x));
                     
                     float t = time;
-                    float s = sin(t + uv.x);
-                    float c = cos(t - uv.y);
-                
-                /*
-                    mat3 rot = mat3(
-                      vec3(1, 0, 0),
-                      vec3(0, 1, 0),
-                      vec3(1, 1, 1)      
-                    );
-                  */  
+
+                    float s = sin(t + uv.y * length(mouse.x - uv.y));                    
+                    float c = cos(t + uv.x * length(mouse.x - uv.x));
+
                     mat3 rot = mat3(
                       vec3(c, s, 0),
                       vec3(-s, c, 0),
-                      vec3(0.1, 0.1, 1)      
+                      vec3(0., 0., 1)      
                     );
                     
-                    uv2 *= vec3(rot * vec3(uv, 1.0)).xy;
+                    //uv2 *= vec3(rot * vec3(uv, 1.0)).xy;
+                    //uv2 += vec3(rot * vec3(mouse / uv * time, 1.)).xy;
+
+                    uv2 *= vec3(rot * vec3(uv * uv2, 1.)).xy;                    
                     
-                    float circle = 1.0 / length(uv2);
+                    //float circle = 1.0 / length(uv2);                    
+                    float circle = 1.0 / length(uv2 * uv);
                     
-                    circle *= 0.1; //* sin(1.0 / fract(time));
+                    //circle *= 22.5 + mouse.x * 0.5;
+                    circle *= 2.5 + mouse.x * 0.8;                    
                     
-                    circle = pow(circle, 0.8);
+                    //circle = pow(circle, 0.8);
+                    circle = pow(circle, .9);                    
                     
                     float r = 0.144;
                     float g = 0.132;
@@ -105,10 +129,10 @@ class ContactSceneMain{
                     vec3 color = circle * vec3(r, g, b);
                     
                     color = 1.0 - exp(-color);
-                    
                 
                     // Output to screen
                     gl_FragColor = vec4(color,1.0);
+                    
                     //gl_FragColor = vec4(uv, 0.0 ,1.0);    
 
 
@@ -149,7 +173,19 @@ class ContactSceneMain{
 
             this.renderPass = new RenderPass(this.scene, this.camera);
 
-            this.passes = [this.renderPass];
+            const params = {
+                exposure: 3.,
+                bloomStrength: 1.,
+                bloomThreshold: .1,
+                bloomRadius: 1.
+              };
+
+            this.bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+            this.bloomPass.threshold = params.bloomThreshold;
+            this.bloomPass.strength = params.bloomStrength;
+            this.bloomPass.radius = params.bloomRadius;
+
+            this.passes = [this.renderPass, this.bloomPass];
 
             this.scene.add(model.scene);
 
@@ -161,14 +197,27 @@ class ContactSceneMain{
             animationControllerCallback(this.scene, this.camera);
         });
 
-
+        this.addFriction = false;
         this.t = 0;
+    }
+
+    updateMousePos(pos, changeFrictionState){
+        this.mouse.x += Math.abs(pos.x) * 0.05;
+        //this.mouse.y += pos.y;
+
+        this.mouse.x = Math.min(Math.max(this.mouse.x, 0), 15.);
+        this.addFriction = changeFrictionState;
     }
 
     renderScene(){
         this.t += 0.01;
 
+        if(!this.addFriction){
+            this.mouse.multiplyScalar(0.9);
+        }
+
         this.tunnelShader.uniforms.time.value = this.t;
+        this.tunnelShader.uniforms.mouse.value = this.mouse;
     }
 
     initialRender(){

@@ -13,7 +13,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 
 //import laptop from './lp53.glb';
-import laptop from './lp53Draco.glb';
+//import laptop from './lp53Draco.glb';
+import laptop from './lp5Draco.glb';
 
 
 import postFragmentShader from './shaders/postFragment.js';
