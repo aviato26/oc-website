@@ -7,6 +7,7 @@ const coffeeSmokeFrag = `
 
     uniform float time;
     uniform sampler2D tex;
+    uniform float displacement;
 
     varying vec2 vUv;
 
@@ -34,20 +35,9 @@ const coffeeSmokeFrag = `
         uv3.y += cTheta.y + s;
         uv3.x += fract(uv3.x * 1.) + (sin(time * .1));
         uv3 *= 1.3;
-        gl_FragColor = texture(tex , uv3);
-        //gl_FragColor *= sin(time - uv3.y * uv3.y * uv3.x);  
-        //gl_FragColor *= sin(time - uv3.y - exp(uv3.y));          
+        gl_FragColor = texture(tex , uv3 - fract((length(displacement * uv) * time * 0.05) + uv.x));
 
-        //gl_FragColor *= sin(time - length(uv.y) - exp(uv3.y));                  
-        //gl_FragColor *= sin(time - length(uv3.y * uv.y + 0.02) - exp(uv3.y));          
-        //gl_FragColor *= sin(time - length(uv3.y * uv.y) - exp(uv3.y));                  
-
-        //gl_FragColor *= abs(sin(uv.y * uv.y)) + uv.y;                       
-        //gl_FragColor *= sin(uv.y) + abs(sin(time));                               
         gl_FragColor *= abs(sin(time + uv3.y) * sin(uv.y) * sin(uv3.y)) * (uv3.y * uv.y) + length(uv.y) + 0.2;
-
-        //gl_FragColor = vec4(uv , 0. , 1.1);
-        //gl_FragColor = numberTexture;
     }
 
 `

@@ -130,7 +130,7 @@ logoTex.flipY = false;
 
 
   // setting the camera field of view based on the camera aspect (this is basically checks if the screen is mobile or larger device)
-  this.camera.fov = (this.camera.aspect < 1) ? 75 : 50;
+  this.camera.fov = (this.camera.aspect < 1) ? 70 : 50;
 
   this.camera.updateProjectionMatrix();
 
@@ -222,6 +222,11 @@ updateCamera(mousePos){
       // keeping camera looking at the cpu model even when the position is being updated
       this.camera.lookAt(new Vector3(this.cpu.position.x, this.cpu.position.y - 0.3 , this.cpu.position.z));    
     }
+}
+
+resetCamera(){
+      // keeping camera looking at the cpu model even when the position is being updated
+      this.camera.lookAt(new Vector3(this.cpu.position.x, this.cpu.position.y - 0.3 , this.cpu.position.z));    
 }
 
 

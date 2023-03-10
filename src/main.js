@@ -47,9 +47,6 @@ export default class Main
 
     this.renderPlaneMaterial = new THREE.ShaderMaterial({
       uniforms: {
-        //tex1: { value: this.bufferRenderer },
-        //tex1: { value: img },
-
         // scene index will be the index of the desired scene to be rendered
         sceneIndex: { value: 0 },
 
@@ -76,7 +73,7 @@ export default class Main
     this.scene.add(this.renderPlaneMesh);
 
     this.renderer = new THREE.WebGLRenderer({
-      //antialias: false,
+      antialias: true,
       //powerPreference: "high-performance",
       powerPreference: "high-performance",      
       //antialias: true,      
@@ -93,15 +90,22 @@ export default class Main
     //this.renderer.toneMapping = THREE.NoToneMapping
     //this.renderer.toneMapping = THREE.LinearToneMapping
     //this.renderer.toneMapping = THREE.ReinhardToneMapping
-    //this.renderer.toneMapping = THREE.CineonToneMapping
-    this.renderer.toneMapping = THREE.ACESFilmicToneMapping
+    this.renderer.toneMapping = THREE.CineonToneMapping
+    //this.renderer.toneMapping = THREE.ACESFilmicToneMapping
     //this.renderer.toneMapping = THREE.CustomToneMapping
 
     this.renderer.domElement.style.position = 'fixed';
 
     this.cameraAspect = this.width / this.height;
+    console.log(this.cameraAspect)
+
+    if(this.cameraAspect < 1){
+      //this.renderer.setPixelRatio( window.devicePixelRatio );
+      this.renderer.setPixelRatio(1.7);          
+    }
 
     //this.renderer.setPixelRatio( window.devicePixelRatio );
+    //this.renderer.setPixelRatio( 1.5);    
 
     document.body.appendChild( this.renderer.domElement );
 
@@ -146,12 +150,7 @@ export default class Main
         all objects and materials are not in initial pre-rendered camera view then anything that comes into the cameras view during
         animation will be loaded (this is where the initial studdering and frame drops were coming from since the scene was being pre-rendered but with main objects (laptop, coffee mug...) being out of camera view) 
       */
-/*
-      this.homeScreenTexture = this.homeScreen.getRenderedSceneTexture(this.t);
-      this.servicePageTexture = this.servicesPage.renderSceneTexture(this.t);        
-      this.aboutPageTexture = this.aboutPage.renderedTexture(this.t2);
-      this.contactPageTexture = this.contactPage.renderedTexture();
-      */
+
 
       this.homeScreenTexture = this.homeScreen.renderScene(this.t);
       this.servicePageTexture = this.servicesPage.renderScene(this.t);
@@ -172,6 +171,8 @@ export default class Main
       this.contactPage.camera.rotation.x = Math.PI / 2;
 
       this.mainSceneRenderer.updateRenderPass(this.homeScreen);
+      //this.mainSceneRenderer.updateRenderPass(this.aboutPage);      
+      //this.mainSceneRenderer.updateRenderPass(this.contactPage);            
 
       this.animate();
     }
