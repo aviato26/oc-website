@@ -32,7 +32,7 @@ import floorVertexShader from './shaders/floor/floorVertexShader.js';
 
 export default class HomeScene
 {
-  constructor(parentRenderer, animationCallBack)
+  constructor(parentRenderer, animationCallBack, loadingManager)
   {
 
     this.scene = new Scene();
@@ -60,14 +60,16 @@ this.environmentMap = new TextureLoader().load(spaceImg, (img) => {
     this.renderer = parentRenderer;
     //this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
-
 const dracoLoader = new DRACOLoader();
 dracoLoader.setDecoderPath('/draco/');
 dracoLoader.setDecoderConfig( { type: 'js' } );
 
-this.model = new GLTFLoader();
+this.model = new GLTFLoader(loadingManager);
 this.model.setDRACOLoader(dracoLoader);        
 
+loadingManager.onProgress = function(u, l, t){
+  console.log(l / t)
+}
 
 const floorTex = new TextureLoader().load(floorTexture);
 

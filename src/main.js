@@ -42,28 +42,16 @@ export default class Main
 
     this.mouse = new THREE.Vector2(0, 0);
 
+    this.loadingManager = new THREE.LoadingManager();
 
     this.renderPlaneGeometry = new THREE.PlaneGeometry(2, 2);
 
     this.renderPlaneMaterial = new THREE.ShaderMaterial({
       uniforms: {
-        // scene index will be the index of the desired scene to be rendered
-        sceneIndex: { value: 0 },
-
-        homeScene: { value: null },
-        servicesScene: { value: null },
-        aboutScene: { value: null },
-        contactScene: { value: null },
-        
-        progress: { value: 0.0 },
-        progress2: { value: 0.0 },
-        progress3: { value: 0.0 },        
-
-        time: { value: 0.0 },
-        res: { value: new THREE.Vector2(this.width, this.height) },
-        mouse: { type: 'vec2', value: new THREE.Vector2(0.0, 0.0)}
+        mainScene: { value: null },
+        progressBarValue: { value: 0},
+        radius: { value: 0}
       },
-
 
       fragmentShader: mainSceneFragmentShader,          
       vertexShader: mainSceneVertexShader
@@ -90,14 +78,13 @@ export default class Main
     //this.renderer.toneMapping = THREE.NoToneMapping
     //this.renderer.toneMapping = THREE.LinearToneMapping
     //this.renderer.toneMapping = THREE.ReinhardToneMapping
-    this.renderer.toneMapping = THREE.CineonToneMapping
+    //this.renderer.toneMapping = THREE.CineonToneMapping
     //this.renderer.toneMapping = THREE.ACESFilmicToneMapping
     //this.renderer.toneMapping = THREE.CustomToneMapping
 
     this.renderer.domElement.style.position = 'fixed';
 
     this.cameraAspect = this.width / this.height;
-    console.log(this.cameraAspect)
 
     if(this.cameraAspect < 1){
       //this.renderer.setPixelRatio( window.devicePixelRatio );
@@ -114,33 +101,44 @@ export default class Main
     this.addAnimations = this.addAnimations.bind(this);
 
     // loading Home screen page
-    this.homeScreen = new HomeScene(this.renderer, this.addAnimations);
+    this.homeScreen = new HomeScene(this.renderer, this.addAnimations, this.loadingManager);
 
     // loading services page
-    this.servicesPage = new ServicesPage(this.renderer, this.addAnimations);
+    this.servicesPage = new ServicesPage(this.renderer, this.addAnimations, this.loadingManager);
 
     // loading about page
-    this.aboutPage = new AboutScene(this.renderer, this.addAnimations);
+    this.aboutPage = new AboutScene(this.renderer, this.addAnimations, this.loadingManager);
 
     // loading contact page
-    this.contactPage = new ContactScene(this.renderer, this.addAnimations);
+    this.contactPage = new ContactScene(this.renderer, this.addAnimations, this.loadingManager);
 
-    this.t;
-    this.t2 = 0
-
-    this.pixelRatio = 1;
+    this.counter = 0;
+    this.progress = 0;
 
     this.animate = this.animate.bind(this);
+
+    this.allScenesLoaded = false;
+
+    this.mainSceneRenderer = new MainSceneRenderer(this.renderer);
+
+    this.animationController = new AnimationController([this.homeScreen, this.servicesPage, this.aboutPage, this.contactPage], this.mainSceneRenderer.updateRenderPass);
+
+    this.loadingManager.onProgress = (u, l, t) => {
+      this.progress = l / t;
+      this.animationController.loadingProgress(this.progress);      
+      //this.renderPlaneMaterial.uniforms.progressBarValue.value = this.progress;
+    }
+
+    this.animate();
   }
 
 
 
-  addAnimations(scene, camera){    
+  addAnimations(){    
 
     if(this.homeScreen.sceneLoaded && this.servicesPage.sceneLoaded && this.aboutPage.sceneLoaded && this.contactPage.sceneLoaded){
-      this.mainSceneRenderer = new MainSceneRenderer(this.renderer);
 
-      this.animationController = new AnimationController([this.homeScreen, this.servicesPage, this.aboutPage, this.contactPage], this.mainSceneRenderer.updateRenderPass);
+      //this.animationController = new AnimationController([this.homeScreen, this.servicesPage, this.aboutPage, this.contactPage], this.mainSceneRenderer.updateRenderPass);
 
       /* 
         pre-rendering all scenes to send them to gpu before user views scene, doing this will make scene transitions
@@ -152,17 +150,13 @@ export default class Main
       */
 
 
-      this.homeScreenTexture = this.homeScreen.renderScene(this.t);
-      this.servicePageTexture = this.servicesPage.renderScene(this.t);
+      this.homeScreenTexture = this.homeScreen.renderScene();
+      this.servicePageTexture = this.servicesPage.renderScene();
       
       // need to render scene to send the rendered image to the gpu so as not to do it when user first browses page
       this.servicesPage.initialRender();        
       this.aboutPage.initialRender();
       this.contactPage.initialRender();
-      //this.aboutPageTexture = this.aboutPage.renderScene(this.t2);
-      //this.contactPageTexture = this.contactPage.renderScene();
-
-      //this.homeScreen.addRenderPass(this.servicesPage.scene, this.servicesPage.camera);
 
       // once scene has been rendered moving camera to look away from objects so it will be set for the rotating animation
       this.servicesPage.camera.rotateX(Math.PI / 2);
@@ -171,49 +165,35 @@ export default class Main
       this.contactPage.camera.rotation.x = Math.PI / 2;
 
       this.mainSceneRenderer.updateRenderPass(this.homeScreen);
-      //this.mainSceneRenderer.updateRenderPass(this.aboutPage);      
-      //this.mainSceneRenderer.updateRenderPass(this.contactPage);            
 
-      this.animate();
+      this.allScenesLoaded = true;
     }
-    
 
   }
   
 
-
   animate(time){
     requestAnimationFrame( this.animate );
 
-
     this.stats.update();
 
-    this.animationController.updateAnimation();
+    if(this.counter < this.progress){
+      //this.counter += 0.005;
+      //this.renderPlaneMaterial.uniforms.progressBarValue.value = this.counter;      
+    }
 
-    this.bufferSceneTexture = this.mainSceneRenderer.renderScene();       
+    this.renderPlaneMaterial.uniforms.progressBarValue.value = this.animationController.loadingCounter;      
+    this.renderPlaneMaterial.uniforms.radius.value = this.animationController.scrollYPosition;          
 
+    if(this.allScenesLoaded){
+      this.animationController.updateAnimation();
+      this.bufferSceneTexture = this.mainSceneRenderer.renderScene();             
 
+      // once scences have been rendered we will place them into the post process material to be rendered to the final mesh
+      this.renderPlaneMaterial.uniforms.mainScene.value = this.bufferSceneTexture;
+    }
 
-
-        // once scences have been rendered we will place them into the post process material to be rendered to the final mesh
-        this.renderPlaneMaterial.uniforms.homeScene.value = this.bufferSceneTexture;
-    
-
-        
-        this.renderPlaneMaterial.uniforms.progress.value = this.animationController.progressAnimation;     
-        this.renderPlaneMaterial.uniforms.progress2.value = this.animationController.progressAnimation2;     
-        this.renderPlaneMaterial.uniforms.progress3.value = this.animationController.progressAnimation3;             
-        
-        //console.log(this.animationController.sceneTextureIndex);
-
-        // loading textures to be displayed depending on user swiping interaction
-        this.renderPlaneMaterial.uniforms.sceneIndex.value = this.animationController.sceneTextureIndex;
-
-        this.renderPlaneMaterial.uniforms.time.value = 0.3;
-
-
-
-        this.renderer.render( this.scene, this.camera );      
+    this.renderer.render( this.scene, this.camera );      
 
   };
 

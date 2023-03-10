@@ -21,9 +21,8 @@ import wireVertexShader from './shaders/wire-vertex';
 import coffeeSmokeFrag from './shaders/coffee-smoke-fragment';
 import coffeeSmokeVertex from './shaders/coffee-smoke-vertex';
 
-
 class AboutSceneMain{
-    constructor(parentRenderer, animationControllerCallback){
+    constructor(parentRenderer, animationControllerCallback, loadingManager){
         this.scene = new THREE.Scene();
 
         //this.scene.background = new THREE.Color(0x888888);
@@ -37,8 +36,6 @@ class AboutSceneMain{
             this.renderer.initTexture(img);            
             this.scene.environment = img;
         });
-
-
 
         // this camera will be changed once the scene loads but will keep this here for a place holder to pass to the animation controller
         //this.camera = new THREE.PerspectiveCamera( 45, this.width / this.height, 1, 1000 );
@@ -61,12 +58,14 @@ class AboutSceneMain{
 		dracoLoader.setDecoderPath('/draco/');
 		dracoLoader.setDecoderConfig( { type: 'js' } );
 
-        this.modelLoader = new GLTFLoader();
+        this.modelLoader = new GLTFLoader(loadingManager);
         this.modelLoader.setDRACOLoader(dracoLoader);        
 
         this.sceneLoaded = false;
 
-
+        loadingManager.onProgress = function(u, l, t){
+            console.log(u)
+          }
 
         const mathTexture = new THREE.TextureLoader().load(numbersImg, (tex) => {
             //this.renderer.initTexture(tex);
