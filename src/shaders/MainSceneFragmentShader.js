@@ -3,105 +3,50 @@
 
 const horseShoeFragment = 
 `
-    //precision mediump float;
-
-    uniform sampler2D homeScene;
-    uniform sampler2D servicesScene;
-    uniform sampler2D aboutScene;
-    uniform sampler2D contactScene;
-
-    uniform vec2 mouse;
-    uniform vec2 res;
-
-    uniform float progress;
-    uniform float progress2;
-    uniform float progress3;
-
-    uniform float time;
-
-    uniform int sceneIndex;
-
-    varying vec2 vUv;    
+    uniform sampler2D mainScene;
+    uniform float progressBarValue;
+    uniform float radius;
     
+    varying vec2 vUv;    
+
+
+    float sdSegment( in vec2 p, in vec2 a, in vec2 b )
+    {
+        vec2 pa = p-a, ba = b-a;
+        float h = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
+        return length( pa - ba*h );
+    }
+
     
     void main()
     {
       vec2 uv = vUv;
-      vec2 uv2 = vUv;      
-      vec2 uv3 = vUv;            
+      vec2 uv2 = vUv;
+      vec2 sphereUV = vUv;
 
-      vec2 m = mouse.xy;
-      
-      vec4 HomeSceneTexture = texture(homeScene, uv);
-      vec4 ServicesSceneTexture = texture(servicesScene, uv);
-      vec4 AboutSceneTexture = texture(aboutScene, uv);
-      vec4 ContactSceneTexture = texture(contactScene, uv);
+      vec2 line = uv;
+      line -= 0.5;
+      line *= 8.0;
 
-      float p = progress;
-      float p2 = progress2;
-      float p3 = progress3;
+      sphereUV -= 0.5;
+  
+      float sdf = step(sdSegment(line, vec2(-1, 0), vec2(1, 0)) * 2., 0.05) * 0.3;
+      float sdf2 = step(sdSegment(line, vec2(0, 0) - vec2(1, 0), vec2(progressBarValue * 2.0, 0) - vec2(1, 0)) * 2., 0.05);    
 
-      //float p = sin(time);      
-      //float p = 1.0;            
 
-      vec4 currentTexture;
-      vec4 lastTexture;
-      vec4 mixTexture;
-      vec4 mixTexture2;
+      float circle = smoothstep(length(sphereUV), length(sphereUV - uv2), radius);
+      //float circle = step(length(sphereUV), radius);      
 
-/*
-      if(p == 0.0){
-        currentTexture = texture(tex1, uv);
+      vec4 mainSceneTexture = texture(mainScene, uv2);
+
+      if(progressBarValue < 1.){
+        gl_FragColor = vec4(sdf + sdf2);
+      }
+      else{
+        //gl_FragColor = mainSceneTexture;                    
+        gl_FragColor = mix(vec4(0.), vec4(circle * mainSceneTexture), radius);
       }
 
-      if(p == 1.0){
-        currentTexture = texture(tex2, uv);
-      }
-*/
-
-      if(sceneIndex == 0){
-        //gl_FragColor = mix(ServicesSceneTexture, HomeSceneTexture, smoothstep(p - 0.4, p + 0.1, uv / 2.0).y);      
-        currentTexture = HomeSceneTexture;
-        lastTexture = ServicesSceneTexture;
-
-        gl_FragColor = mix(lastTexture, currentTexture, smoothstep(p - 0.4, p + 0.1, uv / 2.0).y);              
-
-      }
-      else if(sceneIndex == 1){
-
-        currentTexture = ServicesSceneTexture;
-        lastTexture = AboutSceneTexture;
-
-        //lastTexture = ServicesSceneTexture;
-        //currentTexture = AboutSceneTexture;
-
-        gl_FragColor = mix(lastTexture, currentTexture, smoothstep(p2 - 0.4, p2 + 0.1, uv2 / 2.0).y);              
-
-      }
-
-      else if(sceneIndex == 2){
-        currentTexture = AboutSceneTexture;
-        lastTexture = ContactSceneTexture;
-
-        //currentTexture = ContactSceneTexture;
-        //lastTexture = AboutSceneTexture;
-
-        gl_FragColor = mix(lastTexture, currentTexture, smoothstep(p3 - 0.4, p3 + 0.1, uv3 / 2.0).y);              
-      }
-
-      //gl_FragColor = mix(lastTexture, currentTexture, -smoothstep(p - 0.4, p + 0.1, uv / 2.0).y);              
-
-      //vec4 finalTextureMix = mix(texture1, texture2, smoothstep(m.x, m.x + 0.08, uv / 2.0).y);
-
-      //vec4 finalTextureMix = mix(texture2, texture1, smoothstep(p - 0.04, p + 0.001, uv / 2.0).y);
-      //vec4 finalTextureMix = mix(texture2, texture1, smoothstep(p - 0.4, p + 0.1, uv / 2.0).y);      
-      //vec4 finalTextureMix = mix(texture2, texture1, smoothstep(p - 0.4, p + 0.1, uv / 2.0).y);            
-     
-      //gl_FragColor = finalTextureMix;
-      gl_FragColor = HomeSceneTexture;      
-      //gl_FragColor = ServicesSceneTexture;            
-      //gl_FragColor = AboutSceneTexture;            
-      //gl_FragColor = ContactSceneTexture;                  
     }
 `;
 

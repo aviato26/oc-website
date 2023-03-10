@@ -1,6 +1,5 @@
 
 
-//import * as THREE from 'three';
 import gsap from 'gsap';
 import { Clock } from 'three';
 import PageDesciption from '../scenes/components/services';
@@ -29,9 +28,6 @@ export default class AnimationController{
 
         this.sceneIndex = 0;
 
-        this.time = new Clock();
-        this.t = 0;
-
         // variable to only trigger one animation event at a time
         this.animating = false;
 
@@ -52,6 +48,10 @@ export default class AnimationController{
 
         this.init();
 
+        this.loadingCounter = 0;
+        this.currentLoadingState = 0;
+        this.scrollYPosition = 0;
+        this.initialRender = false;
     }
 
     
@@ -63,11 +63,6 @@ export default class AnimationController{
         this.aboutPageText = this.textSegments.addAboutScreenText();
         this.aboutPageDescription = this.textSegments.addAboutScreenDescription();
         this.contactPageText = this.textSegments.addContactScreenText();
-
-
-        this.titleTextAnimationForward(this.homePageText);
-        //this.titleTextAnimationForward(this.servicesPageText);        
-        //this.titleTextAnimationForward(this.servicesDescription);                
 
         this.servicesScene = this.scenes[1];
 
@@ -179,7 +174,7 @@ export default class AnimationController{
 
             }, 1200);
 
-        }, 1000);
+        }, 1200);
 
         //setTimeout(() => this.playAnimation = false, 1500);
     }
@@ -480,7 +475,26 @@ export default class AnimationController{
         });
     }
 
+    loadingProgress(loadingState){
+        this.currentLoadingState = loadingState;
+    }
+
     updateAnimation(){    
+
+        if(this.loadingCounter < this.currentLoadingState){
+            this.loadingCounter += 0.005;
+        }
+        else{
+            if(this.scrollYPosition < 1){
+                this.scrollYPosition += 0.01;
+            }
+        }
+
+        if(!this.initialRender && this.scrollYPosition > 1){
+            // display home page text once initial loading animation are finished
+            this.titleTextAnimationForward(this.homePageText);
+            this.initialRender = true;
+        }
 
         this.sceneTextureIndex = this.states[this.sceneIndex].sceneIndex;
 

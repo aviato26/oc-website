@@ -33,7 +33,7 @@ import env from './textures/galaxy.jpg';
 
 export default class ServicesPage
 {
-  constructor(parentRenderer, animationCallBack)
+  constructor(parentRenderer, animationCallBack, loadingManager)
   {
     this.scene = new THREE.Scene();
 
@@ -81,11 +81,12 @@ export default class ServicesPage
 		dracoLoader.setDecoderConfig( { type: 'js' } );
 
 
-    this.model = new GLTFLoader();
+    this.model = new GLTFLoader(loadingManager);
     this.model.setDRACOLoader(dracoLoader);    
-    //this.ktx2Loader = new KTX2Loader();
-    //this.model.setKTX2Loader(this.ktx2Loader);
-    //this.model = new DRACOLoader();
+
+    loadingManager.onProgress = function(u, l, t){
+      console.log(u)
+    }
 
     this.model.load(laptop, (obj) => {
 

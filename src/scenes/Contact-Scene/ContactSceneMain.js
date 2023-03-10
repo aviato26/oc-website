@@ -15,7 +15,7 @@ import tunnelModel2 from './t3.glb';
 
 
 class ContactSceneMain{
-    constructor(parentRenderer, animationControllerCallback){
+    constructor(parentRenderer, animationControllerCallback, loadingManager){
         this.scene = new THREE.Scene();
 
         //this.scene.background = new THREE.Color(0x333333);
@@ -33,7 +33,7 @@ class ContactSceneMain{
 		dracoLoader.setDecoderPath('/draco/');
 		dracoLoader.setDecoderConfig( { type: 'js' } );
 
-        this.modelLoader = new GLTFLoader();
+        this.modelLoader = new GLTFLoader(loadingManager);
         this.modelLoader.setDRACOLoader(dracoLoader);
 
         this.mouse = new THREE.Vector2(0);
@@ -146,7 +146,6 @@ class ContactSceneMain{
     
 
         this.modelLoader.load(tunnelModel2, (model) => {
-
             //this.camera = model.scene.children[0];
             this.camera = model.cameras[0];            
 
