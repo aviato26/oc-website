@@ -1,6 +1,7 @@
 
 
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { sRGBEncoding } from 'three';
 
 
 export default class MainSceneRenderer{

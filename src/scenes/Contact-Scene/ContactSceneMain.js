@@ -9,9 +9,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
-
-//import tunnelModel2 from './tunnel2.glb';
-import tunnelModel2 from './t3.glb';
+import tunnelModel2 from './t-rigged.glb';
 
 
 class ContactSceneMain{
@@ -27,7 +25,6 @@ class ContactSceneMain{
         //this.camera = new THREE.PerspectiveCamera( 45, this.width / this.height, 1, 1000 );
     
         this.renderer = parentRenderer;
-        //this.renderer.physicallyCorrectLights = true;
 
         const dracoLoader = new DRACOLoader();
 		dracoLoader.setDecoderPath('/draco/');
@@ -39,6 +36,8 @@ class ContactSceneMain{
         this.mouse = new THREE.Vector2(0);
 
         this.sceneLoaded = false;
+
+        this.angleRotation = 0;
 
         //this.texture = new THREE.TextureLoader().load();
 
@@ -62,19 +61,6 @@ class ContactSceneMain{
 
                     vec3 pos = position;
 
-                    float t = time;
-                    float s = sin(pos.y + mouse.x);                    
-                    float c = cos(pos.y + mouse.x);
-                
-
-                    mat3 rot = mat3(
-                      vec3(c, s, 0),
-                      vec3(-s, c, 0),
-                      vec3(0., 0, 1.)      
-                    );
-
-                    //pos *= rot;
-
                     gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1);
                 }
             `,
@@ -88,19 +74,29 @@ class ContactSceneMain{
                 void main(){
                     vec2 uv = vUv;
 
-                    uv.x -= 0.5;
-                    
-                    uv *= 16.0;
-                    uv.y += fract(mouse.x * time * 1.3);
-                    
-                    vec2 uv2 = fract(uv * 8.) + 0.5;
+                    //uv.x -= 0.5;
+                    //uv.y += 0.5;                   
 
-                    //uv2 *= uv * vec2(cos(time + uv.x), sin(time + uv.x));
+                    uv.x -= 0.5;
+                    uv.y -= 0.5;                   
+
+                    //uv *= 12.0;
+                    uv *= 4.0;                    
+                    //uv.y += fract(mouse.x * time * 1.3);
+                    uv.y += fract(time * 0.1 + uv.x * uv.y) * uv.x;
+                    
+                    vec2 uv2 = fract(uv * 24.) + 0.5;
+                    //vec2 uv2 = fract(uv * 48. * 2.) + 0.5;
+
+                    uv2 *= uv * vec2(cos(time + uv.x), sin(time + uv.x));
                     
                     float t = time;
 
-                    float s = sin(t + uv.y * length(mouse.x - uv.y));                    
-                    float c = cos(t + uv.x * length(mouse.x - uv.x));
+                    //float s = sin(t + uv.y * length(mouse.x - uv.y));                    
+                    //float c = cos(t + uv.x * length(mouse.x - uv.x));
+
+                    float s = sin(t + uv.y * length(uv.y));                    
+                    float c = cos(t + uv.x * length(uv.x));                    
 
                     mat3 rot = mat3(
                       vec3(c, s, 0),
@@ -111,16 +107,18 @@ class ContactSceneMain{
                     //uv2 *= vec3(rot * vec3(uv, 1.0)).xy;
                     //uv2 += vec3(rot * vec3(mouse / uv * time, 1.)).xy;
 
-                    uv2 *= vec3(rot * vec3(uv * uv2, 1.)).xy;                    
+                    uv2 *= vec3(rot * vec3(uv, 1.)).xy;                    
                     
                     //float circle = 1.0 / length(uv2);                    
-                    float circle = 1.0 / length(uv2 * uv);
+                    float circle = 1.0 / length((uv2 - uv) + uv);
                     
                     //circle *= 22.5 + mouse.x * 0.5;
-                    circle *= 2.5 + mouse.x * 0.8;                    
+                    //circle *= 2.5 + length(mouse.x - uv2) * 0.6;                    
+                    //circle *= .1 + length(mouse.x * uv2) * 0.08;                                        
+                    circle *= .1 + length(uv - uv2) * 0.01;                                                            
                     
-                    //circle = pow(circle, 0.8);
-                    circle = pow(circle, .9);                    
+                    circle = pow(circle, 1.0 - mouse.x * 0.02);
+                    //circle = pow(circle, 1.);                    
                     
                     float r = 0.144;
                     float g = 0.132;
@@ -128,7 +126,7 @@ class ContactSceneMain{
                     
                     vec3 color = circle * vec3(r, g, b);
                     
-                    color = 1.0 - exp(-color);
+                    //color = 1.0 - exp(-color);
                 
                     // Output to screen
                     gl_FragColor = vec4(color,1.0);
@@ -150,9 +148,10 @@ class ContactSceneMain{
             this.camera = model.cameras[0];            
 
             model.scene.traverse(obj => {
-                if(obj.name === 'Cylinder'){
+                if(obj.type === 'Mesh'){
                     obj.material = this.tunnelShader
                 }
+                
             });
 
             //console.log(this.cameraAnimation)
@@ -161,10 +160,12 @@ class ContactSceneMain{
             //model.scene.children[1].material = new THREE.MeshBasicMaterial({ color: 0xffffff })            
 
             // need to update camera projection matrix of the rendered texture will be distorted
-            //this.camera.fov = 30;
+            this.camera.fov = 55;
             this.camera.aspect = window.innerWidth / window.innerHeight;
 
-            this.camera.fov = (this.camera.aspect < 1) ? 30 : this.camera.fov;    
+            //this.camera.fov = (this.camera.aspect < 1) ? 30 : this.camera.fov;    
+            //this.camera.position.z -= 1.5;            
+            //this.camera.rotation.x -= Math.PI / 2;
 
             this.camera.updateProjectionMatrix();
 
@@ -174,7 +175,7 @@ class ContactSceneMain{
 
             const params = {
                 exposure: 3.,
-                bloomStrength: 1.,
+                bloomStrength: 0.5,
                 bloomThreshold: .1,
                 bloomRadius: 1.
               };
@@ -185,6 +186,13 @@ class ContactSceneMain{
             this.bloomPass.radius = params.bloomRadius;
 
             this.passes = [this.renderPass, this.bloomPass];
+            //this.passes = [this.renderPass];            
+
+            this.mixer = new THREE.AnimationMixer(model.scene);
+            this.clips = model.animations;
+            this.action = this.mixer.clipAction(this.clips[0]);
+            this.action.timeScale = 0.02;
+            this.action.play();
 
             this.scene.add(model.scene);
 
@@ -198,6 +206,20 @@ class ContactSceneMain{
 
         this.addFriction = false;
         this.t = 0;
+        this.clock = new THREE.Clock();
+        this.time = 0;
+        this.animating = false;
+
+        this.nextCameraPos = new THREE.Vector3(1, 0, 0);
+        this.xAxis = new THREE.Vector3(1, 0, 0);
+        this.q = new THREE.Quaternion();
+
+
+
+    }
+
+    updateCameraPos(t){
+        this.mixer.update(t);
     }
 
     updateMousePos(pos, changeFrictionState){
@@ -208,12 +230,21 @@ class ContactSceneMain{
         this.addFriction = changeFrictionState;
     }
 
+    updateCameraRotationPos(){
+        this.camera.rotateOnAxis(this.xAxis, this.angleRotation);        
+    }
+
     renderScene(){
-        this.t += 0.01;
+        this.time = this.clock.getDelta();
 
         if(!this.addFriction){
             this.mouse.multiplyScalar(0.9);
         }
+
+        this.t += 0.01;
+
+        this.updateCameraPos(this.time * -this.mouse.x - 0.0001);
+        this.updateCameraRotationPos();
 
         this.tunnelShader.uniforms.time.value = this.t;
         this.tunnelShader.uniforms.mouse.value = this.mouse;

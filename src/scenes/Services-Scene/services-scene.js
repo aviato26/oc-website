@@ -9,12 +9,9 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
-
-//import laptop from './lp53.glb';
 //import laptop from './lp53Draco.glb';
-import laptop from './lp5Draco.glb';
+import laptop from './lp51Draco.glb';
 
 
 import postFragmentShader from './shaders/postFragment.js';
@@ -52,13 +49,6 @@ export default class ServicesPage
 
     this.renderer = parentRenderer;
 
-    //this.renderer.physicallyCorrectLights = true;
-    this.renderer.outputEncoding = THREE.sRGBEncoding;
-    //this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    //this.renderer.toneMapping = THREE.LinearToneMapping;    
-    //this.renderer.toneMapping = THREE.ReinhardToneMapping;        
-    //this.renderer.toneMapping = THREE.CineonToneMapping;            
-
     // variable to switch on when scene is in frame to activate this scenes camera controls and switch off when scene is not being rendered
     this.cameraActive = false;
 
@@ -83,10 +73,6 @@ export default class ServicesPage
 
     this.model = new GLTFLoader(loadingManager);
     this.model.setDRACOLoader(dracoLoader);    
-
-    loadingManager.onProgress = function(u, l, t){
-      console.log(u)
-    }
 
     this.model.load(laptop, (obj) => {
 
@@ -182,10 +168,11 @@ export default class ServicesPage
       
       this.composer.addPass(this.renderPass);
       this.composer.addPass(this.shaderPass);
-      this.composer.addPass(this.bokeh);
+      //this.composer.addPass(this.bokeh);
       this.composer.addPass(this.bloomPass);      
 
-      this.passes = [this.renderPass, this.shaderPass, this.bokeh, this.bloomPass];
+      //this.passes = [this.renderPass, this.shaderPass, this.bokeh, this.bloomPass];
+      this.passes = [this.renderPass, this.shaderPass, this.bloomPass];      
 
       this.scene.add(obj.scene);
       
@@ -273,10 +260,6 @@ export default class ServicesPage
 
     // updating time for the blue screen of death to switch images
     this.screenShader.uniforms.time.value = this.time;
-
-    //this.composer.render();
-
-    //return this.composer.readBuffer.texture;      
 
   }
 
