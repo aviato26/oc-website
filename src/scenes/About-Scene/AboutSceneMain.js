@@ -13,13 +13,17 @@ import spaceImg from './textures/floor-emission.png';
 
 import numbersImg from './textures/c2.png';
 
-import CoffeeSceneModel from './aboutSceneDraco.glb';
+//import CoffeeSceneModel from './aboutSceneDraco.glb';
+import CoffeeSceneModel from './aboutSceneDraco2.glb';
 
 import wireFragmentShader from './shaders/wire-fragment';
 import wireVertexShader from './shaders/wire-vertex';
 
 import coffeeSmokeFrag from './shaders/coffee-smoke-fragment';
 import coffeeSmokeVertex from './shaders/coffee-smoke-vertex';
+
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { Group } from 'three';
 
 class AboutSceneMain{
     constructor(parentRenderer, animationControllerCallback, loadingManager){
@@ -41,8 +45,7 @@ class AboutSceneMain{
         //this.camera = new THREE.PerspectiveCamera( 45, this.width / this.height, 1, 1000 );
     
         this.renderer = parentRenderer;
-        this.renderer.physicallyCorrectLights = true;
-        //this.renderer.useLegacyLights = true;
+        this.renderer.useLegacyLights = false;
 
         const pinkLight = 0xFF00E9;
 
@@ -83,6 +86,7 @@ class AboutSceneMain{
             this.camera = model.cameras[0];
 
 
+            this.groupScene = new Group();
 
             model.scene.traverse((e) => {
                 //check for coffee cup, model was not properly named so its name is under circle
@@ -113,7 +117,8 @@ class AboutSceneMain{
                     }
 
                     //if(e.name === 'Plane001'){
-                    if(e.name === 'c2'){                        
+                    if(e.name === 'c2'){               
+                        this.smokeCylinder = e;         
                         this.smokeMaterial = new THREE.ShaderMaterial({
 
                             side: THREE.DoubleSide,
@@ -154,7 +159,6 @@ class AboutSceneMain{
                     if(e.name === 'Coffee_Mug001_Mug_White_0'){                    
                     //console.log(e)
                     this.mod = e;
-
 
                     this.mod.material.defines.USE_UV = '';                    
 
@@ -278,6 +282,8 @@ class AboutSceneMain{
 
             this.camera.updateProjectionMatrix();
 
+            //const controls = new OrbitControls(this.camera, this.renderer.domElement)
+
             this.scene.add(model.scene);            
 
             const params = {
@@ -338,7 +344,10 @@ class AboutSceneMain{
     }
 
     updateDisplacement(pos, mouseDown){
-        this.displacement.x += Math.abs(pos.x) * 0.06;
+        this.displacement.x += Math.abs(pos.x) * 0.06;       
+        this.mod.rotation.y = pos.x * 0.1;
+        this.cube.rotation.z = pos.x * 0.1;
+
         // the y value will be used for the smoke animation, this needs to be different than the x since it will need to 
         // be decremented when the user stops moving controls
         //this.displacement.y += Math.abs(pos.x) * 0.06;        
@@ -355,10 +364,13 @@ class AboutSceneMain{
             this.displacement.y *= 0.97;
         }
 
+        
         this.smokeMaterial.uniforms.time.value = this.time;
         this.smokeMaterial.uniforms.displacement.value = this.displacement.y;        
+        
         this.mod.material.userData.shader.uniforms.time.value = this.time;        
         this.mod.material.userData.shader.uniforms.displacement.value = this.displacement;        
+        
     }
 
     initialRender(){

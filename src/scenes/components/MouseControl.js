@@ -113,4 +113,10 @@ export default class MouseControl{
         }
     }
 
+    resetMouseControls(){
+        this.mouseDiff.x = 0;
+        this.mousePos.x = 0;
+        this.mousePos.y = 0;            
+    }
+
 }

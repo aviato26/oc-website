@@ -1,7 +1,5 @@
 
 
-
-import * as THREE from 'three';
 import '../css/style.css';
 
 import { Scene, PerspectiveCamera, Vector2, ShaderMaterial, WebGLRenderTarget, Vector3 } from 'three'
@@ -15,8 +13,6 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
-import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
-import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 
 
 import logoTexture from './textures/logo.png';
@@ -24,7 +20,7 @@ import floorTexture from './textures/floorTex.jpg';
 import spaceImg from './textures/neonLights2.jpeg';
 
 //import cpu from './cpu3Draco.glb';
-import cpu from './cpu.glb';
+import cpu from './cpu2.glb';
 
 import floorFragmentShader from './shaders/floor/floorFragmentShader.js';
 import floorVertexShader from './shaders/floor/floorVertexShader.js';
@@ -67,10 +63,6 @@ dracoLoader.setDecoderConfig( { type: 'js' } );
 this.model = new GLTFLoader(loadingManager);
 this.model.setDRACOLoader(dracoLoader);        
 
-loadingManager.onProgress = function(u, l, t){
-  console.log(l / t)
-}
-
 const floorTex = new TextureLoader().load(floorTexture);
 
 const logoTex = new TextureLoader().load(logoTexture);
@@ -93,7 +85,6 @@ this.cpuWireShader = new ShaderMaterial({
   fragmentShader: floorFragmentShader,
   vertexShader: floorVertexShader
 })
-
 
 floorTex.flipY = false;
 floorTex.encoding = sRGBEncoding;
@@ -118,11 +109,12 @@ logoTex.flipY = false;
   this.wires = obj.scene.getObjectByName('path7');
 
 
-  this.t.material.emissiveIntensity = .5;
-  this.t.material.metalness = 1.5;
-  this.t.material.roughness = 0;
+  this.t.material.emissiveIntensity = 0.8;
+  //this.t.material.metalness = 0.7;
+  //this.t.material.roughness = 1;
 
   this.cpu.material.envMapIntensity = 0.3;
+  //this.cpu.material.envMapIntensity = 0.5;  
   this.cpu.material.metalness = .9;
   //cube.material.roughness = 0.3;  
 
@@ -133,6 +125,7 @@ logoTex.flipY = false;
 
   // setting the camera field of view based on the camera aspect (this is basically checks if the screen is mobile or larger device)
   this.camera.fov = (this.camera.aspect < 1) ? 70 : 50;
+  this.blur = (this.camera.aspect < 1) ? 0.03 : 0.01; 
 
   this.camera.updateProjectionMatrix();
 
@@ -154,10 +147,11 @@ logoTex.flipY = false;
 
   this.bokehPass = new BokehPass(this.scene, this.camera, {
     focus: 4,  
-    //focus: 3.5,      
+    //focus: 3.5,     
     //aperture: .01,
-    aperture: .01,    
-    maxblur: 0.01
+    aperture: .01,        
+    //maxblur: 0.01
+    maxblur: this.blur    
   })
 
 

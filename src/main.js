@@ -69,8 +69,10 @@ export default class Main
       magFilter: THREE.LinearFilter
     });
 
+    //this.renderer.outputEncoding = THREE.sRGBEncoding;
+
     this.renderer.gammaOutput = true;
-    this.renderer.gammaFactor = 2.2;
+    //this.renderer.gammaFactor = 22.;
 
     this.renderer.setSize( window.innerWidth, window.innerHeight );
     //this.renderer.physicallyCorrectLights = true;
@@ -148,11 +150,12 @@ export default class Main
         all objects and materials are not in initial pre-rendered camera view then anything that comes into the cameras view during
         animation will be loaded (this is where the initial studdering and frame drops were coming from since the scene was being pre-rendered but with main objects (laptop, coffee mug...) being out of camera view) 
       */
-
+      this.animationController.loadCameraCoordinates();
 
       this.homeScreenTexture = this.homeScreen.renderScene();
+
       this.servicePageTexture = this.servicesPage.renderScene();
-      
+
       // need to render scene to send the rendered image to the gpu so as not to do it when user first browses page
       this.servicesPage.initialRender();        
       this.aboutPage.initialRender();
@@ -160,11 +163,17 @@ export default class Main
 
       // once scene has been rendered moving camera to look away from objects so it will be set for the rotating animation
       this.servicesPage.camera.rotateX(Math.PI / 2);
-      this.aboutPage.camera.quaternion.w = 0.206;
-      this.aboutPage.camera.quaternion.x = 1.082;      
-      this.contactPage.camera.rotation.x = Math.PI / 2;
+      this.aboutPage.camera.rotateX(Math.PI / 2);  
+      this.contactPage.angleRotation = Math.PI / 2;    
+      
+      //this.aboutPage.camera.quaternion.w = 0.206;
+      //this.aboutPage.camera.quaternion.x = 1.082;  
+      //this.contactPage.camera.rotation.x = -Math.PI;
 
       this.mainSceneRenderer.updateRenderPass(this.homeScreen);
+      //this.mainSceneRenderer.updateRenderPass(this.aboutPage);
+      //this.mainSceneRenderer.updateRenderPass(this.contactPage);      
+      //this.mainSceneRenderer.updateRenderPass(this.servicesPage);      
 
       this.allScenesLoaded = true;
     }
@@ -176,11 +185,6 @@ export default class Main
     requestAnimationFrame( this.animate );
 
     this.stats.update();
-
-    if(this.counter < this.progress){
-      //this.counter += 0.005;
-      //this.renderPlaneMaterial.uniforms.progressBarValue.value = this.counter;      
-    }
 
     this.renderPlaneMaterial.uniforms.progressBarValue.value = this.animationController.loadingCounter;      
     this.renderPlaneMaterial.uniforms.radius.value = this.animationController.scrollYPosition;          
