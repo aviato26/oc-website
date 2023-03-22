@@ -94,7 +94,7 @@ class AboutSceneMain{
                     if(e.name === 'Cube'){
 
                         this.cube = e;
-                        this.cube.material = new THREE.MeshStandardMaterial({ color: 0x444444, side: THREE.DoubleSide, metalness: 0.1, roughness: .6 });          
+                        this.cube.material = new THREE.MeshStandardMaterial({ color: 0x222222, side: THREE.DoubleSide, metalness: 0.1, roughness: .6 });          
 
                         e.material.needsUpdate = true;
                     }
