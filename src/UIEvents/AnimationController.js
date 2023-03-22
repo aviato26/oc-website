@@ -63,11 +63,17 @@ export default class AnimationController{
     init(){
 
         this.homePageText = this.textSegments.addHomeScreenText();
+
         this.servicesPageText = this.textSegments.addServicesScreenText();
         this.servicesDescription = this.textSegments.addServicesDescription();
+
         this.aboutPageText = this.textSegments.addAboutScreenText();
         this.aboutPageDescription = this.textSegments.addAboutScreenDescription();
+
         this.contactPageText = this.textSegments.addContactScreenText();
+        this.contactPageDescription = this.textSegments.addContactDescription();
+        console.log(this.textSegments.addContactMailTo())
+        this.contactPageLink = this.textSegments.addContactMailTo();
 
         this.servicesScene = this.scenes[1];
 
@@ -329,7 +335,7 @@ export default class AnimationController{
                     onComplete: () => this.updateScenePass(this.scenes[2])                               
                 });
 
-                gsap.to(this.scenes[1].camera.rotation, { x: -Math.PI / 1.5 , duration: 2., ease: "back.inOut(1.7)", onStart: () => {
+                gsap.to(this.scenes[1].camera.rotation, { x: -Math.PI , duration: 2., ease: "back.inOut(1.7)", onStart: () => {
                 //gsap.to(this.scenes[1].camera.rotation, { x: -Math.PI / 2 , duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                    
                 //gsap.to(this.scenes[1].camera.quaternion, { x: -1, duration: 2., ease: "back.inOut(1.7)", onStart: () => {
                         this.titleTextAnimationBackward(this.servicesPageText);
@@ -410,6 +416,9 @@ export default class AnimationController{
                 //gsap.to(this.scenes[3].camera.rotation, { x: -2.516327579495256, y: 0.09964269351339618, z: 3.069903791870366, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {
                 gsap.to(this.scenes[3], { angleRotation: 0, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                          
                         this.titleTextAnimationForward(this.contactPageText) 
+                        this.textAnimationForward(this.contactPageDescription);
+                        this.textAnimationForward(this.contactPageLink);
+
                         this.scenes[3].animating = true;         
                         //this.scenes[3].updateCameraRotationPos();               
                     }
@@ -448,7 +457,10 @@ export default class AnimationController{
                 //gsap.to(this.scenes[3].camera.rotation, { x: -Math.PI * 2, duration: 2., ease: "back.inOut(1.7)", onStart: () => {                                    
              
                 gsap.to(this.scenes[3], { angleRotation: Math.PI, duration: 2., ease: "back.inOut(1.7)", onStart: () => {                                                        
-                    this.titleTextAnimationBackward(this.contactPageText) 
+                    this.titleTextAnimationBackward(this.contactPageText); 
+                    this.textAnimationBackward(this.contactPageDescription);
+                    this.textAnimationBackward(this.contactPageLink);
+
                     this.scenes[3].animating = false;                    
 
                     this.mouseControl.resetMouseControls();

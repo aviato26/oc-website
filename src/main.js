@@ -72,7 +72,7 @@ export default class Main
     //this.renderer.outputEncoding = THREE.sRGBEncoding;
 
     this.renderer.gammaOutput = true;
-    //this.renderer.gammaFactor = 22.;
+    this.renderer.gammaFactor = 2.;
 
     this.renderer.setSize( window.innerWidth, window.innerHeight );
     //this.renderer.physicallyCorrectLights = true;
@@ -80,7 +80,7 @@ export default class Main
     //this.renderer.toneMapping = THREE.NoToneMapping
     //this.renderer.toneMapping = THREE.LinearToneMapping
     //this.renderer.toneMapping = THREE.ReinhardToneMapping
-    //this.renderer.toneMapping = THREE.CineonToneMapping
+    this.renderer.toneMapping = THREE.CineonToneMapping
     //this.renderer.toneMapping = THREE.ACESFilmicToneMapping
     //this.renderer.toneMapping = THREE.CustomToneMapping
 
