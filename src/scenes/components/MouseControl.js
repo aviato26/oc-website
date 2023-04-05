@@ -16,6 +16,10 @@ export default class MouseControl{
         this.mobileCoords = new THREE.Vector2(0);
 
         this.userMouseDown = false;
+        this.currentElement = 0;
+        this.nextElement = 1;
+
+        this.fn = null;
 
         this.init();
     }
@@ -89,6 +93,13 @@ export default class MouseControl{
 
         document.addEventListener('mousedown', (e) => {
             this.userMouseDown = true;
+
+            if(e.target.attributes.tabindex && e.target.attributes.tabindex.nodeValue !== 'nav-container'){
+                this.currentElement = e.target.attributes.tabindex.nodeValue;
+                this.currentElement = parseInt(this.currentElement);
+                this.cb(this.currentElement);
+            }
+            
         });
 
         document.addEventListener('mouseup', () => {
@@ -103,7 +114,23 @@ export default class MouseControl{
                 this.mouseDiff.x += e.movementX * 0.001;
             }
         });
+
     }
+
+    addHoverOverElement(element){
+        element.addEventListener('mouseover', (e) => {
+            if(e.fromElement.attributes['tabindex']){
+                //console.log(e.fromElement.attributes.tabindex.nodeValue)
+            };            
+        });
+    }
+
+    cb(currentIndex, nextIndex){
+       if(this.fn){
+        this.fn(currentIndex, nextIndex);
+       }
+    }
+
 
     addFrictionDecay(){
         if(!this.userMouseDown){

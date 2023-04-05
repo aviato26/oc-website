@@ -14,7 +14,8 @@ import spaceImg from './textures/floor-emission.png';
 import numbersImg from './textures/c2.png';
 
 //import CoffeeSceneModel from './aboutSceneDraco.glb';
-import CoffeeSceneModel from './aboutSceneDraco2.glb';
+//import CoffeeSceneModel from './aboutSceneDraco2.glb';
+import CoffeeSceneModel from './aboutSceneDraco3.glb';
 
 import wireFragmentShader from './shaders/wire-fragment';
 import wireVertexShader from './shaders/wire-vertex';
@@ -94,7 +95,8 @@ class AboutSceneMain{
                     if(e.name === 'Cube'){
 
                         this.cube = e;
-                        this.cube.material = new THREE.MeshStandardMaterial({ color: 0x222222, side: THREE.DoubleSide, metalness: 0.1, roughness: .6 });          
+                        //this.cube.material = new THREE.MeshStandardMaterial({ color: 0x333333, side: THREE.DoubleSide, metalness: 0.1, roughness: .6 });          
+                        this.cube.material = new THREE.MeshStandardMaterial({ color: 0x555555, side: THREE.DoubleSide });                                  
 
                         e.material.needsUpdate = true;
                     }
@@ -341,6 +343,8 @@ class AboutSceneMain{
         this.time = 0.0;
         this.animating = false;
 
+        this.cameraAnimating = false;
+
     }
 
     updateDisplacement(pos, mouseDown){
@@ -364,7 +368,9 @@ class AboutSceneMain{
             this.displacement.y *= 0.97;
         }
 
-        
+        //this.updateCameraRotationPos();
+        //console.log(this.angleRotation)
+
         this.smokeMaterial.uniforms.time.value = this.time;
         this.smokeMaterial.uniforms.displacement.value = this.displacement.y;        
         
