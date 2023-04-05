@@ -1,17 +1,24 @@
 
 import * as THREE from 'three';
+
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
+
+//import { BloomEffect, EffectComposer, EffectPass, ShaderPass, RenderPass, DepthOfFieldEffect } from "postprocessing";
+
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
 
 //import laptop from './lp53Draco.glb';
-import laptop from './lp51Draco.glb';
+//import laptop from './lp51Draco.glb';
+//import laptop from './lp52.glb';
+//import laptop from './lp53.glb';
+import laptop from './lp54.glb';
 
 
 import postFragmentShader from './shaders/postFragment.js';
@@ -79,8 +86,23 @@ export default class ServicesPage
 
       obj.scene.traverse((obj) => {
 
+
+
+        if(obj.name === 'Spot'){
+          this.light = obj;
+        }
+
+        if(obj.name === 'Cube002'){
+          //obj.material.envMapIntensity = 2;
+          obj.material.roughness = 0.8;
+          obj.material.metalness = 1;          
+          //const mat = new THREE.MeshStandardMaterial({metalness: 0.5, roughness: 0.8});
+          //obj.material = mat;
+        }
+
+
         if(obj.name === 'Cube'){
-          const mat = new THREE.MeshStandardMaterial({ color: 0x555555, side: THREE.DoubleSide, metalness: 0.1, roughness: .6 });          
+          const mat = new THREE.MeshStandardMaterial({ color: 0x222222, side: THREE.DoubleSide, metalness: 0.1, roughness: .6 });          
           obj.material = mat;         
           //c.marterial.side = THREE.DoubleSide;
           //c.material.side = 3
@@ -104,7 +126,10 @@ export default class ServicesPage
 
       this.camera.aspect = window.innerWidth / window.innerHeight;
 
-      this.camera.fov = (this.camera.aspect < 1) ? 45 : this.camera.fov;    
+      this.camera.position.set(0, 0.07597390562295914, 0.12254553288221359);
+
+      this.camera.fov = (this.camera.aspect < 1) ? 90 : this.camera.fov;    
+      //this.camera.fov = (this.camera.aspect < 1) ? 45 : 45;    
 
       //this.camera.rotation.x = Math.PI;
       //this.camera.rotation.x = Math.PI * 2;      
@@ -116,9 +141,15 @@ export default class ServicesPage
       //this.camera.rotation.x += Math.sin(Math.PI / 2);
 
       const params = {
+        /*
         exposure: 3.,
-        bloomStrength: .2,
-        bloomThreshold: 0.3,
+        bloomStrength: .3,        
+        bloomThreshold: 0.1,
+        bloomRadius: 1.
+        */
+        exposure: 3.,
+        bloomStrength: .05,        
+        bloomThreshold: 0.1,
         bloomRadius: 1.
       };
 
@@ -126,15 +157,25 @@ export default class ServicesPage
 
       this.composer = new EffectComposer(this.renderer);
       // composer must not render to screen in order to save all the passes to pass through to store as a texture
-      //this.composer.renderToScreen = false;
+      this.composer.renderToScreen = false;
+      //this.composer.autoRenderToScreen = false;
 
-      this.renderPass = new RenderPass(this.scene, this.camera);
-  
+      //this.renderPass = new RenderPass(this.scene, this.camera);
+
+      //this.bloomPass = new BloomEffect( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+      //this.bloomPass.threshold = params.bloomThreshold;
+      //this.bloomPass.strength = params.bloomStrength;
+      //this.bloomPass.radius = params.bloomRadius;
+      //this.bloomPass.intensity = 20;
+
+      this.renderPass = new RenderPass(this.scene, this.camera);      
+
+      
       this.bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
       this.bloomPass.threshold = params.bloomThreshold;
       this.bloomPass.strength = params.bloomStrength;
       this.bloomPass.radius = params.bloomRadius;
-
+/*
       this.bokeh = new BokehPass(this.scene, this.camera, {
         focus: 1.,
         aperture: 0.01,
@@ -143,7 +184,7 @@ export default class ServicesPage
         width: window.innerWidth,
         height: window.innerHeight
       });
-
+*/
 
 
       this.postMaterial = new THREE.ShaderMaterial({
@@ -159,20 +200,27 @@ export default class ServicesPage
         vertexShader: postVertexShader
       });
   
-      this.shaderPass = new ShaderPass(this.postMaterial);
+      //this.shaderPass = new ShaderPass(this.postMaterial);
+      this.shaderPass = new ShaderPass(this.postMaterial);      
+
+      //this.effectPass = new EffectPass(this.camera, this.bloomPass, new DepthOfFieldEffect(this.camera));  
 
       // this pass needs to be swapped to the write buffer in order to be rendererd into the texture
       //bokeh.needsSwap = true;
       //bloomPass.needsSwap = true;
 
+      //this.effectPass.needsSwap = true;
       
       this.composer.addPass(this.renderPass);
-      this.composer.addPass(this.shaderPass);
+      //this.composer.addPass(this.effectPass);
+      //this.composer.addPass(this.shaderPass);
       //this.composer.addPass(this.bokeh);
-      this.composer.addPass(this.bloomPass);      
+      ///this.composer.addPass(this.bloomPass);      
 
       //this.passes = [this.renderPass, this.shaderPass, this.bokeh, this.bloomPass];
       this.passes = [this.renderPass, this.shaderPass, this.bloomPass];      
+      //this.passes = [this.renderPass];            
+      //this.passes = [this.renderPass, this.effectPass];            
 
       this.scene.add(obj.scene);
       
@@ -187,8 +235,7 @@ export default class ServicesPage
       //this.renderSceneTexture();
       //this.preRender();
 
-      //3this.renderer2 = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
-
+      //this.renderer2 = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
 
       animationCallBack(this.scene, this.camera);
 
@@ -199,6 +246,9 @@ export default class ServicesPage
   });
 
   this.cameraAnimating = true;
+
+  this.clock = new THREE.Clock();
+ 
   
   }
 
@@ -227,8 +277,10 @@ export default class ServicesPage
 
       // updating camera position according to users mouse position along the x axis
       this.camera.position.x = mousePos.x * 0.8;
+
+      //this.light.intensity += this.camera.position.x;
  
-      this.camera.position.x = Math.min(Math.max(this.camera.position.x, -.5), .5);      
+      this.camera.position.x = Math.min(Math.max(this.camera.position.x, -.2), .2);      
       
       // keeping the camera looking at the laptop no matter where the cameras position is placed
       this.camera.lookAt(this.sceenPos);
@@ -248,8 +300,9 @@ export default class ServicesPage
     
     this.mouseDiff.subVectors(this.mouse, this.mouseLastPos);
     this.mVel.add(this.mouseDiff);
-    this.mVel.multiplyScalar(0.9);
+    this.mVel.multiplyScalar(0.7);
 
+    
     // postMaterial for the blur bloom effect
     this.postMaterial.uniforms.time.value = this.time;
     this.postMaterial.uniforms.mouse.value = this.mouse;
@@ -258,8 +311,14 @@ export default class ServicesPage
     // after getting velocity setting last mouse position to current mouse position
     this.mouseLastPos.copy(this.mouse);
 
-    // updating time for the blue screen of death to switch images
+
     this.screenShader.uniforms.time.value = this.time;
+
+
+    //this.composer.render();
+
+    //return this.composer.inputBuffer.texture;
+    //return this.composer.inputBuffer.texture;
 
   }
 

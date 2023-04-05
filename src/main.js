@@ -30,7 +30,7 @@ export default class Main
     this.clock = new THREE.Clock();
 
     this.stats = Stats()
-    document.body.appendChild(this.stats.dom)
+    //document.body.appendChild(this.stats.dom)
 
     // setting title
     document.title = "Oc Networks Inc";
@@ -62,31 +62,31 @@ export default class Main
 
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
-      //powerPreference: "high-performance",
       powerPreference: "high-performance",      
-      //antialias: true,      
-      minFilter: THREE.LinearFilter,
-      magFilter: THREE.LinearFilter
     });
 
-    //this.renderer.outputEncoding = THREE.sRGBEncoding;
+    this.renderer.outputEncoding = THREE.sRGBEncoding;
+    //this.renderer.setPixelRatio(window.devicePixelRatio);
 
     this.renderer.gammaOutput = true;
     this.renderer.gammaFactor = 2.;
 
     this.renderer.setSize( window.innerWidth, window.innerHeight );
+    this.renderer.useLegacyLights = true;
     //this.renderer.physicallyCorrectLights = true;
 
     //this.renderer.toneMapping = THREE.NoToneMapping
     //this.renderer.toneMapping = THREE.LinearToneMapping
     //this.renderer.toneMapping = THREE.ReinhardToneMapping
-    this.renderer.toneMapping = THREE.CineonToneMapping
+    //this.renderer.toneMapping = THREE.CineonToneMapping
     //this.renderer.toneMapping = THREE.ACESFilmicToneMapping
     //this.renderer.toneMapping = THREE.CustomToneMapping
 
     this.renderer.domElement.style.position = 'fixed';
 
     this.cameraAspect = this.width / this.height;
+
+    //this.renderer.setPixelRatio( 1.3 );
 
     if(this.cameraAspect < 1){
       //this.renderer.setPixelRatio( window.devicePixelRatio );
@@ -154,16 +154,19 @@ export default class Main
 
       this.homeScreenTexture = this.homeScreen.renderScene();
 
-      this.servicePageTexture = this.servicesPage.renderScene();
+      //this.servicePageTexture = this.servicesPage.renderScene();
 
       // need to render scene to send the rendered image to the gpu so as not to do it when user first browses page
       this.servicesPage.initialRender();        
       this.aboutPage.initialRender();
       this.contactPage.initialRender();
 
+
       // once scene has been rendered moving camera to look away from objects so it will be set for the rotating animation
-      this.servicesPage.camera.rotateX(Math.PI / 2);
+      this.servicesPage.camera.rotation.x = 1;
       this.aboutPage.camera.rotateX(Math.PI / 2);  
+
+      //this.aboutPage.angleRotation = 3.14;
       this.contactPage.angleRotation = Math.PI / 2;    
       
       //this.aboutPage.camera.quaternion.w = 0.206;
@@ -188,6 +191,7 @@ export default class Main
 
     this.renderPlaneMaterial.uniforms.progressBarValue.value = this.animationController.loadingCounter;      
     this.renderPlaneMaterial.uniforms.radius.value = this.animationController.scrollYPosition;          
+
 
     if(this.allScenesLoaded){
       this.animationController.updateAnimation();

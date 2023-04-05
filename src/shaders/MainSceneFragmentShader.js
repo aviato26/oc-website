@@ -47,6 +47,8 @@ const horseShoeFragment =
         gl_FragColor = mix(vec4(0.), vec4(circle * mainSceneTexture), radius);
       }
 
+      //gl_FragColor = mainSceneTexture;                    
+
     }
 `;
 
