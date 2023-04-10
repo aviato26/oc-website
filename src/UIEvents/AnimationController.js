@@ -670,21 +670,23 @@ export default class AnimationController{
     }
 
 
-    titleTextAnimationForward(text){
+    titleTextAnimationForward(text, condition){
         gsap.fromTo(text, { 
-            xPercent: -200,
-            yPercent: 0,
-            display: 'block',
-            opacity: 0,
-            //stagger: 0.1,            
-        },
-        {                       
-            stagger: 0.1,                                                         
-            duration: 0.5,
-            xPercent: 0,
-            display: 'block',
-            opacity: 1,
-        });     
+                xPercent: -200,
+                yPercent: 0,
+                display: 'block',
+                opacity: 0,
+                //stagger: 0.1,            
+            },
+            {                       
+                stagger: 0.1,                                                         
+                duration: 0.5,
+                xPercent: 0,
+                display: 'block',
+                opacity: 1,
+                onComplete: () => {}
+            }
+        );     
     }
 
     titleTextAnimationBackward(text){

@@ -26,11 +26,10 @@ export default class Main
 
     this.scene = new THREE.Scene();
 
-
     this.clock = new THREE.Clock();
 
     this.stats = Stats()
-    //document.body.appendChild(this.stats.dom)
+    document.body.appendChild(this.stats.dom)
 
     // setting title
     document.title = "Oc Networks Inc";
@@ -69,7 +68,7 @@ export default class Main
     //this.renderer.setPixelRatio(window.devicePixelRatio);
 
     this.renderer.gammaOutput = true;
-    this.renderer.gammaFactor = 2.;
+    this.renderer.gammaFactor = 2.2;
 
     this.renderer.setSize( window.innerWidth, window.innerHeight );
     this.renderer.useLegacyLights = true;

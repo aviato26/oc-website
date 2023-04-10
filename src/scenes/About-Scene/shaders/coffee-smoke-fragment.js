@@ -38,6 +38,7 @@ const coffeeSmokeFrag = `
         gl_FragColor = texture(tex , uv3 - fract((length(displacement * uv) * time * 0.05) + uv.x));
 
         gl_FragColor *= abs(sin(time + uv3.y) * sin(uv.y) * sin(uv3.y)) * (uv3.y * uv.y) + length(uv.y) + 0.2;
+        gl_FragColor.a = dot(uv.y, 0.5) * 4.;
     }
 
 `
