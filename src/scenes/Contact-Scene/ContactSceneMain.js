@@ -80,56 +80,58 @@ class ContactSceneMain{
                     uv.x -= 0.5;
                     uv.y -= 0.5;                   
 
-                    //uv *= 12.0;
+                    //uv *= 8.0;
                     uv *= 4.0;                    
                     //uv.y += fract(mouse.x * time * 1.3);
                     uv.y += fract(time * 0.1 + uv.x * uv.y) * uv.x;
                     
-                    vec2 uv2 = fract(uv * 24.) + 0.5;
+                    //vec2 uv2 = fract(uv * 4.) + 0.5;
+                    vec2 uv2 = fract(uv * 24.) + 0.5;                    
                     //vec2 uv2 = fract(uv * 48. * 2.) + 0.5;
+                    //vec2 uv2 = fract(uv * 48.) + 0.5;                    
 
-                    uv2 *= uv * vec2(cos(time + uv.x), sin(time + uv.x));
+                    //uv2 *= uv * vec2(cos(time + uv.x), sin(time + uv.x));
                     
                     float t = time;
 
-                    //float s = sin(t + uv.y * length(mouse.x - uv.y));                    
-                    //float c = cos(t + uv.x * length(mouse.x - uv.x));
-
-                    float s = sin(t + uv.y * length(uv.y));                    
-                    float c = cos(t + uv.x * length(uv.x));                    
+                    float s = sin(t + t + uv.y * length(uv.y + (mouse.x) + uv.x));                    
+                    float c = cos(t + t + uv.x * length(uv.x + (mouse.x * abs(sin(uv.x + t) * uv2.x)) + uv.y));                    
 
                     mat3 rot = mat3(
                       vec3(c, s, 0),
                       vec3(-s, c, 0),
-                      vec3(0., 0., 1)      
+                      vec3(0., 0., 1.)      
                     );
                     
-                    //uv2 *= vec3(rot * vec3(uv, 1.0)).xy;
-                    //uv2 += vec3(rot * vec3(mouse / uv * time, 1.)).xy;
 
-                    uv2 *= vec3(rot * vec3(uv, 1.)).xy;                    
+                    uv2 *= vec3(rot * vec3(uv + abs(sin(time) * 6.28), 1.)).xy;                    
                     
-                    //float circle = 1.0 / length(uv2);                    
-                    float circle = 1.0 / length((uv2 - uv) + uv);
+                    float circle = 1.0 / length((uv2 - uv) + uv);                                   
+                    float circle2 = length((uv2 - uv) + uv);                                                       
                     
-                    //circle *= 22.5 + mouse.x * 0.5;
-                    //circle *= 2.5 + length(mouse.x - uv2) * 0.6;                    
-                    //circle *= .1 + length(mouse.x * uv2) * 0.08;                                        
-                    circle *= .1 + length(uv - uv2) * 0.01;                                                            
+                    //circle *= .1 + length(uv - uv2) * 0.2;                                                            
                     
-                    circle = pow(circle, 1.0 - mouse.x * 0.02);
-                    //circle = pow(circle, 1.);                    
+                    //circle = pow(circle, 1.0 - mouse.x * 0.03);                    
+
+                    //circle *= pow(circle, mouse.x * 0.1);                    
                     
                     float r = 0.144;
                     float g = 0.132;
                     float b = 0.588;
+
+                    float r2 = 1.0;
+                    float g2 = 0.0;
+                    float b2 = 0.815;
                     
                     vec3 color = circle * vec3(r, g, b);
+                    //vec3 color2 = circle * mix(vec3(r2, g2, b2), vec3(r, g, b), mouse.x);                    
+                    vec3 color2 = circle * vec3(r2, g2, b2);                                        
                     
                     //color = 1.0 - exp(-color);
                 
                     // Output to screen
-                    gl_FragColor = vec4(color,1.0);
+                    //gl_FragColor = mix(vec4(color,1.0), vec4(circle * vec3(r2, g2, b2), 1.), mouse.x);
+                    gl_FragColor = vec4(color, 1.0);                    
                     
                     //gl_FragColor = vec4(uv, 0.0 ,1.0);    
 
@@ -245,6 +247,7 @@ class ContactSceneMain{
 
         this.updateCameraPos(this.time * -this.mouse.x - 0.0001);
         this.updateCameraRotationPos();
+
 
         this.tunnelShader.uniforms.time.value = this.t;
         this.tunnelShader.uniforms.mouse.value = this.mouse;

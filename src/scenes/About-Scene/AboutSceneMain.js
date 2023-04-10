@@ -5,6 +5,11 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
+
+import postFragmentShader from './shaders/postFragment';
+import postVertexShader from './shaders/postVertex';
+
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
@@ -15,7 +20,8 @@ import numbersImg from './textures/c2.png';
 
 //import CoffeeSceneModel from './aboutSceneDraco.glb';
 //import CoffeeSceneModel from './aboutSceneDraco2.glb';
-import CoffeeSceneModel from './aboutSceneDraco3.glb';
+//import CoffeeSceneModel from './aboutSceneDraco3.glb';
+import CoffeeSceneModel from './as.glb';
 
 import wireFragmentShader from './shaders/wire-fragment';
 import wireVertexShader from './shaders/wire-vertex';
@@ -164,6 +170,8 @@ class AboutSceneMain{
 
                     this.mod.material.defines.USE_UV = '';                    
 
+                    this.mod.material.toneMapped = false;
+
                     this.mod.material.onBeforeCompile = shader => {
 
                         //shader.vertexShader = 'varying vec2 uv' + shader.vertexShader;
@@ -181,44 +189,7 @@ class AboutSceneMain{
                       ` + shader.fragmentShader;
                   
                           shader.fragmentShader = shader.fragmentShader.replace(/vec4 diffuseColor.*;/, `
-       /*
-                          // Normalized pixel coordinates (from 0 to 1)
-                          vec2 uv = vUv;
 
-                          vec2 uv2 = fract(uv * 20.0);
-                          
-                          //uv2 -= fract(uv * time) - sin(pow(-uv.y, 2.0) / pow(uv2, uv));
-                          //uv2 -= sin(uv * time - uv2.y * uv.y);                          
-                          uv2.x -= fract(uv2.x + time - uv.x * uv.x);                                                    
-
-                          
-                          //float dist = 1.0 / length(uv - uv2);
-                          float dist = 1.0 / length(uv2 - 0.5);                          
-                          
-                          //dist *= 0.03;
-                          dist *= 1.1;                          
-                      
-                          // Time varying pixel color
-                          vec3 col = vec3(dist);
-
-
-                          float r = 0.412;
-                          float g = 0.012;
-                          float b = 0.034;
-
-                          vec3 colors = vec3(r, g, b);
-
-                          vec4 diffuseColor2 = vec4(diffuse, opacity);
-                          //vec4 diffuseColor = vec4(diffuse, opacity);                          
-                          
-                          //col *= mix(colors, diffuseColor2.xyz, 0.2);
-
-                          diffuseColor2.xyz = mix(col * colors, diffuseColor2.xyz - fract(vec3(uv , 1) * 40.0), 0.9);
-
-                  
-                          vec4 diffuseColor = diffuseColor2;                          
-                          //vec4 diffuseColor = vec4(diffuse, 1); 
-                        */
 
 
                           // Normalized pixel coordinates (from 0 to 1)
@@ -248,13 +219,10 @@ class AboutSceneMain{
                           
                           //col *= mix(colors, diffuseColor2.xyz, 0.2);
 
-                          diffuseColor2.xyz *= col * log(col);      
+                          diffuseColor2.xyz *= col * log(col);     
 
-                  
                           //fragColor = diffuseColor2;           
-                          diffuseColor += diffuseColor2 + (vec4(diffuse, opacity) * 0.3);    
-
-
+                          diffuseColor += diffuseColor2 + (vec4(diffuse, opacity) );    
 
                           `)
                   
@@ -289,10 +257,12 @@ class AboutSceneMain{
             this.scene.add(model.scene);            
 
             const params = {
-                exposure: 1.,
-                bloomStrength: .5,
-                bloomThreshold: 0.001,
-                bloomRadius: .0
+                exposure: 1,
+                bloomStrength: 0.3,
+                //bloomStrength: 0.5,                
+                //bloomThreshold: 0.001,                
+                bloomThreshold: 0.,
+                bloomRadius: 0.1
               };
 
             this.composer = new EffectComposer(this.renderer);
@@ -310,10 +280,10 @@ class AboutSceneMain{
 
       
             this.bokeh = new BokehPass(this.scene, this.camera, {
-                focus: 2.,    
+                focus: 1.,    
                 //aperture: .01,
-                aperture: .00011,    
-                maxblur: 0.04,
+                aperture: .0005,    
+                maxblur: 0.9,
       
               width: window.innerWidth,
               height: window.innerHeight
@@ -323,11 +293,29 @@ class AboutSceneMain{
             this.bokeh.needsSwap = true;
             //this.bloomPass.needsSwap = true;
 
+            this.postMaterial = new THREE.ShaderMaterial({
+                uniforms: {
+                  tDiffuse: { value: null },
+                  time: { value: 0.0 },
+                  cameraPos: { value: new THREE.Vector3(0) },
+                  mouse: { value: this.mouse },
+                  mouseVel: { value: this.mouseVel }
+                },
+          
+                fragmentShader: postFragmentShader,
+                vertexShader: postVertexShader
+              });
+
+            this.postBloom = new ShaderPass( this.postMaterial );
+
+
             this.composer.addPass(this.renderPass);
-            this.composer.addPass(this.bokeh);
+            this.composer.addPass(this.postBloom);
             this.composer.addPass(this.bloomPass);            
 
-            this.passes = [this.renderPass, this.bokeh, this.bloomPass];
+            this.passes = [this.renderPass, this.postBloom, this.bloomPass];
+            //this.passes = [this.renderPass, this.bloomPass];            
+            //this.passes = [this.renderPass, this.postBloom];                        
 
             this.sceneLoaded = true;
 
@@ -372,7 +360,11 @@ class AboutSceneMain{
         //console.log(this.angleRotation)
 
         this.smokeMaterial.uniforms.time.value = this.time;
-        this.smokeMaterial.uniforms.displacement.value = this.displacement.y;        
+        this.smokeMaterial.uniforms.displacement.value = this.displacement.y;       
+
+        this.postMaterial.uniforms.time.value = this.time;
+        this.postMaterial.uniforms.mouse.value = this.mouse;
+        this.postMaterial.uniforms.mouseVel.value = this.mVel;    
         
         this.mod.material.userData.shader.uniforms.time.value = this.time;        
         this.mod.material.userData.shader.uniforms.displacement.value = this.displacement;        
