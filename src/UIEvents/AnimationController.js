@@ -107,6 +107,7 @@ export default class AnimationController{
     }
 
     updateActiveMenuItem(){
+        
         this.menuList.forEach((item, index) => {
             if(index === this.sceneIndex){
                 //this.menuList[this.sceneIndex].className = 'services-items active'
@@ -117,6 +118,19 @@ export default class AnimationController{
             }
 
         });
+        
+       /*
+       for(let i = 0; i < this.menuList.length; i++){
+        if(i === this.sceneIndex){
+            this.menuList[this.sceneIndex].className = 'services-items active'
+            //item.className = 'services-items active'                
+        }
+        else{
+            this.menuList[this.sceneIndex].className = 'services-items'            
+            //item.className = 'services-items'
+        }
+       }
+       */
     }
 
     laptopWheelControl(e){
@@ -428,14 +442,15 @@ export default class AnimationController{
                 this.progressAnimation = 0
                 gsap.to(this, {
                     progressAnimation: 1,
-                    duration: 0.95,
+                    duration: 1.1,
                     //delay: .85,
-                    delay: .15,                    
+                    //delay: .3,                    
                     ease: "expo.out",
                     onComplete: () => this.updateScenePass(this.scenes[1])
                 });
 
                 gsap.to(this.scenes[0].camera.rotation, { x: -Math.PI * 2, y: 0.02676750914208681, z: 
+                //gsap.to(this.scenes[0].camera.rotation, { x: -Math.PI * 2, y: 0.02676750914208681, z: 
                     0.014685823446374004, duration: 2., ease: "back.inOut(1.7)", onStart: () => { 
                     this.titleTextAnimationBackward(this.homePageText) 
                     this.scenes[0].cameraAnimating = true;
@@ -446,7 +461,7 @@ export default class AnimationController{
                 gsap.to(this.scenes[1].camera.position, { x: -5e-324})
 
                 // resetting camera to look up when user scrolls down
-                this.scenes[1].camera.rotation.x = 1;
+                this.scenes[1].camera.rotation.x = 3.14;
 
                 gsap.to(this.scenes[1].camera.rotation, { x: 0.1334403815502587, y: 0, z: 0 , delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                    
                 //gsap.to(this.scenes[1].camera.rotation, { x: -0.21988, y: 0, z: 0 , delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                        
@@ -724,6 +739,7 @@ export default class AnimationController{
     }
 
     textAnimationBackward(text){
+        console.log(text)
         gsap.fromTo(text, {
             yPercent: 0,
             xPercent: 0,
@@ -802,7 +818,7 @@ export default class AnimationController{
 
         this.mouseControl.addFrictionDecay();
 
-
+        console.log(this.contactPageText)
 
         this.scenes[0].updateCamera(this.mouseControl.mouseDiff);
         this.scenes[1].updateCamera(this.mouseControl.mouseDiff); 

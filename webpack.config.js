@@ -43,7 +43,11 @@ module.exports =
     ]
   },
 
-  plugins: [new HtmlWebpackPlugin({})],
+  plugins: [new HtmlWebpackPlugin({
+    meta: {
+      description: 'Top rated IT company specializing in installation, repair integration and consulting'
+    }
+  })],
 
   devServer:
   {

@@ -18,7 +18,8 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 //import laptop from './lp51Draco.glb';
 //import laptop from './lp52.glb';
 //import laptop from './lp53.glb';
-import laptop from './lp54.glb';
+//import laptop from './lp54.glb';
+import laptop from './scene.glb';
 
 
 import postFragmentShader from './shaders/postFragment.js';

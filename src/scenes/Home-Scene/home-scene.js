@@ -20,7 +20,8 @@ import floorTexture from './textures/floorTex.jpg';
 import spaceImg from './textures/neonLights2.jpeg';
 
 //import cpu from './cpu3Draco.glb';
-import cpu from './cpu2.glb';
+//import cpu from './cpu2.glb';
+import cpu from './test.glb';
 
 import floorFragmentShader from './shaders/floor/floorFragmentShader.js';
 import floorVertexShader from './shaders/floor/floorVertexShader.js';
