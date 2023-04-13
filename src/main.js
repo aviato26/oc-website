@@ -68,7 +68,7 @@ export default class Main
     //this.renderer.setPixelRatio(window.devicePixelRatio);
 
     this.renderer.gammaOutput = true;
-    this.renderer.gammaFactor = 2.2;
+    //this.renderer.gammaFactor = 2.2;
 
     this.renderer.setSize( window.innerWidth, window.innerHeight );
     this.renderer.useLegacyLights = true;
