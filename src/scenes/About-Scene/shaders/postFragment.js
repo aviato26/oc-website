@@ -37,14 +37,14 @@ const postFragmentShader =
 
             float weight = sin(lerp * 3.14159);
 
-            //vec4 sampleT = texture(tDiffuse, uv + center * lerp * .29 );
+            //vec4 sampleT = texture(tDiffuse, uv + center * lerp * .90 );
             vec4 sampleT = texture(tDiffuse, uv + center * lerp * .60 );            
             sampleT.rgb *= sampleT.a;
             color += sampleT * weight;
         }
 
         color.a = 1.0;
-        color.rgb /= 4.;
+        color.rgb /= 3.;
 
         vec4 finalColor = 1.0 - (1.0 - color) * (1.0 - originalTex);
 

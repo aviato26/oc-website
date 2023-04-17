@@ -182,6 +182,7 @@ this.bloomProps = {
   //this.composer.addPass(fxaa);
 
   this.passes = [this.scenePass, this.bloomPass, this.bokehPass]
+  //this.passes = [this.scenePass, this.bloomPass]  
 
 
   this.floor.material.emissiveMap = floorTex;
