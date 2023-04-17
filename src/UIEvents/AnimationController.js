@@ -28,6 +28,10 @@ export default class AnimationController{
 
         this.sceneIndex = 0;
 
+        gsap.config({
+            //autoSleep: 60
+        });
+
         // variable to only trigger one animation event at a time
         this.animating = false;
 
@@ -100,11 +104,25 @@ export default class AnimationController{
         this.textAnimationForward = this.textAnimationForward.bind(this);
 
         this.sceneState();
+    
     }
 
     loadCameraCoordinates(){
         this.currentCameraPos.set(this.scenes[3].camera.rotation.x, this.scenes[3].camera.rotation.y, this.scenes[3].camera.rotation.z);
     }
+
+
+    anime(){
+        this.s1 = gsap.to(this.scenes[0].camera.rotation, { x: -Math.PI * 2, y: 0.02676750914208681, z: 
+                0.014685823446374004, duration: 2., paused: true, ease: "back.inOut(1.7)", onStart: () => { 
+                //this.titleTextAnimationBackward(this.homePageText) 
+                this.scenes[0].cameraAnimating = true;
+                this.scenes[1].cameraAnimating = true;
+                this.mouseControl.resetMouseControls();
+            }});                
+    }
+
+
 
     updateActiveMenuItem(){
         
@@ -118,19 +136,6 @@ export default class AnimationController{
             }
 
         });
-        
-       /*
-       for(let i = 0; i < this.menuList.length; i++){
-        if(i === this.sceneIndex){
-            this.menuList[this.sceneIndex].className = 'services-items active'
-            //item.className = 'services-items active'                
-        }
-        else{
-            this.menuList[this.sceneIndex].className = 'services-items'            
-            //item.className = 'services-items'
-        }
-       }
-       */
     }
 
     laptopWheelControl(e){
@@ -198,7 +203,7 @@ export default class AnimationController{
                 { x: -1.5478153800680585, delay: 0.2, duration: 2., ease: "back.inOut(1.7)",  onComplete: () => {                    
                         this.titleTextAnimationForward(this.homePageText);
     
-                        this.animating = false;
+                        //this.animating = false;
 
                         this.sceneIndex = 0;
                         
@@ -228,7 +233,7 @@ export default class AnimationController{
                             this.parentContext.mouseControl.resetMouseControls();
                             }, onComplete: () => {
                                 this.state = 'up';
-                                this.parentContext.animating = true;
+                                //this.parentContext.animating = true;
                             }
                         }                        
                     } else{
@@ -240,7 +245,7 @@ export default class AnimationController{
                                     this.parentContext.textAnimationForward(this.parentContext.servicesDescription);
                                     
                                     // animating is set to false at end of animation so next animation can be triggered
-                                    this.parentContext.animating = false;
+                                    //this.parentContext.animating = false;
                                     this.parentContext.scenes[1].cameraAnimating = false;     
                                     this.state = 'middle';
 
@@ -276,7 +281,7 @@ export default class AnimationController{
                                 this.parentContext.titleTextAnimationForward(this.parentContext.servicesDescription); 
                                 this.parentContext.scenes[1].cameraAnimating = false;                                                      
         
-                                this.parentContext.animating = false;
+                                //this.parentContext.animating = false;
 
                                 this.parentContext.sceneIndex = 1;
         
@@ -298,10 +303,10 @@ export default class AnimationController{
                         return { x: 2.412166253191378 , duration: 2., ease: "back.inOut(1.7)", onComplete: () => {          
                             this.parentContext.titleTextAnimationForward(this.parentContext.aboutPageText);
                             this.parentContext.textAnimationForward(this.parentContext.aboutPageDescription);
-        
+
                             this.parentContext.scenes[2].cameraAnimating = false;
         
-                            this.parentContext.animating = false;
+                            //this.parentContext.animating = false;
                             this.state = 'middle';
 
                             // updating sceneIndex to current index
@@ -321,7 +326,8 @@ export default class AnimationController{
                                     this.parentContext.mouseControl.resetMouseControls();
                             }, onComplete: () => {
                                 this.state = 'up';                      
-                                this.parentContext.animating = false;          
+
+                                //this.parentContext.animating = false;          
                             }
                         }
                     }
@@ -343,7 +349,8 @@ export default class AnimationController{
 
                             }, onComplete: () => {
                                 this.state = 'up';
-                                this.parentContext.animating = false;
+
+                                //this.parentContext.animating = false;
                             }
                         }
                     }
@@ -353,7 +360,7 @@ export default class AnimationController{
                                 this.parentContext.titleTextAnimationForward(this.parentContext.aboutPageText); 
                                 this.parentContext.textAnimationForward(this.parentContext.aboutPageDescription);
 
-                                this.parentContext.animating = false;
+                                //this.parentContext.animating = false;
                                 this.state = 'middle';
                             }
                         }
@@ -369,7 +376,7 @@ export default class AnimationController{
                         this.textAnimationForward(this.contactPageDescription);
                         this.textAnimationForward(this.contactPageLink);
 
-                        this.animating = false;
+                        //this.animating = false;
 
                         this.sceneIndex = 3;
 
@@ -401,38 +408,38 @@ export default class AnimationController{
         this.cameraOrRotation = (Object.hasOwn(scene.scene, 'angleRotation')) ? scene.scene : scene.scene.camera.rotation;
         this.cameraOrRotation2 = (Object.hasOwn(scene2.scene, 'angleRotation')) ? scene2.scene : scene2.scene.camera.rotation;            
 
-        if(direction){
+        if(!this.animating){
+            if(direction){
+                this.progressAnimation = 0
+                gsap.to(this, {
+                    progressAnimation: 1,
+                    duration: 0.95,
+                    //delay: .85,
+                    delay: .15,                    
+                    ease: "expo.out",
+                    onComplete: () => this.updateScenePass(scene2.scene)
+                });
+    
+                gsap.to(this.cameraOrRotation, scene.downwardAnimation);                
+                gsap.to(this.cameraOrRotation2, scene2.downwardAnimation);  
+                
+            }                            
+            else{
+                this.progressAnimation = 1;
+                gsap.to(this, {
+                    progressAnimation: 0,
+                    duration: 0.95,
+                    //delay: .85,
+                    delay: .15,                          
+                    ease: "expo.out",
+                    onComplete: () => this.updateScenePass(scene2.scene)                    
+                });
 
-            this.progressAnimation = 0
-            gsap.to(this, {
-                progressAnimation: 1,
-                duration: 0.95,
-                //delay: .85,
-                delay: .15,                    
-                ease: "expo.out",
-                onComplete: () => this.updateScenePass(scene2.scene)
-            });
-
-            gsap.to(this.cameraOrRotation, scene.downwardAnimation);                
-            gsap.to(this.cameraOrRotation2, scene2.downwardAnimation);  
-            
-        }                            
-        else{
-            this.progressAnimation = 1;
-            gsap.to(this, {
-                progressAnimation: 0,
-                duration: 0.95,
-                //delay: .85,
-                delay: .15,                          
-                ease: "expo.out",
-                onComplete: () => this.updateScenePass(scene2.scene)                    
-            });
-
-            gsap.to(this.cameraOrRotation2, scene2.upwardAnimation);                        
-            gsap.to(this.cameraOrRotation, scene.upwardAnimation);
-            
+                gsap.to(this.cameraOrRotation2, scene2.upwardAnimation);                        
+                gsap.to(this.cameraOrRotation, scene.upwardAnimation);
+                
+            }
         }
-
     }
 
     updateSlideAnimation(){
@@ -458,9 +465,12 @@ export default class AnimationController{
                     this.mouseControl.resetMouseControls();
                 }});                
 
-                gsap.to(this.scenes[1].camera.position, { x: -5e-324})
+                //this.s1.restart();
+
+                //gsap.to(this.scenes[1].camera.position, { x: -5e-324})
 
                 // resetting camera to look up when user scrolls down
+                this.scenes[1].camera.position.x = -5e-324;                
                 this.scenes[1].camera.rotation.x = 3.14;
 
                 gsap.to(this.scenes[1].camera.rotation, { x: 0.1334403815502587, y: 0, z: 0 , delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                    
@@ -469,7 +479,7 @@ export default class AnimationController{
                     this.textAnimationForward(this.servicesDescription);
 
                     // animating is set to false at end of animation so next animation can be triggered
-                    this.animating = false;
+                    //this.animating = false;
                     this.scenes[1].cameraAnimating = false;  
 
                     this.states[1].state = 'middle';
@@ -515,7 +525,7 @@ export default class AnimationController{
 
                     this.scenes[2].cameraAnimating = false;
 
-                    this.animating = false;
+                    //this.animating = false;
 
                     this.states[2].state = 'middle';
 
@@ -536,7 +546,7 @@ export default class AnimationController{
                 gsap.to(this.scenes[0].camera.rotation, { x: -1.5478153800680585, delay: 0.2, duration: 2., ease: "back.inOut(1.7)",  onComplete: () => {                    
                     this.titleTextAnimationForward(this.homePageText);
 
-                    this.animating = false;
+                    //this.animating = false;
                     
                     this.scenes[0].cameraAnimating = false;
                     //this.scenes[1].cameraAnimating = true;
@@ -579,13 +589,15 @@ export default class AnimationController{
                     }, onComplete: () => this.states[2].state = 'up'
                 });                                
 
+                //this.scenes[3].angleRotation = 1.8;
+                this.scenes[3].angleRotation = Math.PI;                
 
-                gsap.to(this.scenes[3], { angleRotation: 0, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                          
+                gsap.to(this.scenes[3], { angleRotation: 0, delay: 0., duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                          
                         this.titleTextAnimationForward(this.contactPageText) 
                         this.textAnimationForward(this.contactPageDescription);
                         this.textAnimationForward(this.contactPageLink);
 
-                        this.animating = false;
+                        //this.animating = false;
 
                         this.scenes[3].animating = true;         
                     }
@@ -616,7 +628,7 @@ export default class AnimationController{
 
                          this.states[1].state = 'middle';
 
-                         this.animating = false;
+                         //this.animating = false;
 
                          this.mouseControl.resetMouseControls();                         
                     }
@@ -645,7 +657,7 @@ export default class AnimationController{
                 gsap.to(this, {
                     progressAnimation3: Math.PI,
                     duration: 0.95,
-                    delay: .15,
+                    //delay: .15,
                     ease: "expo.out",
                     onComplete: () => this.updateScenePass(this.scenes[2])
                 });
@@ -662,7 +674,7 @@ export default class AnimationController{
 
                     this.states[2].state = 'middle';
 
-                    this.animating = false;
+                    //this.animating = false;
 
                 }});                                
 
@@ -699,7 +711,9 @@ export default class AnimationController{
                 xPercent: 0,
                 display: 'block',
                 opacity: 1,
-                onComplete: () => {}
+                onComplete: () => {
+                    this.animating = false
+                }
             }
         );     
     }
@@ -734,12 +748,11 @@ export default class AnimationController{
             duration: 0.5,
             xPercent: 0,
             display: 'block',
-            opacity: 1,
+            opacity: 1
         });     
     }
 
     textAnimationBackward(text){
-        console.log(text)
         gsap.fromTo(text, {
             yPercent: 0,
             xPercent: 0,
@@ -775,24 +788,26 @@ export default class AnimationController{
     }
 
     updateSceneFromMenu(currentIndex){
-        this.indexLessThan = (currentIndex < this.lastSceneIndex) ? false : true;
+        if(!this.animating){
 
-        if(currentIndex < this.nextSceneIndex){
-            this.timeDirection = 1
-        }
-        else{
-            this.timeDirection = -1
+            this.indexLessThan = (currentIndex < this.lastSceneIndex) ? false : true;
+
+            if(currentIndex < this.nextSceneIndex){
+                this.timeDirection = 1
+            }
+            else{
+                this.timeDirection = -1
+            }
+            // checking to see if the same li was clicked twice and if the scene is currently animating
+            if(this.lastSceneIndex !== currentIndex){
+                this.sceneIndex = currentIndex;
+                this.updateActiveMenuItem();
+                this.cameraAnimation(this.states[this.lastSceneIndex], this.states[currentIndex], this.indexLessThan);        
+            }
+
+            this.lastSceneIndex = currentIndex;
         }
 
-        // checking to see if the same li was clicked twice and if the scene is currently animating
-        if(this.lastSceneIndex !== currentIndex && this.animating === false){
-            this.sceneIndex = currentIndex;
-            this.updateActiveMenuItem();
-            this.cameraAnimation(this.states[this.lastSceneIndex], this.states[currentIndex], this.indexLessThan);        
-        }
-
-        //this.updateSlideAnimation();                 
-        this.lastSceneIndex = currentIndex;
     }
 
     updateAnimation(){    
@@ -817,8 +832,6 @@ export default class AnimationController{
         }
 
         this.mouseControl.addFrictionDecay();
-
-        console.log(this.contactPageText)
 
         this.scenes[0].updateCamera(this.mouseControl.mouseDiff);
         this.scenes[1].updateCamera(this.mouseControl.mouseDiff); 

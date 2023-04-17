@@ -14,12 +14,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
 
-//import laptop from './lp53Draco.glb';
-//import laptop from './lp51Draco.glb';
-//import laptop from './lp52.glb';
-//import laptop from './lp53.glb';
-//import laptop from './lp54.glb';
-import laptop from './scene.glb';
+//import laptop from './scene.glb';
+import laptop from './scene3.glb';
 
 
 import postFragmentShader from './shaders/postFragment.js';
@@ -33,6 +29,7 @@ import css from '../css/style.css'
 import errorImage from './textures/error.png';
 import fixedErrorImage from './textures/fixed-blue-screen.png';
 import env from './textures/galaxy.jpg';
+//import env from './textures/neonLights2.jpeg';
 
 //import env from './textures/pink.jpeg';
 
@@ -87,14 +84,16 @@ export default class ServicesPage
 
       obj.scene.traverse((obj) => {
 
-
+        if(obj.name === "Cube002_Laptop_0003"){
+          //obj.material.envMapIntensity = 2.5;
+        }
 
         if(obj.name === 'Spot'){
           this.light = obj;
         }
 
         if(obj.name === 'Cube002'){
-          //obj.material.envMapIntensity = 2;
+          obj.material.envMapIntensity = 2;
           obj.material.roughness = 0.8;
           obj.material.metalness = 1;          
           //const mat = new THREE.MeshStandardMaterial({metalness: 0.5, roughness: 0.8});
@@ -149,7 +148,7 @@ export default class ServicesPage
         bloomRadius: 1.
         */
         exposure: 3.,
-        bloomStrength: .05,        
+        bloomStrength: .1,        
         bloomThreshold: 0.1,
         bloomRadius: 1.
       };
@@ -216,10 +215,11 @@ export default class ServicesPage
       //this.composer.addPass(this.effectPass);
       //this.composer.addPass(this.shaderPass);
       //this.composer.addPass(this.bokeh);
-      ///this.composer.addPass(this.bloomPass);      
+      //this.composer.addPass(this.bloomPass);      
 
       //this.passes = [this.renderPass, this.shaderPass, this.bokeh, this.bloomPass];
       this.passes = [this.renderPass, this.shaderPass, this.bloomPass];      
+      //this.passes = [this.renderPass, this.shaderPass];            
       //this.passes = [this.renderPass];            
       //this.passes = [this.renderPass, this.effectPass];            
 

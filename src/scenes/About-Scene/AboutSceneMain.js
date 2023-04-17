@@ -14,14 +14,14 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
-import spaceImg from './textures/floor-emission.png';
+//import spaceImg from './textures/floor-emission.png';
+import spaceImg from './textures/neonLights2.jpeg';
 
 import numbersImg from './textures/c2.png';
 
-//import CoffeeSceneModel from './aboutSceneDraco.glb';
-//import CoffeeSceneModel from './aboutSceneDraco2.glb';
+
+import CoffeeSceneModel from './as4.glb';
 //import CoffeeSceneModel from './aboutSceneDraco3.glb';
-import CoffeeSceneModel from './as.glb';
 
 import wireFragmentShader from './shaders/wire-fragment';
 import wireVertexShader from './shaders/wire-vertex';
@@ -73,10 +73,6 @@ class AboutSceneMain{
 
         this.sceneLoaded = false;
 
-        loadingManager.onProgress = function(u, l, t){
-            console.log(u)
-          }
-
         const mathTexture = new THREE.TextureLoader().load(numbersImg, (tex) => {
             //this.renderer.initTexture(tex);
             tex.wrapS = THREE.RepeatWrapping;
@@ -101,8 +97,8 @@ class AboutSceneMain{
                     if(e.name === 'Cube'){
 
                         this.cube = e;
-                        //this.cube.material = new THREE.MeshStandardMaterial({ color: 0x333333, side: THREE.DoubleSide, metalness: 0.1, roughness: .6 });          
-                        this.cube.material = new THREE.MeshStandardMaterial({ color: 0x555555, side: THREE.DoubleSide });                                  
+                        this.cube.material = new THREE.MeshStandardMaterial({ color: 0x333333, side: THREE.DoubleSide, metalness: 0, roughness: 1 });          
+                        //this.cube.material = new THREE.MeshStandardMaterial({ color: 0x555555, side: THREE.DoubleSide });                                  
 
                         e.material.needsUpdate = true;
                     }
@@ -154,9 +150,8 @@ class AboutSceneMain{
                     }
 
                     if(e.name == 'Cube001'){
-                        //console.log(e)
-                        //const mat = new THREE.MeshBasicMaterial({ map: floorTexture });
-                        const mat = new THREE.MeshBasicMaterial({ color: 0x00001 });                        
+                        //const mat = new THREE.MeshBasicMaterial({ color: 0x000011 });                        
+                        const mat = new THREE.MeshStandardMaterial({ color: 0x000011, roughness: 1, metalness: 0 });                                                
                         e.material = mat;
                         e.material.needsUpdate = true;
 
@@ -196,13 +191,15 @@ class AboutSceneMain{
                           vec2 uv = vUv;
 
                           vec2 uv2 = fract(uv * 140.0);
+                          //vec2 uv2 = fract(uv * 80.0);                          
                                     
-                          uv2.x -= fract(uv2.x + (time * 0.5 + (displacement.x)) - uv.x * uv.x - uv2.x * uv.x); 
+                          uv2.x -= fract(uv2.x + (time * 0.5 + (displacement.x)) - uv.x * uv.x - uv2.x * uv.x);
                           //uv2.x -= fract(uv2.x + (time * 0.5) - uv.x * uv.x - uv2.x * uv.x); 
 
                           float dist = 1.0 / length(uv2 - 0.5);                          
                           
                           dist *= .3;                          
+                          //dist *= .25;                                                    
                       
                           // Time varying pixel color
                           vec3 col = vec3(dist);
@@ -219,7 +216,7 @@ class AboutSceneMain{
                           
                           //col *= mix(colors, diffuseColor2.xyz, 0.2);
 
-                          diffuseColor2.xyz *= col * log(col);     
+                          diffuseColor2.xyz *= col * log(col * col);     
 
                           //fragColor = diffuseColor2;           
                           diffuseColor += diffuseColor2 + (vec4(diffuse, opacity) );    
@@ -227,7 +224,7 @@ class AboutSceneMain{
                           `)
                   
                         this.mod.material.userData.shader = shader;
-                        this.mod.material.envMapIntensity = 0.1;
+                        this.mod.material.envMapIntensity = 0.6;
                   
                       }
 
@@ -249,6 +246,7 @@ class AboutSceneMain{
             this.camera.aspect = window.innerWidth / window.innerHeight;
 
             this.camera.fov = (this.camera.aspect < 1) ? 30 : this.camera.fov;    
+            //this.camera.fov = 50;                
 
             this.camera.updateProjectionMatrix();
 
@@ -258,11 +256,11 @@ class AboutSceneMain{
 
             const params = {
                 exposure: 1,
-                bloomStrength: 0.3,
-                //bloomStrength: 0.5,                
+                bloomStrength: 0.1,
+                //bloomStrength: 0.5,              
                 //bloomThreshold: 0.001,                
                 bloomThreshold: 0.,
-                bloomRadius: 0.1
+                bloomRadius: 0.01
               };
 
             this.composer = new EffectComposer(this.renderer);
@@ -280,10 +278,10 @@ class AboutSceneMain{
 
       
             this.bokeh = new BokehPass(this.scene, this.camera, {
-                focus: 1.,    
+                focus: 5.,    
                 //aperture: .01,
-                aperture: .0005,    
-                maxblur: 0.9,
+                aperture: .001,    
+                maxblur: 0.01,
       
               width: window.innerWidth,
               height: window.innerHeight
@@ -312,8 +310,10 @@ class AboutSceneMain{
             this.composer.addPass(this.renderPass);
             this.composer.addPass(this.postBloom);
             this.composer.addPass(this.bloomPass);            
+            //this.composer.addPass(this.bokeh);                        
 
-            this.passes = [this.renderPass, this.postBloom, this.bloomPass];
+            //this.passes = [this.renderPass, this.postBloom, this.bloomPass, this.bokeh];
+            this.passes = [this.renderPass, this.postBloom, this.bloomPass];            
             //this.passes = [this.renderPass, this.bloomPass];            
             //this.passes = [this.renderPass, this.postBloom];                        
 

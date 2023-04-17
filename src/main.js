@@ -77,7 +77,7 @@ export default class Main
     //this.renderer.toneMapping = THREE.NoToneMapping
     //this.renderer.toneMapping = THREE.LinearToneMapping
     //this.renderer.toneMapping = THREE.ReinhardToneMapping
-    //this.renderer.toneMapping = THREE.CineonToneMapping
+    this.renderer.toneMapping = THREE.CineonToneMapping
     //this.renderer.toneMapping = THREE.ACESFilmicToneMapping
     //this.renderer.toneMapping = THREE.CustomToneMapping
 
@@ -165,11 +165,8 @@ export default class Main
       this.servicesPage.camera.rotation.x = 1;
       this.aboutPage.camera.rotateX(Math.PI / 2);  
 
-      //this.aboutPage.angleRotation = 3.14;
       this.contactPage.angleRotation = Math.PI / 2;    
       
-      //this.aboutPage.camera.quaternion.w = 0.206;
-      //this.aboutPage.camera.quaternion.x = 1.082;  
       //this.contactPage.camera.rotation.x = -Math.PI;
 
       this.mainSceneRenderer.updateRenderPass(this.homeScreen);
@@ -178,6 +175,9 @@ export default class Main
       //this.mainSceneRenderer.updateRenderPass(this.servicesPage);      
 
       this.allScenesLoaded = true;
+
+      // instantiating all gsap animations when scene cameras are loaded
+      //this.animationController.anime();
     }
 
   }
@@ -186,7 +186,7 @@ export default class Main
   animate(time){
     requestAnimationFrame( this.animate );
 
-    this.stats.update();
+    //this.stats.update();
 
     this.renderPlaneMaterial.uniforms.progressBarValue.value = this.animationController.loadingCounter;      
     this.renderPlaneMaterial.uniforms.radius.value = this.animationController.scrollYPosition;          
