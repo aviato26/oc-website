@@ -20,7 +20,7 @@ import spaceImg from './textures/neonLights2.jpeg';
 import numbersImg from './textures/c2.png';
 
 
-import CoffeeSceneModel from './as4.glb';
+import CoffeeSceneModel from './as5.glb';
 //import CoffeeSceneModel from './aboutSceneDraco3.glb';
 
 import wireFragmentShader from './shaders/wire-fragment';
@@ -224,7 +224,7 @@ class AboutSceneMain{
                           `)
                   
                         this.mod.material.userData.shader = shader;
-                        this.mod.material.envMapIntensity = 0.6;
+                        //this.mod.material.envMapIntensity = 0.6;
                   
                       }
 

@@ -277,7 +277,7 @@ export default class ServicesPage
       this.mouse.x = mousePos.x;
 
       // updating camera position according to users mouse position along the x axis
-      this.camera.position.x = mousePos.x * 0.8;
+      this.camera.position.x += mousePos.x * 0.05;
 
       //this.light.intensity += this.camera.position.x;
  
@@ -297,11 +297,12 @@ export default class ServicesPage
 
     this.time += 1 / 60;
 
-    // getting mouse vel and adding dampener to slowly dissepate mVel
-    
+    this.camera.position.x *= 0.8;
+
+    // getting mouse vel and adding dampener to slowly dissepate mVel    
     this.mouseDiff.subVectors(this.mouse, this.mouseLastPos);
     this.mVel.add(this.mouseDiff);
-    this.mVel.multiplyScalar(0.7);
+    this.mVel.multiplyScalar(0.8);
 
     
     // postMaterial for the blur bloom effect

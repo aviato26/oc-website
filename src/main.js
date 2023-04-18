@@ -65,6 +65,7 @@ export default class Main
     });
 
     this.renderer.outputEncoding = THREE.sRGBEncoding;
+    this.renderer.toneMappingExposure = 1.3;
     //this.renderer.setPixelRatio(window.devicePixelRatio);
 
     this.renderer.gammaOutput = true;
