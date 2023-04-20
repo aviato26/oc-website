@@ -29,7 +29,7 @@ export default class AnimationController{
         this.sceneIndex = 0;
 
         gsap.config({
-            //autoSleep: 60
+            autoSleep: 100000000
         });
 
         // variable to only trigger one animation event at a time
@@ -79,7 +79,7 @@ export default class AnimationController{
         this.menu = this.textSegments.menu;
 
         // adding move over element to li elements
-        this.mouseControl.addHoverOverElement(this.menu);
+        //this.mouseControl.addHoverOverElement(this.menu);
 
         this.homePageText = this.textSegments.addHomeScreenText();
 
@@ -259,7 +259,7 @@ export default class AnimationController{
                 get upwardAnimation(){
                     this.scene.camera.rotation.x = -0.22207473795343433;
                     if(this.state === 'middle'){
-                            return { x: 1, duration: 2., ease: "back.inOut(1.7)", onStart: () => {
+                            return { x: Math.PI / 2, duration: 2., ease: "back.inOut(1.7)", onStart: () => {
                                 this.parentContext.titleTextAnimationBackward(this.parentContext.servicesPageText) 
                                 this.parentContext.textAnimationBackward(this.parentContext.servicesDescription);  
                                 this.parentContext.scenes[0].cameraAnimating = true;                             
@@ -788,7 +788,10 @@ export default class AnimationController{
     }
 
     updateSceneFromMenu(currentIndex){
-        if(!this.animating){
+
+        let checkIfMenuIsActive = (document.activeElement.className === 'services-items active' || document.activeElement.className === 'services-items' ) ? true : false;
+ 
+        if(!this.animating && checkIfMenuIsActive){
 
             this.indexLessThan = (currentIndex < this.lastSceneIndex) ? false : true;
 
@@ -798,6 +801,7 @@ export default class AnimationController{
             else{
                 this.timeDirection = -1
             }
+
             // checking to see if the same li was clicked twice and if the scene is currently animating
             if(this.lastSceneIndex !== currentIndex){
                 this.sceneIndex = currentIndex;

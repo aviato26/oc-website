@@ -19,9 +19,7 @@ import spaceImg from './textures/neonLights2.jpeg';
 
 import numbersImg from './textures/c2.png';
 
-
-import CoffeeSceneModel from './as5.glb';
-//import CoffeeSceneModel from './aboutSceneDraco3.glb';
+import CoffeeSceneModel from './as6.glb';
 
 import wireFragmentShader from './shaders/wire-fragment';
 import wireVertexShader from './shaders/wire-vertex';
@@ -61,6 +59,25 @@ class AboutSceneMain{
 
         this.light.position.set(20, 1, 100);        
 
+        THREE.ShaderChunk.fog_fragment = `
+
+        #ifdef USE_FOG
+
+        #ifdef FOG_EXP2
+
+            float heightFactor = 10.5;
+            float fogFactor2 = heightFactor * exp(-0.5 * fogDensity) * ( 1.0 - exp( - fogDensity * fogDensity * vFogDepth * vFogDepth ) );
+            fogFactor2 = saturate(fogFactor2);
+
+            float fogFactor = 1.0 - exp( - fogDensity * fogDensity * vFogDepth * vFogDepth );
+        #else
+            float fogFactor = smoothstep( fogNear, fogFar, vFogDepth );
+        #endif
+            gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor * dot(length(vec2(.5) - vec2(0.)), 0.1) );
+        #endif
+        `
+
+        //this.scene.fog = new THREE.FogExp2(0xffffff, 0.1);
 
         this.renderBuffer = new THREE.WebGLRenderTarget(this.width, this.height);
 
@@ -85,9 +102,11 @@ class AboutSceneMain{
 
             this.cameraAnimation = model.animations;
 
-            //console.log(model)
+            //this.camera = ((this.width / this.height) < 1) ? model.cameras[1] : model.cameras[0];    
+
             this.camera = model.cameras[0];
 
+            console.log(THREE.ShaderChunk.fog_fragment)
 
             this.groupScene = new Group();
 
@@ -245,7 +264,7 @@ class AboutSceneMain{
             // need to update camera projection matrix of the rendered texture will be distorted
             this.camera.aspect = window.innerWidth / window.innerHeight;
 
-            this.camera.fov = (this.camera.aspect < 1) ? 30 : this.camera.fov;    
+            this.camera.fov = (this.camera.aspect < 1) ? 25 : this.camera.fov;    
             //this.camera.fov = 50;                
 
             this.camera.updateProjectionMatrix();
@@ -278,9 +297,9 @@ class AboutSceneMain{
 
       
             this.bokeh = new BokehPass(this.scene, this.camera, {
-                focus: 5.,    
+                focus: 3.,    
                 //aperture: .01,
-                aperture: .001,    
+                aperture: 0.1,    
                 maxblur: 0.01,
       
               width: window.innerWidth,

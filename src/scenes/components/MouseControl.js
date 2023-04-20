@@ -80,6 +80,9 @@ export default class MouseControl{
     mobileSceneUpdate(callback){            
         if(Math.abs(this.mobilePosDiff.y) > 111){                        
             callback(this.mobilePosDiff.y);
+
+            // resetting the user interaction displacement to 0
+            this.mobilePosDiff.y = 0;
         }
     }
 
@@ -117,13 +120,6 @@ export default class MouseControl{
 
     }
 
-    addHoverOverElement(element){
-        element.addEventListener('mouseover', (e) => {
-            if(e.fromElement.attributes['tabindex']){
-                //console.log(e.fromElement.attributes.tabindex.nodeValue)
-            };            
-        });
-    }
 
     cb(currentIndex, nextIndex){
        if(this.fn){
