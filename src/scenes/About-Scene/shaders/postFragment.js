@@ -60,7 +60,13 @@ const postFragmentShader =
         vec4 tex = texture(tDiffuse, uv);
   */      
         //gl_FragColor = finalColor;       
-        gl_FragColor = finalTexture;       
+
+        float edge = 0.2;
+
+        // this will put a faded edge around the screen
+        finalTexture *= (smoothstep(0., edge, uv.y)) * (1. - smoothstep(1. - edge, 1., uv.y));
+
+        gl_FragColor = finalTexture;      
         //gl_FragColor = tex;       
     }
 `;

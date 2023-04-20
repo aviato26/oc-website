@@ -79,7 +79,7 @@ class PageDesciption{
     addMenu(){        
         const container = document.createElement('div');
         container.className = 'menu';
-
+/*
         const d1 = document.createElement('div');
         d1.className = 'd1';
 
@@ -88,7 +88,7 @@ class PageDesciption{
         
         const d3 = document.createElement('div');                
         d3.className = 'd3';
-
+*/
         const ul = document.createElement('ul');
         ul.className = 'links';
 
@@ -127,7 +127,8 @@ class PageDesciption{
             li4
         );
 
-        container.append(d1, d2, ul, d3);
+        //container.append(d1, d2, ul, d3);
+        container.append(ul);        
         container.setAttribute('tabindex', 'nav-container');        
         
         //this.servicesContainer.appendChild(container);
