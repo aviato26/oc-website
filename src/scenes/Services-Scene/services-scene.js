@@ -243,7 +243,6 @@ export default class ServicesPage
 
 
       //this.animate();
-
   });
 
   this.cameraAnimating = true;
@@ -277,7 +276,7 @@ export default class ServicesPage
       this.mouse.x = mousePos.x;
 
       // updating camera position according to users mouse position along the x axis
-      this.camera.position.x += mousePos.x * 0.05;
+      this.camera.position.x += mousePos.x * 0.03;
 
       //this.light.intensity += this.camera.position.x;
  
@@ -315,7 +314,6 @@ export default class ServicesPage
 
 
     this.screenShader.uniforms.time.value = this.time;
-
 
     //this.composer.render();
 
