@@ -15,7 +15,14 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
 
 //import laptop from './scene.glb';
-import laptop from './scene3.glb';
+//import laptop from './scene3.glb';
+//import laptop from './noDraco.glb';
+//import laptop from './testDesign.glb';
+//import laptop from './testDesign2.glb';
+//import laptop from './t3.glb';
+//import laptop from './t1.glb';
+import laptop from './camera2.glb';
+//import laptop from './c3.glb';
 
 
 import postFragmentShader from './shaders/postFragment.js';
@@ -38,6 +45,8 @@ export default class ServicesPage
   constructor(parentRenderer, animationCallBack, loadingManager)
   {
     this.scene = new THREE.Scene();
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
 
     const wallLightMap = new THREE.TextureLoader().load(env, (img) => {
       //img.flipY = false;
@@ -71,22 +80,34 @@ export default class ServicesPage
 
     this.roomMaterial = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
 
+    /*
     const dracoLoader = new DRACOLoader();
 		dracoLoader.setDecoderPath('/draco/');
 		dracoLoader.setDecoderConfig( { type: 'js' } );
-
+    */
 
     this.model = new GLTFLoader(loadingManager);
-    this.model.setDRACOLoader(dracoLoader);    
+    //this.model.setDRACOLoader(dracoLoader);    
+
+    window.addEventListener('resize', (e) => {
+
+
+      //this.camera.aspect = window.innerWidth / window.innerHeight; //Camera aspect ratio.
+
+      if(this.camera.aspect < 1){
+        //this.camera.fov = 50;
+      } else{
+        //this.camera.fov = 31.849913175294404;
+      }
+
+      //this.camera.updateProjectionMatrix(); //Updating the display
+      this.renderer.setSize(window.innerWidth, window.innerHeight) //Setting the renderer to the height and width of the window.
+    });
 
     this.model.load(laptop, (obj) => {
 
 
       obj.scene.traverse((obj) => {
-
-        if(obj.name === "Cube002_Laptop_0003"){
-          //obj.material.envMapIntensity = 2.5;
-        }
 
         if(obj.name === 'Spot'){
           this.light = obj;
@@ -102,7 +123,8 @@ export default class ServicesPage
 
 
         if(obj.name === 'Cube'){
-          const mat = new THREE.MeshStandardMaterial({ color: 0x222222, side: THREE.DoubleSide, metalness: 0.1, roughness: .6 });          
+          //const mat = new THREE.MeshStandardMaterial({ color: 0x222222, side: THREE.DoubleSide, metalness: 0.1, roughness: .6 });          
+          const mat = new THREE.MeshStandardMaterial({ color: 0x000000, side: THREE.DoubleSide, metalness: 0.1, roughness: .6 });                    
           obj.material = mat;         
           //c.marterial.side = THREE.DoubleSide;
           //c.material.side = 3
@@ -121,14 +143,25 @@ export default class ServicesPage
       //console.log(obj)
 
       //console.log(this.cameraAnimation)
-
-      this.camera = obj.cameras[0];
+      
+      // checking aspect of the window to see if its a mobile device or larger
+      if((this.width / this.height) < 1){
+        this.camera = obj.cameras[1];
+      }
+      else{
+        this.camera = obj.cameras[0];
+      }
 
       this.camera.aspect = window.innerWidth / window.innerHeight;
 
-      this.camera.position.set(0, 0.07597390562295914, 0.12254553288221359);
+      // setting variable to reference the original spot the camera is looking at to rotate back to
+      this.cameraAngle = this.camera.rotation.x;
 
-      this.camera.fov = (this.camera.aspect < 1) ? 90 : this.camera.fov;    
+      //this.camera.fov = 70;    
+
+      //this.camera.position.set(0, 0.07597390562295914, 0.12254553288221359);
+      //console.log(this.camera.fov)
+      //this.camera.fov = (this.camera.aspect < 1) ? 60 : this.camera.fov;    
       //this.camera.fov = (this.camera.aspect < 1) ? 45 : 45;    
 
       //this.camera.rotation.x = Math.PI;
@@ -218,8 +251,8 @@ export default class ServicesPage
       //this.composer.addPass(this.bloomPass);      
 
       //this.passes = [this.renderPass, this.shaderPass, this.bokeh, this.bloomPass];
-      this.passes = [this.renderPass, this.shaderPass, this.bloomPass];      
-      //this.passes = [this.renderPass, this.shaderPass];            
+      //this.passes = [this.renderPass, this.shaderPass, this.bloomPass];      
+      this.passes = [this.renderPass, this.shaderPass];            
       //this.passes = [this.renderPass];            
       //this.passes = [this.renderPass, this.effectPass];            
 
@@ -240,7 +273,8 @@ export default class ServicesPage
 
       animationCallBack(this.scene, this.camera);
 
-
+      this.axis = new THREE.Vector3(1, 0, 0);
+      this.angleRotation = 0;
 
       //this.animate();
   });
@@ -281,9 +315,17 @@ export default class ServicesPage
       //this.light.intensity += this.camera.position.x;
  
       this.camera.position.x = Math.min(Math.max(this.camera.position.x, -.2), .2);      
-      
+      this.camera.rotation.y = Math.min(Math.max(this.camera.position.x, -.2), .2);            
+/*
+      this.scene.children[0].children.map(c => {
+        if(c.name !== 'Camera'){
+          c.rotateZ(mousePos.x);
+        }
+      })
+  */    
       // keeping the camera looking at the laptop no matter where the cameras position is placed
-      this.camera.lookAt(this.sceenPos);
+      //this.camera.lookAt(this.sceenPos);
+      //this.camera.lookAt(this.lookAtPoint);      
     }
   }
 
@@ -291,18 +333,16 @@ export default class ServicesPage
     this.cameraActive = !this.cameraActive;
   }
 
-
   renderScene(time){
 
     this.time += 1 / 60;
 
-    this.camera.position.x *= 0.8;
+    this.camera.position.x *= 0.9;
 
     // getting mouse vel and adding dampener to slowly dissepate mVel    
     this.mouseDiff.subVectors(this.mouse, this.mouseLastPos);
     this.mVel.add(this.mouseDiff);
     this.mVel.multiplyScalar(0.8);
-
     
     // postMaterial for the blur bloom effect
     this.postMaterial.uniforms.time.value = this.time;
@@ -312,8 +352,8 @@ export default class ServicesPage
     // after getting velocity setting last mouse position to current mouse position
     this.mouseLastPos.copy(this.mouse);
 
-
     this.screenShader.uniforms.time.value = this.time;
+
 
     //this.composer.render();
 

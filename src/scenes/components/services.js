@@ -21,11 +21,31 @@ class PageDesciption{
         // for mobile devices
         this.addMenu();
 
+        this.addScrollLabel();
+
         // for desktop devices
         //this.addNavBar();
 
+        this.servicesTextContainer = document.createElement('div');
+        this.servicesTextContainer.className = 'services-text-container';        
+
+        this.aboutTextContainer = document.createElement('div');
+        this.aboutTextContainer.className = 'about-text-container';                
+
+        this.contactTextContainer = document.createElement('div');
+        this.contactTextContainer.className = 'contact-text-container';                        
+
+        this.servicesContainer.append(this.servicesTextContainer);
+        this.servicesContainer.append(this.aboutTextContainer);        
+        this.servicesContainer.append(this.contactTextContainer);        
+
         // uncomment to add mark up to page
         document.body.appendChild(this.servicesContainer);
+
+        // getting all elements that will be animated when user clicks menu button
+        this.navMenuContainer = document.querySelector('.menu-text-containers');
+        this.menuBars = [...document.querySelectorAll('.menu-bars')];
+        this.canvas = document.querySelector('canvas');
     }
 
 
@@ -43,6 +63,33 @@ class PageDesciption{
         }
 
         return state;
+
+    }
+
+    addScrollLabel(){
+
+        const container = document.createElement('div');
+        container.className = 'scroll-down';        
+
+        const scroll = document.createElement('span');
+        const scrollText = document.createTextNode('Scroll Down');        
+        scroll.append(scrollText);           
+
+        container.append(scroll);
+
+        const arrowContainer = document.createElement('div');
+        arrowContainer.className = 'arrow-container';
+
+        const arrow = document.createElement('div');
+        arrow.className = 'long-arrow-right';
+
+        arrowContainer.append(arrow);
+        
+        container.append(arrowContainer);
+
+        this.scrollLabel = container;
+
+        this.servicesContainer.appendChild(container);
 
     }
 
@@ -79,62 +126,84 @@ class PageDesciption{
     addMenu(){        
         const container = document.createElement('div');
         container.className = 'menu';
-/*
-        const d1 = document.createElement('div');
-        d1.className = 'd1';
-
-        const d2 = document.createElement('div');
-        d2.className = 'd2';
         
-        const d3 = document.createElement('div');                
-        d3.className = 'd3';
-*/
-        const ul = document.createElement('ul');
-        ul.className = 'links';
+        const bar1 = document.createElement('div');
+        const bar2 = document.createElement('div');
+        const bar3 = document.createElement('div');                
+        const barContainer = document.createElement('div');
 
-        const li1 = document.createElement('li');             
-        // adding tabindex attribute to the li element to be able to apply the css focus selector
-        li1.setAttribute('tabindex', "0"); 
-        li1.className = 'services-items';
+        bar1.className = 'menu-bars';
+        bar2.className = 'menu-bars';
+        bar3.className = 'menu-bars';                
+        barContainer.className = 'menu-bars-container';
 
-        const li2 = document.createElement('li');                        
-        li2.setAttribute('tabindex', '1');
-        li2.className = 'services-items';
+        barContainer.append(bar1, bar2, bar3);
 
-        const li3 = document.createElement('li');                        
-        li3.setAttribute('tabindex', '2');
-        li3.className = 'services-items';
+        this.bodyContainer.append(barContainer);
 
-        const li4 = document.createElement('li');                                                
-        li4.setAttribute('tabindex', '3');        
-        li4.className = 'services-items';
+        const textContainers = document.createElement('div');
+        textContainers.className = 'menu-text-containers';
 
-        const home = document.createTextNode('Home');
-        const services = document.createTextNode('Services');
-        const about = document.createTextNode('About Us');
-        const contact = document.createTextNode('Contact Us');
-
-        li1.appendChild(home);
-        li2.appendChild(services);
-        li3.appendChild(about);
-        li4.appendChild(contact);
-
-        //console.log(services)
-        ul.append(
-            li1,
-            li2,
-            li3,
-            li4
-        );
-
-        //container.append(d1, d2, ul, d3);
-        container.append(ul);        
-        container.setAttribute('tabindex', 'nav-container');        
+        const homeTextContainers = document.createElement('div');
+        homeTextContainers.className = 'menu-text-item-containers';
         
-        //this.servicesContainer.appendChild(container);
-        this.bodyContainer.appendChild(container);
+        const servicesTextContainers = document.createElement('div');
+        servicesTextContainers.className = 'menu-text-item-containers';
+        
+        const aboutTextContainers = document.createElement('div');
+        aboutTextContainers.className = 'menu-text-item-containers';
+        
+        const contactTextContainers = document.createElement('div');
+        contactTextContainers.className = 'menu-text-item-containers';
 
-        this.menu = container;
+        const homeText = document.createElement('h2');
+        const homeTextNode = document.createTextNode(`Home`);
+        homeText.appendChild(homeTextNode);
+        homeTextContainers.append(homeText);
+        
+        const servicesText = document.createElement('h2');
+        const servicesTextNode = document.createTextNode(`Services`);
+        servicesText.appendChild(servicesTextNode);
+        servicesTextContainers.append(servicesText);        
+
+        const aboutText = document.createElement('h2');                
+        const aboutTextNode = document.createTextNode(`About`);
+        aboutText.appendChild(aboutTextNode);
+        aboutTextContainers.appendChild(aboutText);
+
+        const contactText = document.createElement('h2');
+        const contactTextNode = document.createTextNode(`Contact`);
+        contactText.appendChild(contactTextNode);        
+        contactTextContainers.appendChild(contactText);
+
+        const homeDescription = document.createElement('h3');
+        const homeDescTextNode = document.createTextNode(`Back to the start`);
+        homeDescription.appendChild(homeDescTextNode);
+        homeTextContainers.append(homeDescription);        
+
+        const servicesDescription = document.createElement('h3');
+        const servicesDescTextNode = document.createTextNode(`Learn more about what we do`);
+        servicesDescription.appendChild(servicesDescTextNode);
+        servicesTextContainers.append(servicesDescription);
+
+        const aboutDescription = document.createElement('h3');
+        const aboutDescTextNode = document.createTextNode(`Who we are`);
+        aboutDescription.appendChild(aboutDescTextNode);
+        aboutTextContainers.append(aboutDescription);
+        
+        const contactDescription = document.createElement('h3');                        
+        const contactDescTextNode = document.createTextNode(`Get in touch`);
+        contactDescription.appendChild(contactDescTextNode);
+        contactTextContainers.append(contactDescription);
+
+        textContainers.append(homeTextContainers, servicesTextContainers, aboutTextContainers, contactTextContainers);
+
+        this.bodyContainer.append(textContainers);
+        
+        //his.servicesContainer.appendChild(container);
+        //this.bodyContainer.appendChild(container);
+
+        //this.menu = container;
     }
 
 
@@ -201,17 +270,30 @@ class PageDesciption{
         let li;
         let allText;
         let textNode;
+        let textContainer;
         
         div = document.createElement('div');
-        ul = document.createElement('ul');
+        //ul = document.createElement('ul');
+        ul = document.createElement('div');        
         div.className = className;
         ul.className = 'services-list';
         
         allText = text.map(t => {
-            li = document.createElement('li');
-            textNode = document.createTextNode(t);
-            li.appendChild(textNode);            
-            ul.appendChild(li);            
+
+            textContainer = document.createElement('div');
+
+            t.split('').map(c => {
+                ///li = document.createElement('li');
+                li = document.createElement('p');                
+                textNode = document.createTextNode(c);
+                li.appendChild(textNode);            
+
+                textContainer.append(li);
+            })
+
+
+            ul.append(textContainer);            
+
         })
 
         div.appendChild(ul);
@@ -225,28 +307,44 @@ class PageDesciption{
     addHomeScreenText(){
 
         //this.removeAllNodes();        
-        const homePage = this.addSeperatedElement('Professional Technology Assistance', 'title-header');        
+        //const homePage = this.addSeperatedElement('Professional Technology Assistance', 'title-header');        
+        const homePage = this.addTextElement(`The most comprehensive
+         IT support`, 'home-title');                
+
+        const homePageDescription = this.addTextElement(`No technical language
+        just words that you understand.`, 'home-description');                        
+
         
         const container = document.createElement('div');
-        container.className = 'text-container';
-
-        container.append(...homePage);
+        container.append(homePage, homePageDescription);
+        container.className = 'home-text-container';
         this.servicesContainer.appendChild(container);
+        //container.className = 'text-container';
 
-        return homePage;
+        //container.append(...homePage);
+        //this.servicesContainer.appendChild(container);
+
+        //return [homePage, homePageDescription];
+        return [container, homePage, homePageDescription];        
+        //return homePage;        
     }
 
     addServicesScreenText(){
         //this.removeAllNodes();
         //const servicesPage = this.addSeperatedElement('Services');
         const servicesPage = this.addTextElement('Services', 'services-title');
+        //return [homePage, homePageDescription];
+        this.servicesTextContainer.append(servicesPage);
+
         return servicesPage;
     }
 
     addServicesDescription(){
         //const servicesDescription = this.addTextElement("Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum", 'page-description');
         //const servicesDescription = this.addServicesElement(['IT Consulting', 'Repair and Installation', 'Data visualization and analysis', 'Database Design'], 'page-description');
-        const servicesDescription = this.addServicesElement(['IT Consulting', 'Repair and Installation', 'Data visualization', 'Database Design'], 'services-container');        
+        const servicesDescription = this.addServicesElement(['IT Consulting', 'Repair - Install', 'Web Development', 'Database Design'], 'services-container');        
+        //const servicesDescription = this.addSeperatedElement(`IT Consulting, Repair - Install Web Development Database Design`, 'services-container');        
+        this.servicesTextContainer.append(servicesDescription);        
         return servicesDescription;
     }
 
@@ -254,6 +352,7 @@ class PageDesciption{
         //this.removeAllNodes();
         //const aboutPage = this.addSeperatedElement('About-Us', 'about-us-section page-section');
         const aboutPage = this.addTextElement('About Us', 'about-title');        
+        this.aboutTextContainer.append(aboutPage);
         return aboutPage;
     }
 
@@ -262,6 +361,7 @@ class PageDesciption{
         //const aboutPage = this.addSeperatedElement('About-Us', 'about-us-section page-section');
         //const aboutScreenDescription = this.addTextElement("Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum", 'page-description');
         const aboutScreenDescription = this.addTextElement("We are an IT company located in sunny los angeles california powered by coffee and tech.", 'page-description');        
+        this.aboutTextContainer.append(aboutScreenDescription);        
         return aboutScreenDescription;
     }
 
@@ -269,16 +369,22 @@ class PageDesciption{
         //this.removeAllNodes();
         //const contactPage = this.addSeperatedElement('Contact Us');
         const contactPage = this.addTextElement('Contact Us', 'contact-title');       
+
+        this.contactTextContainer.append(contactPage);
         return contactPage;
     }
 
     addContactDescription(){
         const contactScreenDescription = this.addTextElement("Address", 'contact-description');                
+        this.contactTextContainer.append(contactScreenDescription);
+        
         return contactScreenDescription;
     }
 
     addContactMailTo(){
         const contactMailTo = this.addHyperLink("Email Address", 'contact-description');     
+        this.contactTextContainer.append(contactMailTo);
+
         return contactMailTo;           
     }
     

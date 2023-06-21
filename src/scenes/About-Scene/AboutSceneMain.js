@@ -12,6 +12,8 @@ import postVertexShader from './shaders/postVertex';
 
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
+import * as dat from 'dat.gui';
+
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
 //import spaceImg from './textures/floor-emission.png';
@@ -19,7 +21,13 @@ import spaceImg from './textures/neonLights2.jpeg';
 
 import numbersImg from './textures/c2.png';
 
-import CoffeeSceneModel from './as6.glb';
+//import CoffeeSceneModel from './as6.glb';
+//import CoffeeSceneModel from './noDraco.glb';
+//import CoffeeSceneModel from './testDesign2.glb';
+//import CoffeeSceneModel from './testDesign3.glb';
+//import CoffeeSceneModel from './testDesign4.glb';
+import CoffeeSceneModel from './t2.glb';
+//import CoffeeSceneModel from './nd.glb';
 
 import wireFragmentShader from './shaders/wire-fragment';
 import wireVertexShader from './shaders/wire-vertex';
@@ -81,12 +89,30 @@ class AboutSceneMain{
 
         this.renderBuffer = new THREE.WebGLRenderTarget(this.width, this.height);
 
+        //this.gui = new dat.GUI();
+
+        window.addEventListener('resize', (e) => {
+
+
+            this.camera.aspect = window.innerWidth / window.innerHeight; //Camera aspect ratio.
+        /*
+            if(this.camera.aspect < 1){
+              this.camera.fov = 50;
+            } else{
+              this.camera.fov = 31.849913175294404;
+            }
+        */
+            this.camera.updateProjectionMatrix(); //Updating the display
+            this.renderer.setSize(window.innerWidth, window.innerHeight) //Setting the renderer to the height and width of the window.
+          });
+
+/*
         const dracoLoader = new DRACOLoader();
 		dracoLoader.setDecoderPath('/draco/');
 		dracoLoader.setDecoderConfig( { type: 'js' } );
-
+*/
         this.modelLoader = new GLTFLoader(loadingManager);
-        this.modelLoader.setDRACOLoader(dracoLoader);        
+        //this.modelLoader.setDRACOLoader(dracoLoader);        
 
         this.sceneLoaded = false;
 
@@ -105,8 +131,6 @@ class AboutSceneMain{
             //this.camera = ((this.width / this.height) < 1) ? model.cameras[1] : model.cameras[0];    
 
             this.camera = model.cameras[0];
-
-            console.log(THREE.ShaderChunk.fog_fragment)
 
             this.groupScene = new Group();
 
@@ -209,16 +233,17 @@ class AboutSceneMain{
                           // Normalized pixel coordinates (from 0 to 1)
                           vec2 uv = vUv;
 
-                          vec2 uv2 = fract(uv * 140.0);
-                          //vec2 uv2 = fract(uv * 80.0);                          
+                          //vec2 uv2 = fract(uv * 140.0);
+                          vec2 uv2 = fract(uv * 40.0);                          
                                     
                           uv2.x -= fract(uv2.x + (time * 0.5 + (displacement.x)) - uv.x * uv.x - uv2.x * uv.x);
                           //uv2.x -= fract(uv2.x + (time * 0.5) - uv.x * uv.x - uv2.x * uv.x); 
 
                           float dist = 1.0 / length(uv2 - 0.5);                          
-                          
-                          dist *= .3;                          
-                          //dist *= .25;                                                    
+                          //float dist = length(uv2 - 0.5);                                                    
+
+                          //dist *= 0.3;                          
+                          dist *= .2;                                                    
                       
                           // Time varying pixel color
                           vec3 col = vec3(dist);
@@ -297,10 +322,12 @@ class AboutSceneMain{
 
       
             this.bokeh = new BokehPass(this.scene, this.camera, {
-                focus: 3.,    
+                //focus: 1.,    
+                focus: 14.7,                    
                 //aperture: .01,
-                aperture: 0.1,    
-                maxblur: 0.01,
+                //aperture: 0.01,    
+                aperture: 10.,                    
+                maxblur: 0.001,
       
               width: window.innerWidth,
               height: window.innerHeight
@@ -328,11 +355,23 @@ class AboutSceneMain{
 
             this.composer.addPass(this.renderPass);
             this.composer.addPass(this.postBloom);
-            this.composer.addPass(this.bloomPass);            
-            //this.composer.addPass(this.bokeh);                        
+            //this.composer.addPass(this.bloomPass);            
+            this.composer.addPass(this.bokeh);                        
+
+            /*
+            const cubeFolder = this.gui.addFolder('Bokeh')
+            cubeFolder.add(this.bokeh.uniforms.focus, 'value', 0, 50)
+            cubeFolder.add(this.bokeh.uniforms.aperture, 'value', 0, 10)
+            cubeFolder.add(this.bokeh.uniforms.maxblur, 'value', 0, 0.01)
+            //cubeFolder.add(this.bokeh.uniforms.farClip, 'value', 0, 1000)
+            //cubeFolder.add(this.bokeh.uniforms.nearClip, 'value', 0, 1000)
+            //cubeFolder.open()
+            */
+
 
             //this.passes = [this.renderPass, this.postBloom, this.bloomPass, this.bokeh];
-            this.passes = [this.renderPass, this.postBloom, this.bloomPass];            
+            this.passes = [this.renderPass, this.postBloom, this.bokeh];            
+            //this.passes = [this.renderPass, this.postBloom, this.bloomPass];            
             //this.passes = [this.renderPass, this.bloomPass];            
             //this.passes = [this.renderPass, this.postBloom];                        
 
@@ -387,7 +426,7 @@ class AboutSceneMain{
         
         this.mod.material.userData.shader.uniforms.time.value = this.time;        
         this.mod.material.userData.shader.uniforms.displacement.value = this.displacement;        
-        
+  
     }
 
     initialRender(){

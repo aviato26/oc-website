@@ -21,7 +21,8 @@ import spaceImg from './textures/neonLights2.jpeg';
 
 //import cpu from './cpu3Draco.glb';
 //import cpu from './cpu2.glb';
-import cpu from './test.glb';
+//import cpu from './test.glb';
+import cpu from './noDraco.glb';
 
 import floorFragmentShader from './shaders/floor/floorFragmentShader.js';
 import floorVertexShader from './shaders/floor/floorVertexShader.js';
@@ -50,19 +51,34 @@ this.environmentMap = new TextureLoader().load(spaceImg, (img) => {
   });
 
 
+  window.addEventListener('resize', (e) => {
 
+
+    this.camera.aspect = window.innerWidth / window.innerHeight; //Camera aspect ratio.
+/*
+    if(this.camera.aspect < 1){
+      this.camera.fov = 50;
+    } else{
+      this.camera.fov = 31.849913175294404;
+    }
+*/
+    this.camera.updateProjectionMatrix(); //Updating the display
+    this.renderer.setSize(window.innerWidth, window.innerHeight) //Setting the renderer to the height and width of the window.
+  });
 
     //this.clock = new THREE.Clock();
 
     this.renderer = parentRenderer;
     //this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
+/*
 const dracoLoader = new DRACOLoader();
 dracoLoader.setDecoderPath('/draco/');
 dracoLoader.setDecoderConfig( { type: 'js' } );
+*/
 
 this.model = new GLTFLoader(loadingManager);
-this.model.setDRACOLoader(dracoLoader);        
+//this.model.setDRACOLoader(dracoLoader);        
 
 const floorTex = new TextureLoader().load(floorTexture);
 
@@ -110,11 +126,12 @@ logoTex.flipY = false;
   this.wires = obj.scene.getObjectByName('path7');
 
 
-  this.t.material.emissiveIntensity = 0.8;
+  //this.t.material.emissiveIntensity = 0.8;
+  this.t.material.emissiveIntensity = 0.4;  
   //this.t.material.metalness = 0.7;
   //this.t.material.roughness = 1;
 
-  this.cpu.material.envMapIntensity = 0.3;
+  this.cpu.material.envMapIntensity = 0.2;  
   //this.cpu.material.envMapIntensity = 0.5;  
   this.cpu.material.metalness = .9;
   //cube.material.roughness = 0.3;  
