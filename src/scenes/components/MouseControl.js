@@ -21,14 +21,15 @@ export default class MouseControl{
 
         this.fn = null;
 
-        this.init();
+        this.navAnimationSwitch = false;        
+
+        //this.init();
     }
 
     init(){
         //this.wheelEvent();
         //this.mouseMove();
-
-        this.updateLargeDeviceScenes();
+        //this.updateLargeDeviceScenes();
     }
 
     mobileControls(callback){
@@ -92,10 +93,21 @@ export default class MouseControl{
         });
     }
 
-    updateLargeDeviceScenes(){
+    updateLargeDeviceScenes(navMenuCallBack){
 
         document.addEventListener('mousedown', (e) => {
             this.userMouseDown = true;
+
+            if((e.target.className === 'menu-bars-container' || e.target.className === 'menu-bars')){
+                if(this.navAnimationSwitch === false){
+                    navMenuCallBack.play();
+                    this.navAnimationSwitch = !this.navAnimationSwitch;                      
+                }
+                else{
+                    navMenuCallBack.reverse();
+                    this.navAnimationSwitch = !this.navAnimationSwitch;
+                }
+            }
 
             if(e.target.attributes.tabindex && e.target.attributes.tabindex.nodeValue !== 'nav-container'){
                 this.currentElement = e.target.attributes.tabindex.nodeValue;
@@ -125,6 +137,10 @@ export default class MouseControl{
        if(this.fn){
         this.fn(currentIndex, nextIndex);
        }
+    }
+
+    navMenu(callback){
+        console.log(callback)
     }
 
 

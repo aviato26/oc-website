@@ -27,7 +27,9 @@ const postFragmentShader =
         vec4 originalTex = texture(tDiffuse, uv);
 
         vec2 center = vec2(0.5, 0.4) - uv;
-        //vec2 center = vec2(dot(vec2(uv - 0.5), cameraPos.xy));
+        //vec2 center = vec2(0.5) - uv;       
+        //vec2 center = uv - 0.5;               
+        //vec2 center = vec2(dot(uv, vec2(.5, -0.5)));
 
         vec4 color = vec4(0);
         float total = 0.0;
@@ -39,13 +41,16 @@ const postFragmentShader =
             float weight = sin(lerp * 3.14159);
 
             //vec4 sampleT = texture(tDiffuse, uv + center * lerp * .29 );
-            vec4 sampleT = texture(tDiffuse, uv + center * lerp * .60 );            
+            //vec4 sampleT = texture(tDiffuse, uv + center );            
+            vec4 sampleT = texture(tDiffuse, uv + center * lerp * 0.6 );                        
+            
             sampleT.rgb *= sampleT.a + (abs(sin(time)) * 0.2);
             color += sampleT * weight;
         }
 
-        color.a = 1.0;
-        color.rgb /= 4.;
+        //color.a = 1.0;
+        //color.rgb /= 4.;
+        color.rgb /= 8.;        
 
         vec4 finalColor = 1.0 - (1.0 - color) * (1.0 - originalTex);
 
@@ -62,6 +67,7 @@ const postFragmentShader =
   */      
         //gl_FragColor = finalColor;       
         gl_FragColor = finalTexture;       
+        //tex += texture(tDiffuse, uv + center * 0.1);
         //gl_FragColor = tex;       
     }
 `;

@@ -65,7 +65,8 @@ export default class Main
     });
 
     this.renderer.outputEncoding = THREE.sRGBEncoding;
-    this.renderer.toneMappingExposure = 1.3;
+    //this.renderer.toneMappingExposure = 1.3;
+    this.renderer.toneMappingExposure = 1.8;    
     //this.renderer.setPixelRatio(window.devicePixelRatio);
 
     this.renderer.gammaOutput = true;
@@ -78,8 +79,8 @@ export default class Main
     //this.renderer.toneMapping = THREE.NoToneMapping
     //this.renderer.toneMapping = THREE.LinearToneMapping
     //this.renderer.toneMapping = THREE.ReinhardToneMapping
-    this.renderer.toneMapping = THREE.CineonToneMapping
-    //this.renderer.toneMapping = THREE.ACESFilmicToneMapping
+    //this.renderer.toneMapping = THREE.CineonToneMapping
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping
     //this.renderer.toneMapping = THREE.CustomToneMapping
 
     this.renderer.domElement.style.position = 'fixed';
@@ -164,16 +165,17 @@ export default class Main
 
       // once scene has been rendered moving camera to look away from objects so it will be set for the rotating animation
       //this.servicesPage.camera.rotation.x = 1;
-      this.aboutPage.camera.rotateX(Math.PI / 2);  
+      //this.aboutPage.camera.rotateX(Math.PI / 2);  
 
-      this.contactPage.angleRotation = Math.PI;    
+      //this.contactPage.angleRotation = Math.PI;    
       
       //this.contactPage.camera.rotation.x = -Math.PI;
 
-      //this.mainSceneRenderer.updateRenderPass(this.homeScreen);
+      this.mainSceneRenderer.updateRenderPass(this.homeScreen);
       //this.mainSceneRenderer.updateRenderPass(this.aboutPage);
       //this.mainSceneRenderer.updateRenderPass(this.contactPage);      
-      this.mainSceneRenderer.updateRenderPass(this.servicesPage);      
+      //this.mainSceneRenderer.updateRenderPass(this.servicesPage);      
+
 
       this.allScenesLoaded = true;
 
@@ -192,7 +194,10 @@ export default class Main
     this.renderPlaneMaterial.uniforms.progressBarValue.value = this.animationController.loadingCounter;      
     this.renderPlaneMaterial.uniforms.radius.value = this.animationController.scrollYPosition;          
 
-
+    //this.animationController.updateAnimation();
+    //this.bufferSceneTexture = this.mainSceneRenderer.renderScene();                 
+    //this.renderPlaneMaterial.uniforms.mainScene.value = this.bufferSceneTexture;
+    
     if(this.allScenesLoaded){
       this.animationController.updateAnimation();
       this.bufferSceneTexture = this.mainSceneRenderer.renderScene();             

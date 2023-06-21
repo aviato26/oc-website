@@ -9,7 +9,9 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
-import tunnelModel2 from './t-rigged.glb';
+//import tunnelModel2 from './t-rigged.glb';
+//import tunnelModel2 from './noDraco.glb';
+import tunnelModel2 from './t2.glb';
 
 
 class ContactSceneMain{
@@ -25,19 +27,34 @@ class ContactSceneMain{
         //this.camera = new THREE.PerspectiveCamera( 45, this.width / this.height, 1, 1000 );
     
         this.renderer = parentRenderer;
-
+/*
         const dracoLoader = new DRACOLoader();
 		dracoLoader.setDecoderPath('/draco/');
 		dracoLoader.setDecoderConfig( { type: 'js' } );
-
+*/
         this.modelLoader = new GLTFLoader(loadingManager);
-        this.modelLoader.setDRACOLoader(dracoLoader);
+        //this.modelLoader.setDRACOLoader(dracoLoader);
 
         this.mouse = new THREE.Vector2(0);
 
         this.sceneLoaded = false;
 
         this.angleRotation = 0;
+
+        window.addEventListener('resize', (e) => {
+
+
+            this.camera.aspect = window.innerWidth / window.innerHeight; //Camera aspect ratio.
+        /*
+            if(this.camera.aspect < 1){
+              this.camera.fov = 50;
+            } else{
+              this.camera.fov = 31.849913175294404;
+            }
+        */
+            this.camera.updateProjectionMatrix(); //Updating the display
+            this.renderer.setSize(window.innerWidth, window.innerHeight) //Setting the renderer to the height and width of the window.
+          });
 
         //this.texture = new THREE.TextureLoader().load();
 
@@ -176,9 +193,9 @@ class ContactSceneMain{
             this.renderPass = new RenderPass(this.scene, this.camera);
 
             const params = {
-                exposure: 3.,
+                exposure: 10.,
                 bloomStrength: 0.5,
-                bloomThreshold: .1,
+                bloomThreshold: .01,
                 bloomRadius: 1.
               };
 
@@ -193,7 +210,7 @@ class ContactSceneMain{
             this.mixer = new THREE.AnimationMixer(model.scene);
             this.clips = model.animations;
             this.action = this.mixer.clipAction(this.clips[0]);
-            this.action.timeScale = 0.02;
+            this.action.timeScale = 0.1;
             this.action.play();
 
             this.scene.add(model.scene);
@@ -245,7 +262,8 @@ class ContactSceneMain{
 
         this.t += 0.01;
 
-        this.updateCameraPos(this.time * -this.mouse.x - 0.0001);
+        //this.updateCameraPos(this.time * -this.mouse.x - 0.0001);
+        this.updateCameraPos(-this.time);        
         this.updateCameraRotationPos();
 
 
