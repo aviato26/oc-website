@@ -98,7 +98,7 @@ export default class MouseControl{
         document.addEventListener('mousedown', (e) => {
             this.userMouseDown = true;
 
-            if((e.target.className === 'menu-bars-container' || e.target.className === 'menu-bars')){
+            if((e.target.className === 'menu-bars-container' || e.target.className === 'menu-bars' || e.target.parentNode.className === 'menu-text-item-containers')){
                 if(this.navAnimationSwitch === false){
                     navMenuCallBack.play();
                     this.navAnimationSwitch = !this.navAnimationSwitch;                      
@@ -109,12 +109,19 @@ export default class MouseControl{
                 }
             }
 
+            if(e.target.parentNode.attributes.tabindex && e.target.parentNode.attributes.tabindex.nodeValue !== 'nav-container'){
+                this.currentElement = e.target.parentNode.attributes.tabindex.nodeValue;
+                this.currentElement = parseInt(this.currentElement);
+                this.cb(this.currentElement, e.target.parentNode.className);
+            }
+
+/*
             if(e.target.attributes.tabindex && e.target.attributes.tabindex.nodeValue !== 'nav-container'){
                 this.currentElement = e.target.attributes.tabindex.nodeValue;
                 this.currentElement = parseInt(this.currentElement);
                 this.cb(this.currentElement);
             }
-            
+  */          
         });
 
         document.addEventListener('mouseup', () => {
@@ -133,14 +140,10 @@ export default class MouseControl{
     }
 
 
-    cb(currentIndex, nextIndex){
+    cb(currentIndex, currentElement){
        if(this.fn){
-        this.fn(currentIndex, nextIndex);
+        this.fn(currentIndex, currentElement);
        }
-    }
-
-    navMenu(callback){
-        console.log(callback)
     }
 
 

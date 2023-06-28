@@ -146,15 +146,19 @@ class PageDesciption{
 
         const homeTextContainers = document.createElement('div');
         homeTextContainers.className = 'menu-text-item-containers';
+        homeTextContainers.tabIndex = 0;        
         
         const servicesTextContainers = document.createElement('div');
         servicesTextContainers.className = 'menu-text-item-containers';
+        servicesTextContainers.tabIndex = 1;
         
         const aboutTextContainers = document.createElement('div');
         aboutTextContainers.className = 'menu-text-item-containers';
+        aboutTextContainers.tabIndex = 2;
         
         const contactTextContainers = document.createElement('div');
         contactTextContainers.className = 'menu-text-item-containers';
+        contactTextContainers.tabIndex = 3;
 
         const homeText = document.createElement('h2');
         const homeTextNode = document.createTextNode(`Home`);
@@ -203,7 +207,7 @@ class PageDesciption{
         //his.servicesContainer.appendChild(container);
         //this.bodyContainer.appendChild(container);
 
-        //this.menu = container;
+        this.menu = barContainer;
     }
 
 

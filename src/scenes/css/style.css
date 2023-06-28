@@ -38,7 +38,6 @@ canvas{
 }
 
 .menu-text-containers{
-  z-index: 2;
   position: absolute;
   width: 100%;
   height: 100%;
@@ -47,11 +46,11 @@ canvas{
   justify-content: center;
   font-family: sans-serif;
   opacity: 0;
-  transition: opacity 1s ease;
 }
 
 .menu-bars-container{
   position: absolute;
+  display: none;
   right: 30px;
   top: 30px;
   z-index: 3;
@@ -73,7 +72,7 @@ canvas{
   text-decoration: underline;
   margin: 0;
 }
-
+/*
 .menu-bars-container:active .menu-bars:nth-child(1){
   transform: translate(0, 11px) rotate(-45deg);
 }
@@ -95,7 +94,7 @@ canvas{
 .menu-bars-container:active ~ canvas{
   opacity: 0.2;
 }
-
+*/
 .menu-text-item-containers h2{
   color: white;
   text-decoration: none;
@@ -110,18 +109,12 @@ canvas{
   background-size: 100% 2px;
 }
 
+
 section {
   width: 100%;
   height: 100%;
-  z-index: 2;
-  /*
-  display: flex;
-  flex-wrap: wrap;
-  */
   overflow: hidden;
   opacity: 1;
-  align-content: baseline;
-  transition: opacity 0.3s ease;
 }
 
 .text-container{
@@ -563,13 +556,18 @@ a:hover, a:focus {
   transition: transform 0.5s, max-height 0.3s, font-size 0.5s;
 }
 
-.services-items:hover{
+.menu-text-containers h2:hover{
   color: #7b8fff;
 }
 
+.active h2{
+  color: #FF00E9;
+}
+/*
 .active, .active:hover{
   color: #FF00E9;
 }
+*/
 /*
 .menu:hover .d1 {
   margin: 0;
@@ -579,12 +577,13 @@ a:hover, a:focus {
   opacity: 0;
   margin: 0;
 }
-*/
+
 .links:hover .services-items{
   transform: rotateZ(0);
   max-height: 1000px;
   font-size: 2vw;
 }
+*/
 /*
 .menu:hover .links {
   font-size: 2vw;
@@ -608,7 +607,7 @@ a:hover, a:focus {
     overflow: hidden;
     opacity: 1;
   
-    transition: opacity 0.5s linear;
+    /* transition: opacity 0.5s linear; */
   }
 
   .services-text-container{
@@ -708,7 +707,7 @@ a:hover, a:focus {
     transition: width 0.1s ease-out, max-height 0.5s ease-in-out;
     */
   }
-
+/*
   .services-items:hover{
     color: white;
   }
@@ -716,7 +715,7 @@ a:hover, a:focus {
   .active, .active:hover{
     color: #FF00E9;
   }
-
+*/
   .links:hover .services-items{
     transform: rotateZ(0);
     max-height: 1000px;
@@ -833,7 +832,7 @@ a:hover, a:focus {
     overflow: hidden;
     opacity: 1;
   
-    transition: opacity 0.5s linear;
+    /* transition: opacity 0.5s linear; */
   }
 
   .home-text-container{
@@ -1057,6 +1056,7 @@ a:hover, a:focus {
     max-height: 500px;
   }
 
+  /*
   .services-items:hover{
     color: white;
   }
@@ -1064,7 +1064,7 @@ a:hover, a:focus {
   .active, .active:hover{
     color: #FF00E9;
   }
-
+*/
   /*
   .links{
     display: block;
