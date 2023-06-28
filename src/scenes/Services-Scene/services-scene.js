@@ -92,7 +92,7 @@ export default class ServicesPage
     window.addEventListener('resize', (e) => {
 
 
-      //this.camera.aspect = window.innerWidth / window.innerHeight; //Camera aspect ratio.
+      this.camera.aspect = window.innerWidth / window.innerHeight; //Camera aspect ratio.
 
       if(this.camera.aspect < 1){
         //this.camera.fov = 50;
@@ -100,7 +100,7 @@ export default class ServicesPage
         //this.camera.fov = 31.849913175294404;
       }
 
-      //this.camera.updateProjectionMatrix(); //Updating the display
+      this.camera.updateProjectionMatrix(); //Updating the display
       this.renderer.setSize(window.innerWidth, window.innerHeight) //Setting the renderer to the height and width of the window.
     });
 
@@ -274,7 +274,7 @@ export default class ServicesPage
       animationCallBack(this.scene, this.camera);
 
       this.axis = new THREE.Vector3(1, 0, 0);
-      this.angleRotation = 0;
+      //this.angleRotation = 0;
 
       //this.animate();
   });

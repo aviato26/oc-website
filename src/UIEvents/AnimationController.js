@@ -67,7 +67,7 @@ export default class AnimationController{
         this.menuAnimationSwitch = false;
 
         // using spread operator to push items from nodelist to array
-        this.menuList = [...document.querySelectorAll('.services-items')];
+        this.menuList = [...document.querySelectorAll('.menu-text-item-containers')];
 
         // variable to check if the scene has a angleRotation variable
         this.cameraOrRotation = null;
@@ -139,14 +139,13 @@ export default class AnimationController{
         this.canvas = this.textSegments.canvas;
         this.mainTextContainer = this.textSegments.servicesContainer;
 
-        this.navTimeLine = gsap.timeline({ });
-        this.navTimeLine.to(this.menuBars[0], { y: 11, rotation: 45 }, 'start');        
-        this.navTimeLine.to(this.menuBars[1], { opacity: 0 }, 'start');                
-        this.navTimeLine.to(this.menuBars[2], { y: -11, rotation: -45 }, 'start');                        
-        this.navTimeLine.to(this.canvas, { opacity: 0.2,}, 'start');
-        this.navTimeLine.to(this.mainTextContainer, { opacity: 0, display: 'none' });
-        this.navTimeLine.to(this.navMenuContainer, { opacity: 1, display: 'flex', onComplete: () => this.menuAnimationSwitch = !this.menuAnimationSwitch });
-        this.navTimeLine.pause();
+        this.navTimeLine = gsap.timeline({ paused: true });
+        this.navTimeLine.to(this.menuBars[0], { y: 11, duration: 0.2, rotation: 45 }, 'start');        
+        this.navTimeLine.to(this.menuBars[1], { opacity: 0, duration: 0.2 }, 'start');                
+        this.navTimeLine.to(this.menuBars[2], { y: -11, duration: 0.2, rotation: -45 }, 'start');                        
+        this.navTimeLine.to(this.canvas, { opacity: 0.2, duration: 0.2 });
+        this.navTimeLine.to(this.mainTextContainer, { opacity: 0, display: 'none', duration: 0.2, });                
+        this.navTimeLine.to(this.navMenuContainer, { opacity: 1, duration: 0.2, display: 'flex', onComplete: () => this.menuAnimationSwitch = !this.menuAnimationSwitch });                    
 
         return this.navTimeLine;
     }
@@ -156,10 +155,10 @@ export default class AnimationController{
         this.menuList.forEach((item, index) => {
             if(index === this.sceneIndex){
                 //this.menuList[this.sceneIndex].className = 'services-items active'
-                item.className = 'services-items active'                
+                item.className = 'menu-text-item-containers active'                
             }
             else{
-                item.className = 'services-items'
+                item.className = 'menu-text-item-containers'
             }
 
         });
@@ -228,7 +227,7 @@ export default class AnimationController{
                 },
                 upwardAnimation:
                 { x: -1.5478153800680585, delay: 0.2, duration: 2., ease: "back.inOut(1.7)",  onComplete: () => {                    
-                        this.titleTextAnimationForward(this.homePageText);
+                        this.titleTextAnimationForward(this.homePageText, 'grid');
     
                         //this.animating = false;
 
@@ -249,6 +248,7 @@ export default class AnimationController{
                     //this.scene.camera.rotation.x = -0.21988;
                     if(this.state === 'middle'){
                         return { x: -Math.PI , duration: 2., ease: "back.inOut(1.7)", onStart: () => {
+                            this.parentContext.titleTextAnimationBackward(this.parentContext.servicesContainer);                                    
                             this.parentContext.titleTextAnimationBackward(this.parentContext.servicesPageText);
                             this.parentContext.textAnimationBackward(this.parentContext.servicesDescription); 
                             this.parentContext.scenes[1].cameraAnimating = true;                             
@@ -267,8 +267,10 @@ export default class AnimationController{
                         this.scene.camera.rotation.x = Math.PI / 2;
                         return {
                             //x: 0.1334403815502587, y: 0, z: 0 , delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {
-                            x: 0.11616433518877818, y: 0, z: 0 , delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                                                             
+                            //x: 0.11616433518877818, y: 0, z: 0 , delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                                                             
+                            x: this.parentContext.scenes[1].cameraAngle, y: 0, z: 0 , delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                                                                                        
                             //x: -0.21988, y: 0, z: 0 , delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                    
+                                    this.parentContext.titleTextAnimationForward(this.parentContext.servicesContainer, 'grid');                                                    
                                     this.parentContext.titleTextAnimationForward(this.parentContext.servicesPageText);
                                     this.parentContext.textAnimationForward(this.parentContext.servicesDescription);
                                     
@@ -288,6 +290,7 @@ export default class AnimationController{
                     //this.scene.camera.rotation.x = -0.22207473795343433;
                     if(this.state === 'middle'){
                             return { x: Math.PI / 2, duration: 2., ease: "back.inOut(1.7)", onStart: () => {
+                                this.parentContext.titleTextAnimationBackward(this.parentContext.servicesContainer)                                 
                                 this.parentContext.titleTextAnimationBackward(this.parentContext.servicesPageText) 
                                 this.parentContext.textAnimationBackward(this.parentContext.servicesDescription);  
                                 this.parentContext.scenes[0].cameraAnimating = true;                             
@@ -305,7 +308,9 @@ export default class AnimationController{
                     else{
                         this.scene.camera.rotation.x = -Math.PI;
                         //return { x: 0.1334403815502587, y: -1e-323, z: 0, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {
-                        return { x: 0.11616433518877818, y: -1e-323, z: 0, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                                    
+                        //return { x: 0.11616433518877818, y: -1e-323, z: 0, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                                    
+                        return { x: this.parentContext.scenes[1].cameraAngle, y: 0, z: 0 , delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                                                                                    
+                                this.parentContext.titleTextAnimationForward(this.parentContext.servicesContainer, 'grid');                                                                                
                                 this.parentContext.titleTextAnimationForward(this.parentContext.servicesPageText);
                                 this.parentContext.titleTextAnimationForward(this.parentContext.servicesDescription); 
                                 this.parentContext.scenes[1].cameraAnimating = false;                                                      
@@ -329,12 +334,13 @@ export default class AnimationController{
                 get downwardAnimation(){
                 if(this.state === 'up'){
                         this.parentContext.scenes[2].camera.rotation.x = 1.5;
-                        return { x: 2.412166253191378 , duration: 2., ease: "back.inOut(1.7)", onComplete: () => {          
+                        return { x: 2.412166253191378 , delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {          
+                            this.parentContext.titleTextAnimationForward(this.parentContext.aboutTextContainer, 'flex');                                                                        
                             this.parentContext.titleTextAnimationForward(this.parentContext.aboutPageText);
                             this.parentContext.textAnimationForward(this.parentContext.aboutPageDescription);
 
                             this.parentContext.scenes[2].cameraAnimating = false;
-        
+
                             //this.parentContext.animating = false;
                             this.state = 'middle';
 
@@ -346,7 +352,8 @@ export default class AnimationController{
 
                     else{
                         this.parentContext.scenes[2].camera.rotation.x = 2.412166253191378;
-                        return { x: 3.5, duration: 2., ease: "back.inOut(1.7)", onStart: () => {                                        
+                        return { x: 3.5, duration: 2., ease: "back.inOut(1.7)", onStart: () => {                    
+                                    this.parentContext.titleTextAnimationBackward(this.parentContext.aboutTextContainer);                                                
                                     this.parentContext.titleTextAnimationBackward(this.parentContext.aboutPageText);
                                     this.parentContext.textAnimationBackward(this.parentContext.aboutPageDescription);
             
@@ -366,10 +373,10 @@ export default class AnimationController{
                 get upwardAnimation(){
                     if(this.state === 'middle'){
                         this.scene.camera.rotation.x = 2.412166253191378;
-                        return { x: 1.5, duration: 2., ease: "back.inOut(1.7)", onStart: () => { 
+                        return { x: 1.5, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onStart: () => { 
                                 //this.parentContext.titleTextAnimationForward(this.parentContext.aboutPageText);
                                 //this.parentContext.textAnimationForward(this.parentContext.aboutPageDescription);
-             
+                                this.parentContext.titleTextAnimationBackward(this.parentContext.aboutTextContainer);                                                             
                                 this.parentContext.titleTextAnimationBackward(this.parentContext.aboutPageText);
                                 this.parentContext.textAnimationBackward(this.parentContext.aboutPageDescription);
 
@@ -385,7 +392,8 @@ export default class AnimationController{
                     }
                     else{
                       this.scene.camera.rotation.x = 3.5;
-                      return { x: 2.412166253191378, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                
+                      return { x: 2.412166253191378, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {   
+                                this.parentContext.titleTextAnimationForward(this.parentContext.aboutTextContainer, 'flex');                                                                                                             
                                 this.parentContext.titleTextAnimationForward(this.parentContext.aboutPageText); 
                                 this.parentContext.textAnimationForward(this.parentContext.aboutPageDescription);
 
@@ -401,6 +409,7 @@ export default class AnimationController{
                 scene: this.scenes[3],
                 downwardAnimation: 
                 { angleRotation: 0, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                          
+                        this.titleTextAnimationForward(this.contactTextContainer, 'flex');                                                                    
                         this.titleTextAnimationForward(this.contactPageText) 
                         this.textAnimationForward(this.contactPageDescription);
                         this.textAnimationForward(this.contactPageLink);
@@ -415,6 +424,7 @@ export default class AnimationController{
 
                 upwardAnimation:
                 { angleRotation: Math.PI, duration: 2., ease: "back.inOut(1.7)", onStart: () => {                                                        
+                        this.titleTextAnimationBackward(this.contactTextContainer);                                                                    
                         this.titleTextAnimationBackward(this.contactPageText); 
                         this.textAnimationBackward(this.contactPageDescription);
                         this.textAnimationBackward(this.contactPageLink);
@@ -912,10 +922,13 @@ export default class AnimationController{
         })
     }
 
-    updateSceneFromMenu(currentIndex){
+    // passing in the most recently clicked element and its tabindex
+    updateSceneFromMenu(currentIndex, currentElement){
 
-        let checkIfMenuIsActive = (document.activeElement.className === 'services-items active' || document.activeElement.className === 'services-items' ) ? true : false;
- 
+        //let checkIfMenuIsActive = (document.activeElement.className === 'services-items active' || document.activeElement.className === 'services-items' ) ? true : false;
+        //let checkIfMenuIsActive = (document.activeElement.className === 'menu-text-item-containers active' || document.activeElement.className === 'menu-text-item-containers' ) ? true : false;
+        let checkIfMenuIsActive = (currentElement === 'menu-text-item-containers active' || currentElement === 'menu-text-item-containers' ) ? true : false;        
+
         if(!this.animating && checkIfMenuIsActive){
 
             this.indexLessThan = (currentIndex < this.lastSceneIndex) ? false : true;
@@ -931,7 +944,7 @@ export default class AnimationController{
             if(this.lastSceneIndex !== currentIndex){
                 this.sceneIndex = currentIndex;
                 this.updateActiveMenuItem();
-                this.cameraAnimation(this.states[this.lastSceneIndex], this.states[currentIndex], this.indexLessThan);        
+                this.cameraAnimation(this.states[this.lastSceneIndex], this.states[currentIndex], this.indexLessThan);                                        
             }
 
             this.lastSceneIndex = currentIndex;
