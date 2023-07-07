@@ -284,6 +284,8 @@ export default class ServicesPage
   this.cameraAnimating = true;
 
   this.clock = new THREE.Clock();
+
+  this.screenAnimationState = 0;
  
   
   }
@@ -354,8 +356,16 @@ export default class ServicesPage
     // after getting velocity setting last mouse position to current mouse position
     this.mouseLastPos.copy(this.mouse);
 
-    this.screenShader.uniforms.time.value = this.time;
+    this.screenShader.uniforms.time.value = this.screenAnimationState;
 
+    if(!this.cameraAnimating){
+      this.screenAnimationState += 0.01;
+    }
+    else{
+      this.screenAnimationState -= 0.01;
+    }
+
+    this.screenAnimationState = Math.min(Math.max(this.screenAnimationState, 0), 1);
 
     //this.composer.render();
 
