@@ -16,7 +16,7 @@ const screenFragmentShader =
         vec4 tex = texture(errorTexture, uv);
         vec4 tex2 = texture(fixedErrorTexture, uv);
 
-        gl_FragColor = mix(tex, tex2, abs(sin(time * 0.4)) );
+        gl_FragColor = mix(tex, tex2, time );
     }
 `;
 
