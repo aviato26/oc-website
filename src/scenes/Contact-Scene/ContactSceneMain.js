@@ -98,12 +98,12 @@ class ContactSceneMain{
                     uv.y -= 0.5;                   
 
                     //uv *= 8.0;
-                    uv *= 4.0;                    
+                    uv *= 12.;                    
                     //uv.y += fract(mouse.x * time * 1.3);
-                    uv.y += fract(time * 0.1 + uv.x * uv.y) * uv.x;
+                    //uv.y += fract(time * 0.1 + uv.x * uv.y) * uv.x;
                     
                     //vec2 uv2 = fract(uv * 4.) + 0.5;
-                    vec2 uv2 = fract(uv * 24.) + 0.5;                    
+                    vec2 uv2 = fract(uv * 2.) + 0.5;                    
                     //vec2 uv2 = fract(uv * 48. * 2.) + 0.5;
                     //vec2 uv2 = fract(uv * 48.) + 0.5;                    
 
@@ -111,8 +111,13 @@ class ContactSceneMain{
                     
                     float t = time;
 
-                    float s = sin(t + t + uv.y * length(uv.y + (mouse.x) + uv.x));                    
-                    float c = cos(t + t + uv.x * length(uv.x + (mouse.x * abs(sin(uv.x + t) * uv2.x)) + uv.y));                    
+                    //float s = sin(t + t * uv.y + length(uv.y + cos(length(uv.x)) + uv.x));                    
+                    //float c = cos(t + t * uv.x + length(uv.x + sin(length(uv.y)) + uv.y));                    
+
+                    float s = sin(t + uv2.y);                    
+                    float c = cos(t + uv2.x);                    
+
+                    //float c = cos(t + t + uv.x * length(uv.x + (mouse.x + abs(sin(uv.x + t) * uv2.x)) + uv.y));                                        
 
                     mat3 rot = mat3(
                       vec3(c, s, 0),
@@ -120,29 +125,32 @@ class ContactSceneMain{
                       vec3(0., 0., 1.)      
                     );
                     
+                    //uv2 *= vec3(rot * vec3(uv * fract(time + uv.x), 1.)).xy;
+                    uv2 *= vec3(rot * vec3(uv * fract(time + uv.x + ((uv.x + mouse.x * 3.))) * uv.x, 1.)).xy;                    
 
-                    uv2 *= vec3(rot * vec3(uv + abs(sin(time) * 6.28), 1.)).xy;                    
+                    //uv2 *= vec3(rot * vec3(uv + abs(sin(time) * 6.28), 1.)).xy;                    
                     
                     float circle = 1.0 / length((uv2 - uv) + uv);                                   
-                    float circle2 = length((uv2 - uv) + uv);                                                       
+                    float circle2 = 10. / length((uv2 - uv)) * mouse.x;                                                       
                     
                     //circle *= .1 + length(uv - uv2) * 0.2;                                                            
                     
                     //circle = pow(circle, 1.0 - mouse.x * 0.03);                    
 
                     //circle *= pow(circle, mouse.x * 0.1);                    
-                    
+
+
                     float r = 0.144;
                     float g = 0.132;
                     float b = 0.588;
 
                     float r2 = 1.0;
-                    float g2 = 0.0;
-                    float b2 = 0.815;
+                    float g2 = 1.0;
+                    float b2 = 1.815;
                     
-                    vec3 color = circle * vec3(r, g, b);
+                    vec3 color = circle * vec3(r, g, b) * 0.1;
                     //vec3 color2 = circle * mix(vec3(r2, g2, b2), vec3(r, g, b), mouse.x);                    
-                    vec3 color2 = circle * vec3(r2, g2, b2);                                        
+                    vec3 color2 = circle2 * vec3(r2, g2, b2);                                        
                     
                     //color = 1.0 - exp(-color);
                 
@@ -218,7 +226,7 @@ class ContactSceneMain{
             this.sceneLoaded = true;
 
             //this method needs to be called to pre-compile the scene before it gets rendered or the animation will lag in the initial call
-            //this.renderer.compile(this.scene, this.camera);
+             //this.renderer.compile(this.scene, this.camera);
 
             animationControllerCallback(this.scene, this.camera);
         });
@@ -242,10 +250,14 @@ class ContactSceneMain{
     }
 
     updateMousePos(pos, changeFrictionState){
-        this.mouse.x += Math.abs(pos.x) * 0.05;
+
+        //this.mouse.x = Math.abs(pos.x);
+        this.mouse.x += pos.x * 0.01;        
         //this.mouse.y += pos.y;
 
-        this.mouse.x = Math.min(Math.max(this.mouse.x, 0), 15.);
+        //this.mouse.x = this.mouse.x;
+
+        //this.mouse.x = Math.min(Math.max(this.mouse.x, -3.), 3.);
         this.addFriction = changeFrictionState;
     }
 
@@ -257,8 +269,10 @@ class ContactSceneMain{
         this.time = this.clock.getDelta();
 
         if(!this.addFriction){
-            this.mouse.multiplyScalar(0.9);
+            //this.mouse.multiplyScalar(0.9);     
         }
+
+        console.log('asdf')
 
         this.t += 0.01;
 

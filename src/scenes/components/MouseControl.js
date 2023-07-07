@@ -15,7 +15,7 @@ export default class MouseControl{
 
         this.mobileCoords = new THREE.Vector2(0);
 
-        this.userMouseDown = false;
+        this.userMouseDown = true;
         this.currentElement = 0;
         this.nextElement = 1;
 
@@ -35,14 +35,15 @@ export default class MouseControl{
     mobileControls(callback){
 
         document.addEventListener('touchstart', (e) => {
-            this.userMouseDown = true;
+            this.userMouseDown = false;
+            
             this.mobilePos.y = e.touches[0].clientY;
             this.mouseLastPos.x = e.touches[0].clientX;
             this.currentY = 0;
 
             this.lastX = e.touches[0].clientX;
             this.lastY = e.touches[0].clientY;
-
+            
         });
 
         document.addEventListener('touchmove', (e) => {
@@ -52,12 +53,13 @@ export default class MouseControl{
             this.mobileCoords.x = ((e.touches[0].clientX / window.innerWidth) * 2) - 1;
             this.mobileCoords.y = (((e.touches[0].clientY / window.innerHeight) * 2) - 1) * -1;
 
+            this.mousePos.x = ((e.touches[0].clientX / window.innerWidth) * 2) - 1;                
+            this.mousePos.x *= 0.7;                
+
             this.x = e.touches[0].clientX;
             this.y = e.touches[0].clientY;
 
-            if(this.userMouseDown){
-                this.mousePos.x = e.touches[0].clientX;
-
+            if(!this.userMouseDown){
                 this.mobilePosDiff.x = this.mousePos.x - this.mouseLastPos.x;                                        
 
                 this.mouseDiff.x += this.mobilePosDiff.x * 0.005;                     
@@ -73,7 +75,8 @@ export default class MouseControl{
         });
 
         document.addEventListener('touchend', (e) => {
-            this.userMouseDown = false;
+            this.userMouseDown = true;
+            this.mousePos.x = 0;                            
             this.mobileSceneUpdate(callback);                        
         });
     }
@@ -88,7 +91,7 @@ export default class MouseControl{
     }
 
     wheelEvent(wheelControl){
-        document.addEventListener('wheel', (e) => {
+        document.addEventListener('wheel', (e) => {            
             wheelControl(e);
         });
     }
@@ -96,9 +99,13 @@ export default class MouseControl{
     updateLargeDeviceScenes(navMenuCallBack){
 
         document.addEventListener('mousedown', (e) => {
-            this.userMouseDown = true;
+            //this.userMouseDown = true;
 
             if((e.target.className === 'menu-bars-container' || e.target.className === 'menu-bars' || e.target.parentNode.className === 'menu-text-item-containers')){
+                this.userMouseDown = false;
+
+                this.resetMouseControls();
+
                 if(this.navAnimationSwitch === false){
                     navMenuCallBack.play();
                     this.navAnimationSwitch = !this.navAnimationSwitch;                      
@@ -106,6 +113,7 @@ export default class MouseControl{
                 else{
                     navMenuCallBack.reverse();
                     this.navAnimationSwitch = !this.navAnimationSwitch;
+                    this.userMouseDown = true;                    
                 }
             }
 
@@ -125,20 +133,20 @@ export default class MouseControl{
         });
 
         document.addEventListener('mouseup', () => {
-            this.userMouseDown = false;
+            //this.userMouseDown = false;
         });
 
         document.addEventListener('mousemove', (e) => {
             if(this.userMouseDown){
                 this.mousePos.x = ((e.clientX / window.innerWidth) * 2) - 1;
                 this.mousePos.y = (((e.clientY / window.innerHeight) * 2) - 1) * -1;                
-                //this.mousePos.x = e.clientX;               
+                this.mousePos.x *= 0.7;
+                //this.mousePos.x = e.clientX;                             
                 this.mouseDiff.x += e.movementX * 0.001;
             }
         });
 
     }
-
 
     cb(currentIndex, currentElement){
        if(this.fn){

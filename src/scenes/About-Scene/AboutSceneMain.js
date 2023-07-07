@@ -26,7 +26,8 @@ import numbersImg from './textures/c2.png';
 //import CoffeeSceneModel from './testDesign2.glb';
 //import CoffeeSceneModel from './testDesign3.glb';
 //import CoffeeSceneModel from './testDesign4.glb';
-import CoffeeSceneModel from './t2.glb';
+//import CoffeeSceneModel from './t2.glb';
+import CoffeeSceneModel from './t3.glb';
 //import CoffeeSceneModel from './nd.glb';
 
 import wireFragmentShader from './shaders/wire-fragment';
@@ -136,11 +137,14 @@ class AboutSceneMain{
 
             model.scene.traverse((e) => {
                 //check for coffee cup, model was not properly named so its name is under circle
+                    if(e.name === 'lookAtPoint'){
+                        this.point = e
+                    }
 
                     if(e.name === 'Cube'){
 
                         this.cube = e;
-                        this.cube.material = new THREE.MeshStandardMaterial({ color: 0x333333, side: THREE.DoubleSide, metalness: 0, roughness: 1 });          
+                        this.cube.material = new THREE.MeshStandardMaterial({ color: 0x000000 });          
                         //this.cube.material = new THREE.MeshStandardMaterial({ color: 0x555555, side: THREE.DoubleSide });                                  
 
                         e.material.needsUpdate = true;
@@ -161,6 +165,10 @@ class AboutSceneMain{
 
                         e.material = this.wireMaterial;
                         e.material.needsUpdate = true;
+                    }
+
+                    if(e.name === "Coffee_Mug003"){
+                        this.c = e;
                     }
 
                     //if(e.name === 'Plane001'){
@@ -236,7 +244,7 @@ class AboutSceneMain{
                           //vec2 uv2 = fract(uv * 140.0);
                           vec2 uv2 = fract(uv * 40.0);                          
                                     
-                          uv2.x -= fract(uv2.x + (time * 0.5 + (displacement.x)) - uv.x * uv.x - uv2.x * uv.x);
+                          uv2.x -= fract(uv2.x + (time * 0.5 + (displacement.x * 0.2)) - uv.x * uv.x - uv2.x / uv.x) * length(uv2 / uv);
                           //uv2.x -= fract(uv2.x + (time * 0.5) - uv.x * uv.x - uv2.x * uv.x); 
 
                           float dist = 1.0 / length(uv2 - 0.5);                          
@@ -263,7 +271,7 @@ class AboutSceneMain{
                           diffuseColor2.xyz *= col * log(col * col);     
 
                           //fragColor = diffuseColor2;           
-                          diffuseColor += diffuseColor2 + (vec4(diffuse, opacity) );    
+                          diffuseColor += diffuseColor2 * (vec4(diffuse, opacity) );    
 
                           `)
                   
@@ -286,13 +294,22 @@ class AboutSceneMain{
 
             //model.scene.children.map(obj => obj.material = new THREE.MeshBasicMaterial({ color: 0xffffff }))
 
+            // the order of the rotations need to have the x axis last of the camera will spiral since we are only rotating around the x axis
+            this.camera.rotation.order = 'ZYX';            
+
             // need to update camera projection matrix of the rendered texture will be distorted
             this.camera.aspect = window.innerWidth / window.innerHeight;
 
             this.camera.fov = (this.camera.aspect < 1) ? 25 : this.camera.fov;    
-            //this.camera.fov = 50;                
+            //this.camera.fov = 50;               
 
-            this.camera.updateProjectionMatrix();
+            this.camera.updateProjectionMatrix();            
+
+            this.camera.position.z = -10;
+
+            this.camera.lookAt(this.point.position);                                
+
+            this.cameraLastXAngle = {x: this.camera.rotation.x, y: this.camera.rotation.y, z: this.camera.rotation.z};            
 
             //const controls = new OrbitControls(this.camera, this.renderer.domElement)
 
@@ -393,16 +410,42 @@ class AboutSceneMain{
 
     }
 
-    updateDisplacement(pos, mouseDown){
+    updateDisplacement(pos, controlSwitch){
         this.displacement.x += Math.abs(pos.x) * 0.06;       
-        this.mod.rotation.y = pos.x * 0.1;
-        this.cube.rotation.z = pos.x * 0.1;
+        //this.mod.rotation.y = pos.x * 0.1;
+        //this.cube.rotation.z = pos.x * 0.1;
 
+        //this.forward = new THREE.Vector3( 0, 0, -1 ).applyQuaternion( this.camera.quaternion ).add( this.camera.position );
+/*
+        this.camera.position.x += pos.x * 0.2;            
+        this.camera.position.x = Math.min(Math.max(this.camera.position.x, -8), 20);          
+
+        this.camera.position.z = -10;
+*/
+        this.camera.position.z = -10;
         // the y value will be used for the smoke animation, this needs to be different than the x since it will need to 
         // be decremented when the user stops moving controls
         //this.displacement.y += Math.abs(pos.x) * 0.06;        
-        this.displacement.y += Math.abs(pos.x) * 0.1;                
-        this.animating = mouseDown;
+        this.displacement.y += Math.abs(pos.x) * 0.05;                
+        this.displacement.y = Math.min(Math.max(this.displacement.y, 0), 5)        
+        this.animating = controlSwitch;
+
+        //this.camera.lookAt(this.smokeCylinder.position);        
+        //this.camera.lookAt(this.smokeCylinder.position);                
+        //this.camera.lookAt(this.c.position);                        
+
+        // need to check if scrolling animation was triggered to release control of camera or animation will not work
+        if(!controlSwitch){
+            this.camera.position.x += pos.x * 0.2;            
+            this.camera.position.x = Math.min(Math.max(this.camera.position.x, -8), 20);          
+            this.camera.lookAt(this.point.position);        
+
+            this.cameraLastXAngle.x = this.camera.rotation.x;
+            this.cameraLastXAngle.y = this.camera.rotation.y;
+            this.cameraLastXAngle.z = this.camera.rotation.z;                        
+        }
+
+        //this.camera.lookAt(this.forward);
     }
 
 
@@ -411,18 +454,23 @@ class AboutSceneMain{
         this.time += 1 / 60;
 
         if(!this.animating){
-            this.displacement.y *= 0.97;
+            this.displacement.y *= 0.99;
         }
+
+        //this.displacement.y *= 0.97;
+
 
         //this.updateCameraRotationPos();
         //console.log(this.angleRotation)
+
+        //this.camera.position.x += 0.01;
 
         this.smokeMaterial.uniforms.time.value = this.time;
         this.smokeMaterial.uniforms.displacement.value = this.displacement.y;       
 
         this.postMaterial.uniforms.time.value = this.time;
-        this.postMaterial.uniforms.mouse.value = this.mouse;
-        this.postMaterial.uniforms.mouseVel.value = this.mVel;    
+        //this.postMaterial.uniforms.mouse.value = this.mouse;
+        //this.postMaterial.uniforms.mouseVel.value = this.mVel;    
         
         this.mod.material.userData.shader.uniforms.time.value = this.time;        
         this.mod.material.userData.shader.uniforms.displacement.value = this.displacement;        
