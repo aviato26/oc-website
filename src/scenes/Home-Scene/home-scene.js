@@ -216,6 +216,11 @@ this.bloomProps = {
 
   animationCallBack(this.scene, this.camera);
 
+  this.getLastCameraAngle();
+
+  // setting camera rotation order if the x axis is not rotated last it creates a swirl effect, need to set this since this is only rotated on this axis
+  this.camera.rotation.order = 'ZYX'
+
 });
 
 
@@ -225,23 +230,35 @@ this.cameraAnimating = false;
 
 this.time = 0;
 
-this.target = new WebGLRenderTarget(window.innerWidth, window.innerHeight);
+// this variable will change when the user uses the wheel event to record the cameras x angle before it is rotated to have a state to come back to
+this.lastCameraAngle = new Vector3(0, 0, 0);
+
+this.xAxis = new Vector3(1, 0, 0);
+this.xRotation = 0;
 
 }
 
 updateCamera(mousePos){
     if(!this.cameraAnimating){
       // updating camera position according to users mouse position along the x axis
-      this.camera.position.x += mousePos.x * 0.1;
+      //this.camera.position.x += mousePos.x * 0.1;
+      this.camera.position.x += mousePos.x * 0.05;      
+
+      this.camera.position.x = Math.min(Math.max(this.camera.position.x, -1), 1);  
 
       // keeping camera looking at the cpu model even when the position is being updated
       this.camera.lookAt(new Vector3(this.cpu.position.x, this.cpu.position.y - 0.3 , this.cpu.position.z));    
     }
 }
 
+getLastCameraAngle(){
+  this.camera.lookAt(this.cpu.position.x, this.cpu.position.y - 0.3 , this.cpu.position.z);      
+  this.lastCameraAngle.set(this.camera.rotation.x, this.camera.rotation.y, this.camera.rotation.z);  
+}
+
 resetCamera(){
       // keeping camera looking at the cpu model even when the position is being updated
-      this.camera.lookAt(new Vector3(this.cpu.position.x, this.cpu.position.y - 0.3 , this.cpu.position.z));    
+      //this.camera.lookAt(new Vector3(this.cpu.position.x, this.cpu.position.y - 0.3 , this.cpu.position.z));    
 }
 
 
@@ -261,6 +278,9 @@ addRenderPass(scene, camera){
     // this uniform is for the time based pulse through the wires
     this.cpuWireShader.uniforms.time.value = this.time;
 
+    //this.camera.rotateOnWorldAxis(this.xAxis, this.xRotation);
+    //this.camera.rotateOnAxis(this.xAxis, this.xRotation);
+
     // clamping the mouse position uniform which will brighten the circuit wires
     this.cpuWireShader.uniforms.mouseInput.value = Math.min(Math.max(Math.abs(this.camera.position.x) * 12, 0.), 4.);
 
@@ -269,10 +289,11 @@ addRenderPass(scene, camera){
 
     // this will continually decrement the bloom strength and camera position
     this.bloomPass.strength *= 0.9;
-    this.camera.position.x *= 0.9;
+    //this.camera.position.x *= 0.9;
 
     // clamping the bloom strength and camera position
-    this.bloomPass.strength = Math.min(Math.max(this.bloomPass.strength, 0.7), 1.5);                                
+    this.bloomPass.strength = Math.min(Math.max(this.bloomPass.strength, 0.5), 1.2);                                    
+    //this.bloomPass.strength = Math.min(Math.max(this.bloomPass.strength, 0.7), 1.5);                                
     //this.camera.position.x = Math.min(Math.max(this.camera.position.x, -1.5), 1.5);  
 
     // keeping camera looking at the cpu model even when the position is being updated

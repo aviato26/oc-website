@@ -11,7 +11,10 @@ export default class AnimationController{
 
         this.scenes = scenes;
 
-        this.playAnimation = false;
+        this.playAnimation = true;
+
+        // switch to give control over to user move events
+        this.animationSwitch = true;
 
         this.updateScenePass = updateCurrentRenderPass;
 
@@ -215,8 +218,7 @@ export default class AnimationController{
             {
                 scene: this.scenes[0],
                 downwardAnimation: 
-                { x: -Math.PI * 2, y: 0.02676750914208681, z: 
-                    0.014685823446374004, duration: 2., ease: "back.inOut(1.7)", onStart: () => { 
+                { x: -Math.PI * 2, duration: 2., ease: "back.inOut(1.7)", onStart: () => { 
                         this.titleTextAnimationBackward(this.homePageText, 'grid') 
                         this.scenes[0].cameraAnimating = true;
                         this.scenes[1].cameraAnimating = true;
@@ -268,7 +270,7 @@ export default class AnimationController{
                         return {
                             //x: 0.1334403815502587, y: 0, z: 0 , delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {
                             //x: 0.11616433518877818, y: 0, z: 0 , delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                                                             
-                            x: this.parentContext.scenes[1].cameraAngle, y: 0, z: 0 , delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                                                                                        
+                            x: this.parentContext.scenes[1].cameraAngle, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                                                                                        
                             //x: -0.21988, y: 0, z: 0 , delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                    
                                     this.parentContext.titleTextAnimationForward(this.parentContext.servicesContainer, 'grid');                                                    
                                     this.parentContext.titleTextAnimationForward(this.parentContext.servicesPageText);
@@ -309,7 +311,7 @@ export default class AnimationController{
                         this.scene.camera.rotation.x = -Math.PI;
                         //return { x: 0.1334403815502587, y: -1e-323, z: 0, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {
                         //return { x: 0.11616433518877818, y: -1e-323, z: 0, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                                    
-                        return { x: this.parentContext.scenes[1].cameraAngle, y: 0, z: 0 , delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                                                                                    
+                        return { x: this.parentContext.scenes[1].cameraAngle, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                                                                                    
                                 this.parentContext.titleTextAnimationForward(this.parentContext.servicesContainer, 'grid');                                                                                
                                 this.parentContext.titleTextAnimationForward(this.parentContext.servicesPageText);
                                 this.parentContext.titleTextAnimationForward(this.parentContext.servicesDescription); 
@@ -333,13 +335,17 @@ export default class AnimationController{
                 state: 'up',
                 get downwardAnimation(){
                 if(this.state === 'up'){
-                        this.parentContext.scenes[2].camera.rotation.x = 1.5;
-                        return { x: 2.412166253191378 , delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {          
+                        this.parentContext.scenes[2].camera.rotation.x = -1.5;
+                        this.parentContext.scenes[2].camera.position.z = -10;
+                        //this.parentContext.scenes[2].camera.rotation.x = 1.5;
+                        return { x: this.parentContext.scenes[2].cameraLastXAngle.x , delay: 0, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {          
                             this.parentContext.titleTextAnimationForward(this.parentContext.aboutTextContainer, 'flex');                                                                        
                             this.parentContext.titleTextAnimationForward(this.parentContext.aboutPageText);
                             this.parentContext.textAnimationForward(this.parentContext.aboutPageDescription);
 
                             this.parentContext.scenes[2].cameraAnimating = false;
+
+                            this.parentContext.animationSwitch = false;
 
                             //this.parentContext.animating = false;
                             this.state = 'middle';
@@ -351,18 +357,19 @@ export default class AnimationController{
                     }
 
                     else{
-                        this.parentContext.scenes[2].camera.rotation.x = 2.412166253191378;
-                        return { x: 3.5, duration: 2., ease: "back.inOut(1.7)", onStart: () => {                    
+                        this.parentContext.scenes[2].camera.rotation.x = -Math.PI / 2;
+                        return { x: -3.5, duration: 2., ease: "back.inOut(1.7)", onStart: () => {                    
                                     this.parentContext.titleTextAnimationBackward(this.parentContext.aboutTextContainer);                                                
                                     this.parentContext.titleTextAnimationBackward(this.parentContext.aboutPageText);
                                     this.parentContext.textAnimationBackward(this.parentContext.aboutPageDescription);
+
+                                    this.parentContext.animationSwitch = true;
             
                                     this.parentContext.animating = true;
 
                                     this.parentContext.mouseControl.resetMouseControls();
                             }, onComplete: () => {
                                 this.state = 'up';                      
-
                                 //this.parentContext.animating = false;          
                             }
                         }
@@ -371,9 +378,10 @@ export default class AnimationController{
                 
 
                 get upwardAnimation(){
+                    this.parentContext.animationSwitch = true;
                     if(this.state === 'middle'){
-                        this.scene.camera.rotation.x = 2.412166253191378;
-                        return { x: 1.5, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onStart: () => { 
+                        //this.scene.camera.rotation.x = 2.412166253191378;
+                        return { x: -1.5, delay: 0, duration: 2., ease: "back.inOut(1.7)", onStart: () => { 
                                 //this.parentContext.titleTextAnimationForward(this.parentContext.aboutPageText);
                                 //this.parentContext.textAnimationForward(this.parentContext.aboutPageDescription);
                                 this.parentContext.titleTextAnimationBackward(this.parentContext.aboutTextContainer);                                                             
@@ -391,11 +399,13 @@ export default class AnimationController{
                         }
                     }
                     else{
-                      this.scene.camera.rotation.x = 3.5;
-                      return { x: 2.412166253191378, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {   
+                      this.scene.camera.rotation.x = -3.5;
+                      return { x: this.parentContext.scenes[2].cameraLastXAngle.x, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {   
                                 this.parentContext.titleTextAnimationForward(this.parentContext.aboutTextContainer, 'flex');                                                                                                             
                                 this.parentContext.titleTextAnimationForward(this.parentContext.aboutPageText); 
                                 this.parentContext.textAnimationForward(this.parentContext.aboutPageDescription);
+
+                                this.parentContext.animationSwitch = false;
 
                                 //this.parentContext.animating = false;
                                 this.state = 'middle';
@@ -495,9 +505,10 @@ export default class AnimationController{
                     onComplete: () => this.updateScenePass(this.scenes[1])
                 });
 
-                gsap.to(this.scenes[0].camera.rotation, { x: -Math.PI * 2, y: 0.02676750914208681, z: 
-                //gsap.to(this.scenes[0].camera.rotation, { x: -Math.PI * 2, y: 0.02676750914208681, z: 
-                    0.014685823446374004, duration: 2., ease: "back.inOut(1.7)", onStart: () => { 
+                // setting rotation order so the x axis is rotated last
+                //this.scenes[0].camera.rotation.order = 'ZYX';
+                gsap.to(this.scenes[0].camera.rotation, { x: -Math.PI * 2, duration: 2., ease: "back.inOut(1.7)", onStart: () => { 
+                //gsap.to(this.scenes[0], { xRotation: -Math.PI * 0.1, duration: 2., ease: "back.inOut(1.7)", onStart: () => {                     
                     //this.titleTextAnimationBackward(this.homePageText, 'grid') 
                     this.titleTextAnimationBackward([this.homePageText[1], this.homePageText[2]], 'grid')                     
                     this.scenes[0].cameraAnimating = true;
@@ -507,25 +518,17 @@ export default class AnimationController{
 
 
                 // resetting camera to look up when user scrolls down
-                this.scenes[1].camera.position.x = -5e-324;          
+                //this.scenes[1].camera.position.x = -5e-324;          
                 this.scenes[1].camera.rotation.x = Math.PI / 2;                
 
                 //gsap.to(this.scenes[1].camera.rotation, { x: 0.11616433518877818, y: 0, z: 0 , delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                        
-                gsap.to(this.scenes[1].camera.rotation, { x: this.scenes[1].cameraAngle, y: 0, z: 0 , delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                            
+                gsap.to(this.scenes[1].camera.rotation, { x: this.scenes[1].cameraAngle, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                            
                 //gsap.to(this.scenes[1], { angleRotation: 0, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                            
                     this.titleTextAnimationForward(this.servicesContainer, 'grid');
                     this.titleTextAnimationForward(this.servicesPageText);
                     this.textAnimationForward(this.servicesDescription);
 
-                    //this.listTextAnimation(this.servicesDescription);
-                /*
-                    this.listTextAnimation(this.servicesItems[0].children);
-                    this.listTextAnimation(this.servicesItems[1].children);
-                    this.listTextAnimation(this.servicesItems[2].children);
-                    this.listTextAnimation(this.servicesItems[3].children);                                                                                
-                */
-                    // animating is set to false at end of animation so next animation can be triggered
-                    //this.animating = false;
+
                     this.scenes[1].cameraAnimating = false;  
 
                     this.states[1].state = 'middle';
@@ -554,24 +557,32 @@ export default class AnimationController{
                     }
                 });
 
-                gsap.to(this.scenes[1].camera.rotation, { x: -Math.PI , duration: 2., ease: "back.inOut(1.7)", onStart: () => {                    
+                gsap.to(this.scenes[1].camera.rotation, { x: -Math.PI, y: this.scenes[1].camera.rotation.y, z: this.scenes[1].camera.rotation.z, duration: 2., ease: "back.inOut(1.7)", onStart: () => {                    
                         this.titleTextAnimationBackward(this.servicesPageText);
                         this.textAnimationBackward(this.servicesDescription); 
                         this.scenes[1].cameraAnimating = true;                             
 
                         this.scenes[2].cameraAnimating = true;
 
-                        this.states[1].state = 'up';                        
+                        this.states[1].state = 'up';          
+                        
+                        this.animationSwitch = true;                        
 
                         this.mouseControl.resetMouseControls();
                     }
                 });                                
+                
                 //this.currentCameraPos.set(this.scenes[2].camera.rotation.x, this.scenes[2].camera.rotation.y, this.scenes[2].camera.rotation.z);
-                this.scenes[2].camera.rotation.x = 1.5;
-                gsap.to(this.scenes[2].camera.rotation, { x: 2.412166253191378 , duration: 2., ease: "back.inOut(1.7)", onComplete: () => {          
+                this.scenes[2].camera.rotation.x = -1.5;
+                this.scenes[2].camera.position.z = -10;
+                
+                //gsap.to(this.scenes[2].camera.rotation, { x: -2.618273923117948, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {          
+                gsap.to(this.scenes[2].camera.rotation, { x: this.scenes[2].cameraLastXAngle.x, y: this.scenes[2].cameraLastXAngle.y, z: this.scenes[2].cameraLastXAngle.z, duration: 2, ease: "back.inOut(1.7)", onComplete: () => {                              
                 //gsap.to(this.scenes[2].camera.rotation, { x: 2.41, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                              
                     this.titleTextAnimationForward(this.aboutPageText);
                     this.textAnimationForward(this.aboutPageDescription);
+
+                    this.animationSwitch = false;
 
                     this.scenes[2].cameraAnimating = false;
 
@@ -596,17 +607,20 @@ export default class AnimationController{
                     }                    
                 });
 
-                gsap.to(this.scenes[0].camera.rotation, { x: -1.5478153800680585, delay: 0.2, duration: 2., ease: "back.inOut(1.7)",  onComplete: () => {                    
-                    this.titleTextAnimationForward(this.homePageText, 'grid');
 
-                    //this.animating = false;
-                    
+
+            this.animationSwitch = true;
+
+            //gsap.to(this.scenes[0].camera.rotation, { x: this.scenes[0].lastCameraAngle.x, y: this.scenes[0].lastCameraAngle.y, z: this.scenes[0].lastCameraAngle.z, delay: 0.2, duration: 2., ease: "back.inOut(1.7)",  onComplete: () => {                                                    
+            gsap.to(this.scenes[0].camera.rotation, { x: this.scenes[0].lastCameraAngle.x, delay: 0.2, duration: 2., ease: "back.inOut(1.7)",  onComplete: () => {                                                                    
+                    this.titleTextAnimationForward(this.homePageText, 'grid');                
                     this.scenes[0].cameraAnimating = false;
                     //this.scenes[1].cameraAnimating = true;
                 }
-            });
+            });                
+            
 
-            gsap.to(this.scenes[1].camera.quaternion, { x: 1, duration: 2., ease: "back.inOut(1.7)", onStart: () => {
+            gsap.to(this.scenes[1].camera.rotation, { x: Math.PI / 2, duration: 2., ease: "back.inOut(1.7)", onStart: () => {
                         this.titleTextAnimationBackward(this.servicesPageText) 
                         this.textAnimationBackward(this.servicesDescription);  
                         this.scenes[0].cameraAnimating = true;                             
@@ -615,7 +629,6 @@ export default class AnimationController{
                         this.mouseControl.resetMouseControls();
                     }, onComplete: () => this.states[1].state = 'up'
                 });                                
-
             }
 
         }
@@ -637,8 +650,9 @@ export default class AnimationController{
                 });
 
                 this.currentCameraPos.set(this.scenes[2].camera.rotation.x, this.scenes[2].camera.rotation.y, this.scenes[2].camera.rotation.z);
+                this.animationSwitch = true;
 
-                gsap.to(this.scenes[2].camera.rotation, { x: 3.5, duration: 2., ease: "back.inOut(1.7)", onStart: () => {                    
+                gsap.to(this.scenes[2].camera.rotation, { x: -3.5, duration: 2., ease: "back.inOut(1.7)", onStart: () => {                    
                     this.titleTextAnimationBackward(this.aboutPageText);
                     this.textAnimationBackward(this.aboutPageDescription);
 
@@ -653,6 +667,10 @@ export default class AnimationController{
                         this.titleTextAnimationForward(this.contactPageText) 
                         this.textAnimationForward(this.contactPageDescription);
                         this.textAnimationForward(this.contactPageLink);
+
+                        //this.animationSwitch = false;
+
+                        //this.mouseControl.sceneAnimating(false);
 
                         //this.animating = false;
 
@@ -682,18 +700,12 @@ export default class AnimationController{
                 //gsap.to(this.scenes[1].camera.quaternion, { x: 0, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {
                 //gsap.to(this.scenes[1].camera.rotation, { x: 0.1334403815502587, y: 0, z: 0, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                        
                 //gsap.to(this.scenes[1].camera.rotation, { x: 0.11616433518877818, y: 0, z: 0, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                           
-                gsap.to(this.scenes[1].camera.rotation, { x: this.scenes[1].cameraAngle, y: 0, z: 0 , delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                                                
+                gsap.to(this.scenes[1].camera.rotation, { x: this.scenes[1].cameraAngle, y: 0, z: 0 , delay: 0, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                                                
                 //gsap.to(this.scenes[1].camera.rotation, { x: -0.22207473795343433, y: -1e-323, z: 0, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                            
                 //gsap.to(this.scenes[1].camera.rotation, { x: -0.21988, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                    
                         this.titleTextAnimationForward(this.servicesPageText);
                         this.titleTextAnimationForward(this.servicesDescription); 
 
-                    /*
-                        this.listTextAnimation(this.servicesItems[0].children);
-                        this.listTextAnimation(this.servicesItems[1].children);
-                        this.listTextAnimation(this.servicesItems[2].children);
-                        this.listTextAnimation(this.servicesItems[3].children);            
-                    */
                          this.scenes[1].cameraAnimating = false;                                                      
 
                          this.states[1].state = 'middle';
@@ -702,10 +714,13 @@ export default class AnimationController{
 
                          this.mouseControl.resetMouseControls();                         
                     }
-                });                              
+                });  
+            
+                this.animationSwitch = true;
+                
                 this.currentCameraPos.set(this.scenes[2].camera.rotation.x, this.scenes[2].camera.rotation.y, this.scenes[2].camera.rotation.z);
                 //gsap.to(this.scenes[2].camera.quaternion, { w: 0.206, x: 1.082, duration: 2., ease: "back.inOut(1.7)", onStart: () => {
-                gsap.to(this.scenes[2].camera.rotation, { x: 1.5, duration: 2., ease: "back.inOut(1.7)", onStart: () => {                    
+                gsap.to(this.scenes[2].camera.rotation, { x: -1.5, duration: 2, ease: "back.inOut(1.7)", onStart: () => {                    
                 //gsap.to(this.scenes[2], { angleRotation: 1, duration: 2., ease: "back.inOut(1.7)", onStart: () => {                                        
                     this.titleTextAnimationBackward(this.aboutPageText)
                     this.textAnimationBackward(this.aboutPageDescription);
@@ -740,11 +755,13 @@ export default class AnimationController{
                 //this.currentCameraPos.set(this.scenes[3].look.x, this.scenes[3].look.y, this.scenes[3].look.z);                
                 this.currentCameraPos.set(this.scenes[2].camera.rotation.x, this.scenes[2].camera.rotation.y, this.scenes[2].camera.rotation.z);
 
-                this.scenes[2].camera.rotation.x = 3.5;
+                this.scenes[2].camera.rotation.x = -Math.PI;
 
-                gsap.to(this.scenes[2].camera.rotation, { x: 2.412166253191378, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                
+                gsap.to(this.scenes[2].camera.rotation, { x: this.scenes[2].cameraLastXAngle.x, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                
                     this.titleTextAnimationForward(this.aboutPageText); 
                     this.textAnimationForward(this.aboutPageDescription);
+
+                    this.animationSwitch = false;
 
                     this.states[2].state = 'middle';
 
@@ -753,9 +770,8 @@ export default class AnimationController{
                 }});                                
 
                 this.scenes[3].animating = false; 
-
              
-                gsap.to(this.scenes[3], { angleRotation: Math.PI, duration: 2., ease: "back.inOut(1.7)", onStart: () => {                                                        
+                gsap.to(this.scenes[3], { angleRotation: Math.PI * 2, duration: 2., ease: "back.inOut(1.7)", onStart: () => {                                                        
                     this.titleTextAnimationBackward(this.contactPageText); 
                     this.textAnimationBackward(this.contactPageDescription);
                     this.textAnimationBackward(this.contactPageLink);
@@ -987,12 +1003,16 @@ export default class AnimationController{
             this.initialRender = true;
         }
 
-        this.mouseControl.addFrictionDecay();
+        //this.mouseControl.addFrictionDecay();
 
-        this.scenes[0].updateCamera(this.mouseControl.mouseDiff);
-        this.scenes[1].updateCamera(this.mouseControl.mouseDiff); 
-        this.scenes[2].updateDisplacement(this.mouseControl.mouseDiff, this.mouseControl.userMouseDown);
-        this.scenes[3].updateMousePos(this.mouseControl.mouseDiff, this.mouseControl.userMouseDown);
+        //this.scenes[0].updateCamera(this.mouseControl.mouseDiff);
+        this.scenes[0].updateCamera(this.mouseControl.mousePos);  
+        this.scenes[1].updateCamera(this.mouseControl.mousePos);               
+        //this.scenes[1].updateCamera(this.mouseControl.mouseDiff); 
+        this.scenes[2].updateDisplacement(this.mouseControl.mousePos, this.animationSwitch);        
+        //this.scenes[2].updateDisplacement(this.mouseControl.mouseDiff, this.mouseControl.userMouseDown);
+        this.scenes[3].updateMousePos(this.mouseControl.mousePos, this.mouseControl.userMouseDown);        
+        //this.scenes[3].updateMousePos(this.mouseControl.mouseDiff, this.mouseControl.userMouseDown);
 
     }
 }

@@ -165,11 +165,11 @@ export default class Main
 
       // once scene has been rendered moving camera to look away from objects so it will be set for the rotating animation
       this.servicesPage.camera.rotation.x = 1;
-      this.aboutPage.camera.rotateX(Math.PI / 2);  
+      this.aboutPage.camera.rotation.x = -1;  
 
       this.contactPage.angleRotation = Math.PI;    
       
-      //this.contactPage.camera.rotation.x = -Math.PI;
+      //this.contactPage.camera.rotation.x += -1;
 
       this.mainSceneRenderer.updateRenderPass(this.homeScreen);
       //this.mainSceneRenderer.updateRenderPass(this.aboutPage);

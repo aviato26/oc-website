@@ -276,6 +276,8 @@ export default class ServicesPage
       this.axis = new THREE.Vector3(1, 0, 0);
       //this.angleRotation = 0;
 
+      this.camera.rotation.order = 'ZYX';
+
       //this.animate();
   });
 
@@ -337,7 +339,7 @@ export default class ServicesPage
 
     this.time += 1 / 60;
 
-    this.camera.position.x *= 0.9;
+    //this.camera.position.x *= 0.9;
 
     // getting mouse vel and adding dampener to slowly dissepate mVel    
     this.mouseDiff.subVectors(this.mouse, this.mouseLastPos);
