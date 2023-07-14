@@ -209,13 +209,19 @@ section {
     position: absolute;
     z-index: 2;
     color: white;
+    background: white;
     font-family: Arial, Helvetica, sans-serif;
     font-weight: bold;
-    font-size: 12px;
+    font-size: 20px;
+
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+
 }
 
 .arrow-container{
   margin: 1px 25px;
+  display: none;
 }
 
 .long-arrow-right{
@@ -880,14 +886,13 @@ a:hover, a:focus {
     display: none;
     flex-direction: row-reverse;
     bottom: 100px;
-    left: -30px;
     rotate: -90deg;
     position: absolute;
     z-index: 2;
     color: white;
     font-family: Arial, Helvetica, sans-serif;
     font-weight: bold;
-    font-size: 12px;
+    font-size: 15px;
 }
 
   .page-section{

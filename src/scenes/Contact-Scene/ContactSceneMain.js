@@ -83,6 +83,134 @@ class ContactSceneMain{
             `,
 
             fragmentShader: `
+
+
+
+
+
+
+
+
+            varying vec2 vUv;
+            uniform float time;
+            uniform vec2 mouse;            
+
+#define s(a, b, t) smoothstep(a, b, t);
+
+float distline(vec2 p, vec2 a, vec2 b){
+    vec2 pa = p - a;
+    vec2 ba = b - a;
+    float t = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+    return length(pa - ba * t);
+}
+
+float n21(vec2 p){
+    p = fract(p * vec2(333.222, 234.3456));
+    p += dot(p, p + 23.345);
+    return fract(p.x + p.y);
+}
+
+vec2 n22(vec2 p){
+    float n = n21(p);
+    return vec2(n, n21(p + n));
+}
+
+vec2 getPos(vec2 id, vec2 offset){
+  vec2 n = n22(id + offset) * time;
+  float x = sin(time * n.x);
+  float y = cos(time * n.y);
+
+  //n.x += mouse.x * x;
+  //n.y += mouse.x * y;
+  
+  //return vec2(x, y) * 0.4;
+  return offset + sin(n) * .2;  
+}
+
+float line(vec2 p, vec2 a, vec2 b){
+  float d = distline(p, a, b);
+  float m = s(0.03, 0.01, d);
+  //m *= s(0.1, 0.4, length(a - dot(b, a)));
+  return m;
+}
+
+void main()
+{
+    // Normalized pixel coordinates (from 0 to 1)
+    //vec2 uv = fragCoord/iResolution.xy;
+    vec2 uv = vUv;
+    
+    uv -= 0.5;
+    
+    uv *= 40.0;
+    uv.x *= 20.;
+    
+    //uv.x *= (floor(time) * .2) * fract(time);
+    
+    vec2 gv = fract(uv) - 0.5;
+
+    vec2 id = floor(uv);
+
+    vec3 col = vec3(.0);
+    
+    if(gv.x > .48 || gv.y > .48){
+      col.r = 1.0;
+    }
+    
+    vec2 p9[9];
+    
+    int i = 0;
+    
+    for(float y = -1.0; y <= 1.0; y++){
+        for(float x = -1.0; x <= 1.0; x++){
+            p9[i] = getPos(id, vec2(x, y * sin(id.y * col.y)));
+            i++;
+        }
+    }
+    
+    float m = 0.0;
+    
+    for(int i = 0; i < 9; i++){
+        m += line(gv * mouse.x + 0.1, p9[4], p9[i]);
+        vec2 j = (gv - p9[i]) * 9.0;
+        
+        float sparkle = 1. / dot(j, j);
+        
+        m += sparkle * (fract(time * mouse.x * p9[i].x * 0.1) / 2.);
+    }
+
+
+
+    vec2 p = getPos(id, vec2(m));
+    
+    float d = length(gv - p);
+    
+    //float m = s(0.1, 0.05, d);
+    
+    //vec3 c2 = vec3(col.r + m);
+    vec3 c2 = vec3(m) * vec3(0., 0., 0.511);    
+    //vec3 c2 = vec3(m);    
+
+    //uv = fract(uv * 10.0);
+
+    // Output to screen
+    //fragColor = vec4(col, 1.0);
+    gl_FragColor = vec4(c2, 1.0);
+}
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+
                 uniform float time;
                 uniform vec2 mouse;
 
@@ -162,7 +290,7 @@ class ContactSceneMain{
 
 
                 }
-
+*/
 
 
             `
@@ -218,7 +346,7 @@ class ContactSceneMain{
             this.mixer = new THREE.AnimationMixer(model.scene);
             this.clips = model.animations;
             this.action = this.mixer.clipAction(this.clips[0]);
-            this.action.timeScale = 0.1;
+            this.action.timeScale = 0.05;
             this.action.play();
 
             this.scene.add(model.scene);
@@ -251,8 +379,8 @@ class ContactSceneMain{
 
     updateMousePos(pos, changeFrictionState){
 
-        //this.mouse.x = Math.abs(pos.x);
-        this.mouse.x += pos.x * 0.01;        
+        this.mouse.x = Math.abs(pos.x);
+        //this.mouse.x += pos.x * 0.01;        
         //this.mouse.y += pos.y;
 
         //this.mouse.x = this.mouse.x;
@@ -272,9 +400,7 @@ class ContactSceneMain{
             //this.mouse.multiplyScalar(0.9);     
         }
 
-        console.log('asdf')
-
-        this.t += 0.01;
+        this.t += 0.02;
 
         //this.updateCameraPos(this.time * -this.mouse.x - 0.0001);
         this.updateCameraPos(-this.time);        

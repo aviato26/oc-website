@@ -167,7 +167,7 @@ export default class Main
       this.servicesPage.camera.rotation.x = 1;
       this.aboutPage.camera.rotation.x = -1;  
 
-      this.contactPage.angleRotation = Math.PI;    
+      //this.contactPage.angleRotation = Math.PI;    
       
       //this.contactPage.camera.rotation.x += -1;
 

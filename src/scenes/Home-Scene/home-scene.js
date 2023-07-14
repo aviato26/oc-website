@@ -242,9 +242,10 @@ updateCamera(mousePos){
     if(!this.cameraAnimating){
       // updating camera position according to users mouse position along the x axis
       //this.camera.position.x += mousePos.x * 0.1;
-      this.camera.position.x += mousePos.x * 0.05;      
+      this.camera.position.x += mousePos.x * 0.03;      
 
-      this.camera.position.x = Math.min(Math.max(this.camera.position.x, -1), 1);  
+      //this.camera.position.x = Math.min(Math.max(this.camera.position.x, -1), 1);  
+      this.camera.position.x = Math.min(Math.max(this.camera.position.x, -0.5), 0.5);  
 
       // keeping camera looking at the cpu model even when the position is being updated
       this.camera.lookAt(new Vector3(this.cpu.position.x, this.cpu.position.y - 0.3 , this.cpu.position.z));    

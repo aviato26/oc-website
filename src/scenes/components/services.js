@@ -72,7 +72,7 @@ class PageDesciption{
         container.className = 'scroll-down';        
 
         const scroll = document.createElement('span');
-        const scrollText = document.createTextNode('Scroll Down');        
+        const scrollText = document.createTextNode('Scroll Page');        
         scroll.append(scrollText);           
 
         container.append(scroll);
