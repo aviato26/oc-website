@@ -23,6 +23,15 @@ export default class MouseControl{
 
         this.navAnimationSwitch = false;        
 
+        this.scrollAnimation = 0;
+        this.scrollIncrement = 0;
+
+        this.mobileMovement = {
+            deltaY: 0,
+            endY: 0,
+            startY: 0
+        }
+
         //this.init();
     }
 
@@ -41,6 +50,8 @@ export default class MouseControl{
             this.mouseLastPos.x = e.touches[0].clientX;
             this.currentY = 0;
 
+            //this.mobileMovement.startY = e.touches[0].clientY;
+
             this.lastX = e.touches[0].clientX;
             this.lastY = e.touches[0].clientY;
             
@@ -48,7 +59,7 @@ export default class MouseControl{
 
         document.addEventListener('touchmove', (e) => {
             this.currentY = e.touches[0].clientY;
-            this.mobilePosDiff.y = this.mobilePos.y - this.currentY;
+            //this.mobilePosDiff.y = this.mobilePos.y - this.currentY;
 
             this.mobileCoords.x = ((e.touches[0].clientX / window.innerWidth) * 2) - 1;
             this.mobileCoords.y = (((e.touches[0].clientY / window.innerHeight) * 2) - 1) * -1;
@@ -66,6 +77,13 @@ export default class MouseControl{
                 this.mouseDiff.x = Math.min(Math.max(this.mouseDiff.x, -1.2), 1.2);
 
                 this.mouseLastPos.x = this.mousePos.x;
+
+                this.mobileMovement.deltaY = this.mobileMovement.startY - e.touches[0].clientY;
+                this.mobileMovement.deltaY *= 0.1;                
+
+                callback(this.mobileMovement);
+
+                this.mobileMovement.startY = e.touches[0].clientY;
             }
 
             setTimeout(() => {
@@ -91,10 +109,11 @@ export default class MouseControl{
     }
 
     wheelEvent(wheelControl){
-        document.addEventListener('wheel', (e) => {            
+        document.addEventListener('wheel', (e) => {          
             wheelControl(e);
         });
     }
+
 
     updateLargeDeviceScenes(navMenuCallBack){
 

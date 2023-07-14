@@ -76,6 +76,8 @@ export default class AnimationController{
         this.cameraOrRotation = null;
         this.cameraOrRotation2 = null;
 
+        this.scrollIncrement = { count: 0 };
+
         this.updateActiveMenuItem();
     }
 
@@ -118,6 +120,10 @@ export default class AnimationController{
 
         this.navAnimation = this.revealNavMenu();
         this.mouseControl.updateLargeDeviceScenes(this.navAnimation);
+
+        // label for the scroll up span element
+        this.scrollLabel = document.querySelector('.scroll-down');
+        //this.scrollLabelArrow = document.querySelector('.arrow-container');        
     }
 
     loadCameraCoordinates(){
@@ -169,31 +175,56 @@ export default class AnimationController{
 
     laptopWheelControl(e){
 
+            //console.log((((e.touches[0].clientY / window.innerHeight) * 2) - 1) * -1)
 
             if(!this.animating){
+
+                this.scrollLabelAnimation(this.scrollIncrement.count, 0);
+
+                // getting normalized direction of wheel scroll
+                let wheelDir = Math.min(Math.max(e.deltaY, -1), 1)
+
+                this.scrollIncrement.count += 10 * wheelDir;
                 // checking to see if the user has scrolled fast enough to trigger animation
-                if(e.deltaY > 150 || e > 50){
+                //if(e.deltaY > 150 || e > 50){
+                if(this.scrollIncrement.count > 100){
                     this.animating = true;
                     this.timeDirection = 1.0;
 
                     this.updateSlideAnimation();                    
                     this.updateSceneIndex('Increment');
+
                     //this.states[this.sceneIndex].state = 'up';
+                    //this.scrollIncrement.count = 0;
                 }
     
-                if(e.deltaY < -150 || e < -50){
+                if(this.scrollIncrement.count < -100){
                     this.animating = true;                 
 
                     this.timeDirection = -1.0;
-                
+                    
 
                     this.updateSlideAnimation();
                     this.updateSceneIndex('Decrement');                    
                     //this.states[this.sceneIndex].state = 'up';                    
+                    //this.scrollIncrement.count = 0;                    
                 }
-
             }
 
+    }
+
+    scrollLabelAnimation(a, b){
+
+        if(a > 0){
+            this.scrollLabel.style.background = `-webkit-linear-gradient(left, #FF00E9 ${a}%, white ${b}%, white)`;
+        }
+        else{
+            this.scrollLabel.style.background = `-webkit-linear-gradient(right, #062d89 ${-a}%, white ${b}%, white)`;                    
+        }
+    }
+
+    animateScrollElement(){
+        gsap.to(this.scrollIncrement, { count: 0, duration: 1, onUpdate: () => this.scrollLabelAnimation(this.scrollIncrement.count, 0), onComplete: () => this.animating = false });
     }
 
     updateSceneIndex(state){
@@ -234,8 +265,11 @@ export default class AnimationController{
                         //this.animating = false;
 
                         this.sceneIndex = 0;
+
+                        this.animateScrollElement();                        
                         
                         this.scenes[0].cameraAnimating = false;
+
                         //this.scenes[1].cameraAnimating = true;
                     }   
                 }
@@ -278,8 +312,11 @@ export default class AnimationController{
                                     
                                     // animating is set to false at end of animation so next animation can be triggered
                                     //this.parentContext.animating = false;
+                                    
                                     this.parentContext.scenes[1].cameraAnimating = false;     
                                     this.state = 'middle';
+
+                                    this.parentContext.animateScrollElement();                                    
 
                                     // updating to the current scene index
                                     this.parentContext.sceneIndex = 1;
@@ -303,7 +340,7 @@ export default class AnimationController{
                                 this.parentContext.mouseControl.resetMouseControls();
                             }, onComplete: () => {
                                 this.state = 'up';
-                                this.parentContext.animating = false;
+                                //this.parentContext.animating = false;
                             }
                         }
                     }
@@ -318,6 +355,8 @@ export default class AnimationController{
                                 this.parentContext.scenes[1].cameraAnimating = false;                                                      
         
                                 //this.parentContext.animating = false;
+
+                                this.parentContext.animateScrollElement();                                    
 
                                 this.parentContext.sceneIndex = 1;
         
@@ -347,7 +386,10 @@ export default class AnimationController{
 
                             this.parentContext.animationSwitch = false;
 
+                            this.parentContext.animateScrollElement();                                                                
+
                             //this.parentContext.animating = false;
+                            
                             this.state = 'middle';
 
                             // updating sceneIndex to current index
@@ -393,8 +435,6 @@ export default class AnimationController{
 
                             }, onComplete: () => {
                                 this.state = 'up';
-
-                                //this.parentContext.animating = false;
                             }
                         }
                     }
@@ -407,7 +447,8 @@ export default class AnimationController{
 
                                 this.parentContext.animationSwitch = false;
 
-                                //this.parentContext.animating = false;
+                                this.parentContext.animateScrollElement();                                                                    
+
                                 this.state = 'middle';
                             }
                         }
@@ -424,7 +465,7 @@ export default class AnimationController{
                         this.textAnimationForward(this.contactPageDescription);
                         this.textAnimationForward(this.contactPageLink);
 
-                        //this.animating = false;
+                        this.animateScrollElement();                                                            
 
                         this.sceneIndex = 3;
 
@@ -471,7 +512,7 @@ export default class AnimationController{
     
                 gsap.to(this.cameraOrRotation, scene.downwardAnimation);                
                 gsap.to(this.cameraOrRotation2, scene2.downwardAnimation);  
-                
+
             }                            
             else{
                 this.progressAnimation = 1;
@@ -513,6 +554,9 @@ export default class AnimationController{
                     this.titleTextAnimationBackward([this.homePageText[1], this.homePageText[2]], 'grid')                     
                     this.scenes[0].cameraAnimating = true;
                     this.scenes[1].cameraAnimating = true;
+
+                    //this.animating = true;
+
                     this.mouseControl.resetMouseControls();
                 }});                
 
@@ -528,8 +572,11 @@ export default class AnimationController{
                     this.titleTextAnimationForward(this.servicesPageText);
                     this.textAnimationForward(this.servicesDescription);
 
+                    //this.animating = false;
 
                     this.scenes[1].cameraAnimating = false;  
+
+                    this.animateScrollElement();
 
                     this.states[1].state = 'middle';
                 }});                                
@@ -568,6 +615,8 @@ export default class AnimationController{
                         
                         this.animationSwitch = true;                        
 
+                        //this.animating = true;
+
                         this.mouseControl.resetMouseControls();
                     }
                 });                                
@@ -587,6 +636,8 @@ export default class AnimationController{
                     this.scenes[2].cameraAnimating = false;
 
                     //this.animating = false;
+
+                    this.animateScrollElement();
 
                     this.states[2].state = 'middle';
 
@@ -616,6 +667,10 @@ export default class AnimationController{
                     this.titleTextAnimationForward(this.homePageText, 'grid');                
                     this.scenes[0].cameraAnimating = false;
                     //this.scenes[1].cameraAnimating = true;
+
+                    this.animateScrollElement();                    
+
+                    //this.animating = false;
                 }
             });                
             
@@ -625,6 +680,8 @@ export default class AnimationController{
                         this.textAnimationBackward(this.servicesDescription);  
                         this.scenes[0].cameraAnimating = true;                             
                         this.scenes[1].cameraAnimating = true;     
+
+                        //this.animating = true;
 
                         this.mouseControl.resetMouseControls();
                     }, onComplete: () => this.states[1].state = 'up'
@@ -656,6 +713,10 @@ export default class AnimationController{
                     this.titleTextAnimationBackward(this.aboutPageText);
                     this.textAnimationBackward(this.aboutPageDescription);
 
+                    //this.animating = true;
+
+                    this.scenes[2].cameraAnimating = true;
+
                     this.mouseControl.resetMouseControls();
                     }, onComplete: () => this.states[2].state = 'up'
                 });                                
@@ -668,9 +729,13 @@ export default class AnimationController{
                         this.textAnimationForward(this.contactPageDescription);
                         this.textAnimationForward(this.contactPageLink);
 
+                        this.scenes[2].cameraAnimating = false;
+
                         //this.animationSwitch = false;
 
                         //this.mouseControl.sceneAnimating(false);
+
+                        this.animateScrollElement();
 
                         //this.animating = false;
 
@@ -710,6 +775,8 @@ export default class AnimationController{
 
                          this.states[1].state = 'middle';
 
+                         this.animateScrollElement();                         
+
                          //this.animating = false;
 
                          this.mouseControl.resetMouseControls();                         
@@ -724,6 +791,9 @@ export default class AnimationController{
                 //gsap.to(this.scenes[2], { angleRotation: 1, duration: 2., ease: "back.inOut(1.7)", onStart: () => {                                        
                     this.titleTextAnimationBackward(this.aboutPageText)
                     this.textAnimationBackward(this.aboutPageDescription);
+
+                    //this.animating = true;
+
                     }, onComplete: () => this.states[2].state = 'up'
                 });                
 
@@ -765,6 +835,7 @@ export default class AnimationController{
 
                     this.states[2].state = 'middle';
 
+                    this.animateScrollElement();
                     //this.animating = false;
 
                 }});                                
@@ -775,6 +846,8 @@ export default class AnimationController{
                     this.titleTextAnimationBackward(this.contactPageText); 
                     this.textAnimationBackward(this.contactPageDescription);
                     this.textAnimationBackward(this.contactPageLink);
+                
+                    //this.animating = true;
 
                     this.scenes[3].animating = false;                    
 
@@ -801,9 +874,6 @@ export default class AnimationController{
                 xPercent: 0,
                 display: display,
                 opacity: 1,
-                onComplete: () => {
-                    this.animating = false
-                }
             }
         );     
     }
@@ -946,7 +1016,6 @@ export default class AnimationController{
         let checkIfMenuIsActive = (currentElement === 'menu-text-item-containers active' || currentElement === 'menu-text-item-containers' ) ? true : false;        
 
         if(!this.animating && checkIfMenuIsActive){
-
             this.indexLessThan = (currentIndex < this.lastSceneIndex) ? false : true;
 
             if(currentIndex < this.nextSceneIndex){
