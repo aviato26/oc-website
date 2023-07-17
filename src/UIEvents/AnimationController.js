@@ -175,8 +175,6 @@ export default class AnimationController{
 
     laptopWheelControl(e){
 
-            //console.log((((e.touches[0].clientY / window.innerHeight) * 2) - 1) * -1)
-
             if(!this.animating){
 
                 this.scrollLabelAnimation(this.scrollIncrement.count, 0);
@@ -184,10 +182,19 @@ export default class AnimationController{
                 // getting normalized direction of wheel scroll
                 let wheelDir = Math.min(Math.max(e.deltaY, -1), 1)
 
-                this.scrollIncrement.count += 10 * wheelDir;
+                this.scrollIncrement.count += 5 * wheelDir;
+
+                if(this.sceneIndex === 3 && wheelDir > 0){
+                    this.scrollIncrement.count = 0;
+                }
+                else if(this.sceneIndex === 0 && wheelDir < 0){
+                    this.scrollIncrement.count = 0;
+                }
+
+                //this.scrollIncrement.count += 10 * wheelDir;
                 // checking to see if the user has scrolled fast enough to trigger animation
                 //if(e.deltaY > 150 || e > 50){
-                if(this.scrollIncrement.count > 100){
+                if(this.scrollIncrement.count > 105){
                     this.animating = true;
                     this.timeDirection = 1.0;
 
@@ -198,7 +205,7 @@ export default class AnimationController{
                     //this.scrollIncrement.count = 0;
                 }
     
-                if(this.scrollIncrement.count < -100){
+                if(this.scrollIncrement.count < -105){
                     this.animating = true;                 
 
                     this.timeDirection = -1.0;
