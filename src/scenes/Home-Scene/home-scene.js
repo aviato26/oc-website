@@ -120,6 +120,7 @@ logoTex.flipY = false;
 
 
   this.camera = obj.cameras[0];  
+
   this.cpu = obj.scene.getObjectByName('cpu');
   this.t = obj.scene.getObjectByName('Text');
   this.floor = obj.scene.getObjectByName('floor');
@@ -246,6 +247,8 @@ updateCamera(mousePos){
 
       //this.camera.position.x = Math.min(Math.max(this.camera.position.x, -1), 1);  
       this.camera.position.x = Math.min(Math.max(this.camera.position.x, -0.5), 0.5);  
+
+      //console.log(this.camera.lookAt(this.cpu.position.x, this.cpu.position.y - 0.3 , this.cpu.position.z))
 
       // keeping camera looking at the cpu model even when the position is being updated
       this.camera.lookAt(new Vector3(this.cpu.position.x, this.cpu.position.y - 0.3 , this.cpu.position.z));    

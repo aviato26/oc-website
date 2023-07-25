@@ -286,6 +286,12 @@ class PageDesciption{
 
             textContainer = document.createElement('div');
 
+            li = document.createElement('p');                
+            textNode = document.createTextNode(t);
+            li.appendChild(textNode);            
+
+            textContainer.append(li);
+/*
             t.split('').map(c => {
                 ///li = document.createElement('li');
                 li = document.createElement('p');                
@@ -293,9 +299,10 @@ class PageDesciption{
                 li.appendChild(textNode);            
 
                 textContainer.append(li);
+
             })
 
-
+*/
             ul.append(textContainer);            
 
         })
@@ -314,9 +321,11 @@ class PageDesciption{
         //const homePage = this.addSeperatedElement('Professional Technology Assistance', 'title-header');        
         const homePage = this.addTextElement(`The most comprehensive
          IT support`, 'home-title');                
-
+/*
         const homePageDescription = this.addTextElement(`No technical language
         just words that you understand.`, 'home-description');                        
+*/
+        const homePageDescription = this.addTextElement(`Making IT simple, no contracts or hidden fees just pay as you go`, 'home-description');                                
 
         
         const container = document.createElement('div');
@@ -344,10 +353,8 @@ class PageDesciption{
     }
 
     addServicesDescription(){
-        //const servicesDescription = this.addTextElement("Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum", 'page-description');
-        //const servicesDescription = this.addServicesElement(['IT Consulting', 'Repair and Installation', 'Data visualization and analysis', 'Database Design'], 'page-description');
-        const servicesDescription = this.addServicesElement(['IT Consulting', 'Repair - Install', 'Web Development', 'Database Design'], 'services-container');        
-        //const servicesDescription = this.addSeperatedElement(`IT Consulting, Repair - Install Web Development Database Design`, 'services-container');        
+        //const servicesDescription = this.addServicesElement(['IT Consulting', 'Repair - Install', `Web Development`, 'Database Design'], 'services-container');        
+        const servicesDescription = this.addServicesElement(['IT Consulting', 'Hardware Repair - Install', `Web Development`, 'Voice Over Internet'], 'services-container');                
         this.servicesTextContainer.append(servicesDescription);        
         return servicesDescription;
     }
