@@ -175,7 +175,7 @@ export default class AnimationController{
 
     laptopWheelControl(e){
 
-            if(!this.animating){
+            if(!this.animating && this.initialRender){
 
                 this.scrollLabelAnimation(this.scrollIncrement.count, 0);
 
@@ -669,7 +669,17 @@ export default class AnimationController{
 
             this.animationSwitch = true;
 
+/*
+            this.scenes[0].camera.position.x = -0.017362086102366447;
+            this.scenes[0].camera.position.y = 0.00005233287811279297;
+            this.scenes[0].camera.position.z = -0.000029712915420532227;                        
+            */
+            //this.scenes[0].camera.rotation.x = -Math.PI * 2;
+
             //gsap.to(this.scenes[0].camera.rotation, { x: this.scenes[0].lastCameraAngle.x, y: this.scenes[0].lastCameraAngle.y, z: this.scenes[0].lastCameraAngle.z, delay: 0.2, duration: 2., ease: "back.inOut(1.7)",  onComplete: () => {                                                    
+            //gsap.to(this.scenes[0].camera.rotation, { x: this.scenes[0].cameraOrigin.rotation.x , delay: 0.2, duration: 2., ease: "back.inOut(1.7)",  onComplete: () => {                                                                                                
+            //gsap.to(this.scenes[0].camera.rotation, { x: this.scenes[0].cameraOrigin, delay: 0.2, duration: 2., ease: "back.inOut(1.7)",  onComplete: () => {                                                                                    
+            //gsap.to(this.scenes[0].camera.rotation, { x: -1.5478853211264463, y: 0.012878796936275864, z: 0.02224468990993913, delay: 0.2, duration: 2., ease: "back.inOut(1.7)",  onComplete: () => {                                                                                                    
             gsap.to(this.scenes[0].camera.rotation, { x: this.scenes[0].lastCameraAngle.x, delay: 0.2, duration: 2., ease: "back.inOut(1.7)",  onComplete: () => {                                                                    
                     this.titleTextAnimationForward(this.homePageText, 'grid');                
                     this.scenes[0].cameraAnimating = false;
@@ -731,7 +741,7 @@ export default class AnimationController{
                 //this.scenes[3].angleRotation = 1.8;
                 this.scenes[3].angleRotation = Math.PI;                
 
-                gsap.to(this.scenes[3], { angleRotation: 0, delay: 0., duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                          
+                gsap.to(this.scenes[3], { angleRotation: 0, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                          
                         this.titleTextAnimationForward(this.contactPageText) 
                         this.textAnimationForward(this.contactPageDescription);
                         this.textAnimationForward(this.contactPageLink);
@@ -772,7 +782,7 @@ export default class AnimationController{
                 //gsap.to(this.scenes[1].camera.quaternion, { x: 0, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {
                 //gsap.to(this.scenes[1].camera.rotation, { x: 0.1334403815502587, y: 0, z: 0, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                        
                 //gsap.to(this.scenes[1].camera.rotation, { x: 0.11616433518877818, y: 0, z: 0, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                           
-                gsap.to(this.scenes[1].camera.rotation, { x: this.scenes[1].cameraAngle, y: 0, z: 0 , delay: 0, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                                                
+                gsap.to(this.scenes[1].camera.rotation, { x: this.scenes[1].cameraAngle, y: 0, z: 0 , delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                                                
                 //gsap.to(this.scenes[1].camera.rotation, { x: -0.22207473795343433, y: -1e-323, z: 0, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                                                            
                 //gsap.to(this.scenes[1].camera.rotation, { x: -0.21988, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                    
                         this.titleTextAnimationForward(this.servicesPageText);
@@ -1047,7 +1057,7 @@ export default class AnimationController{
     updateAnimation(){    
 
         if(this.loadingCounter < this.currentLoadingState){
-            this.loadingCounter += 0.005;
+            this.loadingCounter += 0.01;
         }
         else{
             if(this.scrollYPosition < 1){
@@ -1062,7 +1072,7 @@ export default class AnimationController{
             this.titleTextAnimationForward(this.homePageText, 'grid');
 
             //this.titleTextAnimationForward(this.servicesContainer, 'grid');  
-            //this.titleTextAnimationForward(this.servicesPageText);
+            //this.titleTextAnimationForward (this.servicesPageText);
             //this.textAnimationForward(this.servicesDescription);
 
             //this.listTextAnimation(this.servicesDescription);

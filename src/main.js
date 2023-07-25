@@ -176,7 +176,6 @@ export default class Main
       //this.mainSceneRenderer.updateRenderPass(this.contactPage);      
       //this.mainSceneRenderer.updateRenderPass(this.servicesPage);      
 
-
       this.allScenesLoaded = true;
 
       // instantiating all gsap animations when scene cameras are loaded

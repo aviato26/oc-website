@@ -91,14 +91,21 @@ export default class ServicesPage
 
     window.addEventListener('resize', (e) => {
 
-
-      this.camera.aspect = window.innerWidth / window.innerHeight; //Camera aspect ratio.
-
-      if(this.camera.aspect < 1){
-        //this.camera.fov = 50;
-      } else{
-        //this.camera.fov = 31.849913175294404;
+      // checking aspect of the window to see if its a mobile device or larger
+      if(this.cameraList.length){
+          if((window.innerWidth / window.innerHeight) < 1){
+            this.camera = this.cameraList[1];
+            this.renderPass.camera = this.camera;                       
+            this.cameraAngle = this.cameraAngleList[0];                        
+          }
+          else{
+            this.camera = this.cameraList[0];
+            this.renderPass.camera = this.camera;                      
+            this.cameraAngle = this.cameraAngleList[1];            
+          }
       }
+      
+      this.camera.aspect = window.innerWidth / window.innerHeight;
 
       this.camera.updateProjectionMatrix(); //Updating the display
       this.renderer.setSize(window.innerWidth, window.innerHeight) //Setting the renderer to the height and width of the window.
@@ -143,6 +150,9 @@ export default class ServicesPage
       //console.log(obj)
 
       //console.log(this.cameraAnimation)
+
+      // keeping the array of cameras for when the user resizes page the appropriate camera will be rendered
+      this.cameraList = obj.cameras;
       
       // checking aspect of the window to see if its a mobile device or larger
       if((this.width / this.height) < 1){
@@ -156,6 +166,7 @@ export default class ServicesPage
 
       // setting variable to reference the original spot the camera is looking at to rotate back to
       this.cameraAngle = this.camera.rotation.x;
+      this.cameraAngleList = [obj.cameras[1].rotation.x, obj.cameras[0].rotation.x];
 
       //this.camera.fov = 70;    
 
