@@ -1,12 +1,15 @@
 
 
 import '../css/style.css';
+import fav from '../css/images/favicon.svg';
 
 class PageDesciption{
     constructor(){
         // adding container for page desription text
         this.servicesContainer = document.createElement('section');
         this.bodyContainer = document.querySelector('body');
+
+        this.addFavicon();
 
         this.shadow1ContainerBoundary = false;
         this.shadow2ContainerBoundary = false;
@@ -46,6 +49,19 @@ class PageDesciption{
         this.navMenuContainer = document.querySelector('.menu-text-containers');
         this.menuBars = [...document.querySelectorAll('.menu-bars')];
         this.canvas = document.querySelector('canvas');
+
+    }
+
+    // adding favicon icon to the head element
+    addFavicon(){
+        const header = document.querySelector('head');
+        const link = document.createElement('link');
+        link.rel = 'icon';
+        link.href = fav;
+        link.type = 'image/png';
+        link.sizes = '16x16';
+
+        header.append(link);
     }
 
 
