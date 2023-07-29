@@ -15,7 +15,6 @@ import ContactScene from './scenes/Contact-Scene/ContactSceneMain';
 
 import MainSceneRenderer from './scenes/MainSceneRenderer';
 
-
 import AnimationController from './UIEvents/AnimationController';
 
 
