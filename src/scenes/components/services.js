@@ -370,7 +370,7 @@ class PageDesciption{
 
     addServicesDescription(){
         //const servicesDescription = this.addServicesElement(['IT Consulting', 'Repair - Install', `Web Development`, 'Database Design'], 'services-container');        
-        const servicesDescription = this.addServicesElement(['IT Consulting', 'Hardware Repair - Install', `Web Development`, 'Voice Over Internet'], 'services-container');                
+        const servicesDescription = this.addServicesElement(['IT Consulting', 'Hardware Repair - Install', `Web Development`, 'Voice over Internet'], 'services-container');                
         this.servicesTextContainer.append(servicesDescription);        
         return servicesDescription;
     }

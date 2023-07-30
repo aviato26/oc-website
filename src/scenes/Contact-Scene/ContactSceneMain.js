@@ -369,8 +369,6 @@ void main()
         this.xAxis = new THREE.Vector3(1, 0, 0);
         this.q = new THREE.Quaternion();
 
-
-
     }
 
     updateCameraPos(t){
@@ -382,10 +380,9 @@ void main()
         this.mouse.x = Math.abs(pos.x);
         //this.mouse.x += pos.x * 0.01;        
         //this.mouse.y += pos.y;
-
         //this.mouse.x = this.mouse.x;
 
-        //this.mouse.x = Math.min(Math.max(this.mouse.x, -3.), 3.);
+        //this.mouse.x = Math.min(Math.max(this.mouseDelay, 0.7), 0.);
         this.addFriction = changeFrictionState;
     }
 
