@@ -211,6 +211,8 @@ this.bloomProps = {
 
   this.scene.add(obj.scene)
 
+  this.cpuPosition = new Vector3(this.cpu.position.x, this.cpu.position.y - 0.3 , this.cpu.position.z);
+
 
   // this method needs to be called to pre-compile the scene before it gets rendered or the animation will lag in the initial call
   this.renderer.compile(this.scene, this.camera);

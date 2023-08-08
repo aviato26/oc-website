@@ -103,7 +103,7 @@ export default class AnimationController{
 
         this.contactTextContainer = this.textSegments.contactTextContainer;
         this.contactPageText = this.textSegments.addContactScreenText();
-        this.contactPageDescription = this.textSegments.addContactDescription();
+        //this.contactPageDescription = this.textSegments.addContactDescription();
 
         this.contactPageLink = this.textSegments.addContactMailTo();
 
@@ -469,7 +469,7 @@ export default class AnimationController{
                 { angleRotation: 0, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                          
                         this.titleTextAnimationForward(this.contactTextContainer, 'flex');                                                                    
                         this.titleTextAnimationForward(this.contactPageText) 
-                        this.textAnimationForward(this.contactPageDescription);
+                        //this.textAnimationForward(this.contactPageDescription);
                         this.textAnimationForward(this.contactPageLink);
 
                         this.animateScrollElement();                                                            
@@ -484,7 +484,7 @@ export default class AnimationController{
                 { angleRotation: Math.PI, duration: 2., ease: "back.inOut(1.7)", onStart: () => {                                                        
                         this.titleTextAnimationBackward(this.contactTextContainer);                                                                    
                         this.titleTextAnimationBackward(this.contactPageText); 
-                        this.textAnimationBackward(this.contactPageDescription);
+                        //this.textAnimationBackward(this.contactPageDescription);
                         this.textAnimationBackward(this.contactPageLink);
 
                         this.animating = true;
@@ -743,7 +743,7 @@ export default class AnimationController{
 
                 gsap.to(this.scenes[3], { angleRotation: 0, delay: 0.2, duration: 2., ease: "back.inOut(1.7)", onComplete: () => {                          
                         this.titleTextAnimationForward(this.contactPageText) 
-                        this.textAnimationForward(this.contactPageDescription);
+                        //this.textAnimationForward(this.contactPageDescription);
                         this.textAnimationForward(this.contactPageLink);
 
                         this.scenes[2].cameraAnimating = false;
@@ -861,7 +861,7 @@ export default class AnimationController{
              
                 gsap.to(this.scenes[3], { angleRotation: Math.PI * 2, duration: 2., ease: "back.inOut(1.7)", onStart: () => {                                                        
                     this.titleTextAnimationBackward(this.contactPageText); 
-                    this.textAnimationBackward(this.contactPageDescription);
+                    //this.textAnimationBackward(this.contactPageDescription);
                     this.textAnimationBackward(this.contactPageLink);
                 
                     //this.animating = true;
