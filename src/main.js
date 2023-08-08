@@ -31,7 +31,7 @@ export default class Main
     //document.body.appendChild(this.stats.dom)
 
     // setting title
-    document.title = "Oc Networks Inc";
+    document.title = "Oc Networks";
 
     this.width = window.innerWidth;
     this.height = window.innerHeight;
@@ -69,7 +69,7 @@ export default class Main
     //this.renderer.setPixelRatio(window.devicePixelRatio);
 
     this.renderer.gammaOutput = true;
-    //this.renderer.gammaFactor = 2.2;
+    this.renderer.gammaFactor = 2.2;
 
     this.renderer.setSize( window.innerWidth, window.innerHeight );
     this.renderer.useLegacyLights = true;

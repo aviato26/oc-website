@@ -395,7 +395,7 @@ class PageDesciption{
     addContactScreenText(){
         //this.removeAllNodes();
         //const contactPage = this.addSeperatedElement('Contact Us');
-        const contactPage = this.addTextElement('Contact Us', 'contact-title');       
+        const contactPage = this.addTextElement('Contact', 'contact-title');       
 
         this.contactTextContainer.append(contactPage);
         return contactPage;
@@ -409,7 +409,7 @@ class PageDesciption{
     }
 
     addContactMailTo(){
-        const contactMailTo = this.addHyperLink("Email Address", 'contact-description');     
+        const contactMailTo = this.addHyperLink("Email Us", 'contact-description');     
         this.contactTextContainer.append(contactMailTo);
 
         return contactMailTo;           

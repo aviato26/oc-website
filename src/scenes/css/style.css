@@ -919,7 +919,7 @@ a:hover, a:focus {
   }
 
   .title-header{
-    font-size: 2em;
+    font-size: 2rem;
     margin: 0 0;
     text-decoration: underline;  
     display: none;
@@ -928,7 +928,7 @@ a:hover, a:focus {
   }
   
   .page-description{
-    font-size: 3vw;
+    font-size: 1rem;
     display: none;
     color: white;  
     font-family: Arial;
@@ -1033,11 +1033,12 @@ a:hover, a:focus {
   }
 
   .contact-title{
-    font-size: 10vw;
+    font-size: 3rem;
   }
 
   .contact-description{
-    font-size: 6vw;
+    margin-top: 1rem;
+    font-size: 1.5rem;
   }
 
   .text-container{
